@@ -9,14 +9,9 @@
       "saldo_inicial_anio": 1240.0,
       "ingresos_mensuales": [
         {
-          "concepto": "Nómina del centro especial de empleo",
-          "importe": 780.0,
+          "concepto": "Nómina de la lavandería",
+          "importe": 980.0,
           "dia": 1
-        },
-        {
-          "concepto": "Pensión no contributiva",
-          "importe": 290.0,
-          "dia": 5
         }
       ],
       "huchas": [
@@ -24,7 +19,7 @@
           "id": "casa",
           "nombre": "Casa",
           "pictograma": "casa",
-          "limite_mensual": 450.0
+          "limite_mensual": 412.0
         },
         {
           "id": "comida",
@@ -34,84 +29,111 @@
         },
         {
           "id": "mis_cosas",
-          "nombre": "Mis cosas",
+          "nombre": "Para tus cosas",
           "pictograma": "bolsa",
-          "limite_mensual": 150.0
-        },
-        {
-          "id": "ocio",
-          "nombre": "Salir",
-          "pictograma": "amigos",
-          "limite_mensual": 80.0
+          "limite_mensual": 288.0
         },
         {
           "id": "ahorro",
           "nombre": "Ahorro",
           "pictograma": "hucha",
-          "limite_mensual": 100.0
+          "limite_mensual": 60.0
         }
       ],
       "gastos_recurrentes": [
         {
-          "concepto": "Alquiler de la habitación",
+          "concepto": "Alquiler",
           "importe": 350.0,
           "hucha": "casa",
           "dia": 2,
-          "destinatario": "Piso compartido Lavapiés"
-        },
-        {
-          "concepto": "Luz",
-          "importe": 38.0,
-          "hucha": "casa",
-          "dia": 10,
-          "destinatario": "Compañía de la luz"
+          "destinatario": "Piso compartido",
+          "pictograma": "casa",
+          "corto": "el alquiler"
         },
         {
           "concepto": "Abono de transporte",
           "importe": 20.0,
           "hucha": "casa",
           "dia": 3,
-          "destinatario": "Consorcio de Transportes"
+          "destinatario": "Consorcio de Transportes",
+          "pictograma": "bus",
+          "corto": "el bus"
         },
         {
-          "concepto": "Supermercado",
-          "importe": 170.0,
-          "hucha": "comida",
-          "dia": 8,
-          "destinatario": "Supermercado del barrio"
+          "concepto": "Luz",
+          "importe": 42.0,
+          "hucha": "casa",
+          "dia": 5,
+          "destinatario": "Compañía de la luz",
+          "pictograma": "luz",
+          "corto": "la luz"
         },
         {
-          "concepto": "Ahorro del mes",
-          "importe": 100.0,
+          "concepto": "Hucha Viaje a Valencia",
+          "importe": 40.0,
           "hucha": "ahorro",
           "dia": 6,
-          "destinatario": "Cuenta de ahorro"
+          "destinatario": "Hucha",
+          "pictograma": "hucha"
+        },
+        {
+          "concepto": "Hucha Móvil nuevo",
+          "importe": 20.0,
+          "hucha": "ahorro",
+          "dia": 6,
+          "destinatario": "Hucha",
+          "pictograma": "hucha"
+        },
+        {
+          "concepto": "Comida del supermercado",
+          "importe": 220.0,
+          "hucha": "comida",
+          "dia": 8,
+          "destinatario": "Supermercado del barrio",
+          "pictograma": "comida",
+          "corto": "la comida"
         }
       ],
       "movimientos_mes_actual": [
         {
-          "fecha_dia": 4,
+          "fecha_dia": 2,
           "concepto": "Camiseta",
           "importe": 30.0,
           "hucha": "mis_cosas",
           "destinatario": "Tienda de ropa"
         },
         {
+          "fecha_dia": 4,
+          "concepto": "Peluquería",
+          "importe": 14.0,
+          "hucha": "mis_cosas",
+          "destinatario": "Peluquería del barrio"
+        },
+        {
           "fecha_dia": 6,
           "concepto": "Cine con amigos",
           "importe": 12.0,
-          "hucha": "ocio",
+          "hucha": "mis_cosas",
           "destinatario": "Cines del centro"
+        },
+        {
+          "fecha_dia": 7,
+          "concepto": "Bar con amigos",
+          "importe": 22.0,
+          "hucha": "mis_cosas",
+          "destinatario": "Bar La Esquina"
         }
       ],
       "destinatarios_conocidos": [
-        "Piso compartido Lavapiés",
+        "Piso compartido",
         "Compañía de la luz",
         "Consorcio de Transportes",
         "Supermercado del barrio",
-        "Cuenta de ahorro",
+        "Hucha",
         "Tienda de ropa",
+        "Peluquería del barrio",
         "Cines del centro",
+        "Bar La Esquina",
         "Ana"
       ],
       "circulo_apoyo": [
@@ -122,20 +144,22 @@
           "nivel": 3,
           "otorgado_por": "persona",
           "consiente_avisos_abuso": true
+        }
+      ],
+      "metas": [
+        {
+          "id": "valencia",
+          "nombre": "Viaje a Valencia",
+          "importe": 300.0,
+          "ahorrado": 120.0,
+          "aporte_mensual": 40.0
         },
         {
-          "id": "fundacion",
-          "nombre": "Fundación tutelar (ejemplo)",
-          "relacion": "curadora",
-          "nivel": 4,
-          "otorgado_por": "documento",
-          "documento": "Resolución judicial de curatela (ejemplo)",
-          "alcance_documento": [
-            "ver_movimientos",
-            "registrar_gastos",
-            "preparar_rendicion_cuentas"
-          ],
-          "consiente_avisos_abuso": false
+          "id": "movil",
+          "nombre": "Móvil nuevo",
+          "importe": 200.0,
+          "ahorrado": 45.0,
+          "aporte_mensual": 20.0
         }
       ]
     },

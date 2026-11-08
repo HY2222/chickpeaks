@@ -228,3 +228,12 @@ h1, h2, h3, p { margin: 0; }
   width: 48px; height: 48px;
   opacity: 0; border: 0; background: transparent; cursor: pointer;
 }
+
+/* Pantalla 1: "Ya está guardado este mes" (pagos fijos, sin cifras) */
+.pagos-tarjeta { margin-top: 20px; }
+.pagos-tarjeta .nombre { display: flex; align-items: center; gap: 10px; }
+.pagos-tarjeta .check svg { width: 26px; height: 26px; color: var(--verde-oscuro); display: block; }
+.pagos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.pago { display: inline-flex; align-items: center; gap: 8px; background: var(--salvia);
+        border-radius: 999px; padding: 8px 14px; font-size: 18px; }
+.pago svg { width: 22px; height: 22px; display: block; }

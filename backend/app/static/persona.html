@@ -30,6 +30,12 @@
     <div class="barra"><span id="p1-barra" style="width:0"></span></div>
   </div>
 
+  <!-- Pagos fijos del mes: el banco los paga solo, Willo nunca paga. Sin cifras, solo para tranquilizar. -->
+  <div class="tarjeta pagos-tarjeta" id="p1-pagos-tarjeta" hidden>
+    <p class="nombre"><span class="check" data-icono="hecho"></span>Ya está guardado este mes</p>
+    <div class="pagos" id="p1-pagos"></div>
+  </div>
+
   <h2 class="titulo-seccion">Tus huchas</h2>
   <div class="lista" id="p1-huchas" aria-live="polite"></div>
 
@@ -244,6 +250,10 @@ const ICONOS = {
   coche: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
   documento: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
   enviar: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
+  casa: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  comida: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  luz: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  bus: '<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>',
   aviso: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
 };
 
@@ -265,7 +275,7 @@ function mostrar() {
 window.addEventListener("hashchange", mostrar);
 
 // ---------- 1 · Inicio de Javi ----------
-// "Este mes te quedan" = lo que queda en la hucha "Mis cosas" (la misma que usa evaluar_compra).
+// "Este mes te quedan" = lo que queda en la hucha "Para tus cosas" (id mis_cosas, la misma que usa evaluar_compra).
 AL_ENTRAR["1"] = async () => {
   const d = await api("presupuesto");
   const fecha = new Date(d.fecha + "T12:00");
@@ -277,13 +287,14 @@ AL_ENTRAR["1"] = async () => {
   $("p1-quedan").textContent = euros(h.quedan);
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
 
-  let metas = await api("metas").catch(() => []);
-  if (!metas.length) {
-    // TODO: Javi todavía no tiene huchas de ahorro en backend/data/seed.json (solo Lucía).
-    // Datos falsos fijos del diseño hasta que se cuadre el seed (fase 0).
-    metas = [{nombre: "Viaje a Valencia", ahorrado: 120, importe: 300},
-             {nombre: "Móvil nuevo", ahorrado: 45, importe: 200}];
-  }
+  // Pagos fijos (alquiler, luz...): solo el nombre y el pictograma, sin cifras.
+  const {pagos} = await api("pagos_del_mes").catch(() => ({pagos: []}));
+  $("p1-pagos-tarjeta").hidden = !pagos.length;
+  $("p1-pagos").innerHTML = pagos.map(p => `
+    <span class="pago"><span data-icono="${ICONOS[p.pictograma] ? p.pictograma : "hecho"}"></span>${mayuscula(sinArticulo(p.corto))}</span>`).join("");
+  pintarIconos($("p1-pagos-tarjeta"));
+
+  const metas = await api("metas").catch(() => []);
   $("p1-huchas").innerHTML = metas.map(m => `
     <div class="tarjeta fila" style="padding-right:40px">
       <span class="picto" data-icono="hucha"></span>
@@ -562,7 +573,7 @@ $("p6-si").onclick = () => { estado.documento.confirmado = true; location.hash =
 $("p6-no").onclick = () => { estado.documento = null; location.hash = "#5"; };
 
 // ---------- 7 · Noa explica el documento ----------
-// Las cuentas las hace el backend con evaluar_compra (resta el importe de "Mis cosas").
+// Las cuentas las hace el backend con evaluar_compra (resta el importe de "Para tus cosas").
 // Solo calcula: no paga nada ni apunta ningún gasto. Noa no paga nada.
 const conceptoDocumento = d => `la ${d.tipo.toLowerCase()}`;   // "la multa de aparcamiento"
 
