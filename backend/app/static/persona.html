@@ -378,6 +378,13 @@ AL_ENTRAR["2"] = async () => {
         if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 1500);
       },
     });
+    // Noa no sabe quién hay en el círculo de apoyo: se lo contamos al empezar.
+    // Si no hay nadie, no debe ofrecer "hablar con tu persona de apoyo".
+    const circulo = await api("circulo").catch(() => []);
+    const apoyos = circulo.filter(m => m.nivel >= 1).map(m => `${m.nombre} (${m.relacion})`);
+    conv?.sendContextualUpdate(apoyos.length
+      ? `Círculo de apoyo de Javi: ${apoyos.join(", ")}.`
+      : "Javi no tiene ninguna persona de apoyo en Willo.");
   } catch {
     console.info("Modo demo: la voz no está conectada. Se usa la frase del guion.");
     await frasePorDefecto();

@@ -1,3 +1,4 @@
+from app.store import store
 from app.easyread import comprobar, euros, fernandez_huerta, silabas
 from app.expenses import interpretar
 
@@ -48,6 +49,17 @@ def test_estafa_avisa_pero_no_bloquea(client):
     assert r["avisados"] == ["Ana"]  # la fundación no consintió avisos
     ids = {s["id"] for s in r["senales"]}
     assert {"destinatario_nuevo", "urgencia", "secreto", "relacion_nueva"} <= ids
+
+
+def test_estafa_sin_persona_de_apoyo(client):
+    """Sin nadie en el círculo, la alerta sale igual, no se avisa a nadie y no se bloquea."""
+    store.persona("javi")["circulo_apoyo"] = []
+    r = client.post("/api/personas/javi/evaluar_riesgo", json={
+        "destinatario": "Marcos", "importe": 200,
+        "contexto": "Un amigo nuevo de Instagram me pide 200 euros urgente"}).json()
+    assert r["nivel_riesgo"] == "alto" and r["bloquea"] is False
+    assert r["avisados"] == [] and "he avisado" not in r["texto_lectura_facil"]
+    assert client.get("/api/personas/javi/circulo").json() == []
 
 
 def test_pago_normal(client):
