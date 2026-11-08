@@ -150,9 +150,11 @@ def test_pwa_instalable(client):
 def test_pagos_del_mes(client):
     r = client.get("/api/personas/javi/pagos_del_mes").json()
     conceptos = [p["concepto"] for p in r["pagos"]]
-    assert conceptos == ["Alquiler", "Abono de transporte", "Luz", "Comida del supermercado"]
-    assert all(p["pagado"] for p in r["pagos"])  # hoy es día 8: ya ha pasado todo
+    assert conceptos == ["Alquiler", "Abono de transporte", "Comida del supermercado", "Luz"]
+    # Hoy es día 8: la luz (día 20) todavía no se ha pagado.
+    assert [p["pagado"] for p in r["pagos"]] == [True, True, True, False]
     assert "Ya has pagado el alquiler: 350 €." in r["texto_lectura_facil"]
+    assert "La luz se paga el día 20: 42 €." in r["texto_lectura_facil"]
     assert comprobar(r["texto_lectura_facil"])["es_facil"]
 
 

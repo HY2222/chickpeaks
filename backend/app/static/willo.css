@@ -237,3 +237,9 @@ h1, h2, h3, p { margin: 0; }
 .pago { display: inline-flex; align-items: center; gap: 8px; background: var(--salvia);
         border-radius: 999px; padding: 8px 14px; font-size: 18px; }
 .pago svg { width: 22px; height: 22px; display: block; }
+.pago { border: 2px solid var(--salvia); color: var(--texto); font: inherit; font-size: 18px; cursor: pointer; }
+.pago.pendiente { background: var(--blanco); border-color: var(--verde-oscuro); }
+.pago[aria-expanded="true"] { outline: 3px solid var(--verde-oscuro); outline-offset: 2px; }
+.pago-check svg { width: 20px; height: 20px; color: var(--verde-oscuro); }
+.pago-detalle { margin-top: 16px; padding: 16px; border-radius: 16px; background: var(--fondo);
+                display: flex; flex-direction: column; gap: 6px; font-size: 20px; }

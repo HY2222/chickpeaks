@@ -21,7 +21,7 @@ Fecha de la demo dentro de la app: **domingo, 8 de noviembre de 2026**.
 | Concepto | Importe | Día | Destinatario |
 |---|---|---|---|
 | Alquiler de la habitación | 350 € | 2 | Piso compartido |
-| Luz | 42 € | 5 | Compañía de la luz |
+| Luz | 42 € | 20 | Compañía de la luz |
 | Abono de transporte | 20 € | 3 | Consorcio de Transportes |
 | Comida (supermercado) | 220 € | — | Supermercado del barrio |
 | Hucha "Viaje a Valencia" | 40 € | 6 | Hucha |

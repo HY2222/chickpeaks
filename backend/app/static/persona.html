@@ -34,6 +34,7 @@
   <div class="tarjeta pagos-tarjeta" id="p1-pagos-tarjeta" hidden>
     <p class="nombre"><span class="check" data-icono="hecho"></span>Ya está guardado este mes</p>
     <div class="pagos" id="p1-pagos"></div>
+    <div class="pago-detalle" id="p1-pago-detalle" aria-live="polite" hidden></div>
   </div>
 
   <h2 class="titulo-seccion">Tus huchas</h2>
@@ -289,12 +290,29 @@ AL_ENTRAR["1"] = async () => {
   $("p1-quedan").textContent = euros(h.quedan);
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
 
-  // Pagos fijos (alquiler, luz...): solo el nombre y el pictograma, sin cifras.
+  // Pagos fijos (alquiler, luz...). Pagado: verde con ✓. Por pagar: blanco con borde y el día.
+  // Al tocar uno se ve el detalle en lectura fácil. Willo no paga nada: lo paga el banco solo.
   const {pagos} = await api("pagos_del_mes").catch(() => ({pagos: []}));
   $("p1-pagos-tarjeta").hidden = !pagos.length;
-  $("p1-pagos").innerHTML = pagos.map(p => `
-    <span class="pago"><span data-icono="${ICONOS[p.pictograma] ? p.pictograma : "hecho"}"></span>${mayuscula(sinArticulo(p.corto))}</span>`).join("");
+  $("p1-pago-detalle").hidden = true;
+  $("p1-pagos").innerHTML = pagos.map((p, i) => `
+    <button type="button" class="pago${p.pagado ? "" : " pendiente"}" data-i="${i}" aria-expanded="false">
+      <span data-icono="${ICONOS[p.pictograma] ? p.pictograma : "hecho"}"></span>${mayuscula(sinArticulo(p.corto))}${p.pagado
+        ? '<span class="pago-check" data-icono="hecho" aria-label="pagado"></span>'
+        : ` · día ${p.dia}`}
+    </button>`).join("");
   pintarIconos($("p1-pagos-tarjeta"));
+  $("p1-pagos").querySelectorAll(".pago").forEach(b => b.onclick = () => {
+    const p = pagos[b.dataset.i], abierto = b.getAttribute("aria-expanded") === "true";
+    $("p1-pagos").querySelectorAll(".pago").forEach(x => x.setAttribute("aria-expanded", "false"));
+    $("p1-pago-detalle").hidden = abierto;
+    if (abierto) return;
+    b.setAttribute("aria-expanded", "true");
+    const frases = [p.concepto, euros(p.importe)].concat(p.pagado
+      ? [`Ya está pagado. Se pagó el día ${p.dia}`]
+      : [`Se paga solo el día ${p.dia}`, "El dinero ya está guardado"]);
+    $("p1-pago-detalle").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
+  });
 
   const metas = await api("metas").catch(() => []);
   $("p1-huchas").innerHTML = metas.map(m => `
