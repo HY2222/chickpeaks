@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Willo · Javi</title>
+<link rel="stylesheet" href="/static/willo.css">
+</head>
+<body>
+<main>
+  <h1>Hola, Javi</h1>
+  <p class="sub">Esto es lo que te queda este mes.</p>
+  <section id="huchas" class="huchas" aria-live="polite"></section>
+
+  <button id="hablar" class="grande">🎤 Hablar con Clara</button>
+  <p id="estado-voz" class="sub" aria-live="polite"></p>
+
+  <h2>O escribe</h2>
+  <form id="preguntar" class="fila">
+    <label>¿Qué quieres comprar? <input id="concepto" value="las zapatillas" required></label>
+    <label>¿Cuánto cuesta? <input id="importe" type="number" min="1" value="80" required> €</label>
+    <button class="grande">¿Puedo comprarlo?</button>
+  </form>
+
+  <section id="respuesta" class="respuesta" hidden aria-live="polite">
+    <p id="texto"></p>
+    <div class="fila">
+      <button data-d="comprar" class="grande">Lo compro</button>
+      <button data-d="esperar" class="grande">Espero</button>
+      <button data-d="hablarlo" class="grande">Lo hablo con Ana</button>
+    </div>
+  </section>
+  <p class="aviso">Demo con datos inventados.</p>
+</main>
+<script type="module">
+const P = "javi";
+const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => x.json());
+const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
+
+async function pintarHuchas() {
+  const d = await api("presupuesto");
+  document.getElementById("huchas").innerHTML = d.huchas.map(h =>
+    `<div class="hucha"><span class="nombre">${h.nombre}</span><span class="cifra">${h.quedan} €</span></div>`).join("");
+}
+
+let ultima = null;
+document.getElementById("preguntar").onsubmit = async e => {
+  e.preventDefault();
+  const concepto = document.getElementById("concepto").value;
+  const importe = +document.getElementById("importe").value;
+  const r = await post("evaluar_compra", {concepto, importe});
+  ultima = {concepto, importe};
+  document.getElementById("texto").textContent = r.texto_lectura_facil;
+  document.getElementById("respuesta").hidden = false;
+};
+document.querySelectorAll("[data-d]").forEach(b => b.onclick = async () => {
+  if (!ultima) return;
+  const r = await post("decisiones", {...ultima, decision: b.dataset.d, palabras_persona: b.textContent});
+  document.getElementById("texto").textContent = r.texto_lectura_facil;
+  pintarHuchas();
+});
+
+// Voz: Clara (ElevenLabs Agents). Necesita ELEVENLABS_API_KEY y ELEVENLABS_AGENT_ID en el backend.
+// P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
+let conv = null;
+document.getElementById("hablar").onclick = async () => {
+  const estado = document.getElementById("estado-voz");
+  if (conv) { await conv.endSession(); conv = null; estado.textContent = ""; return; }
+  try {
+    const { signed_url } = await fetch("/api/voz/signed-url").then(r => { if (!r.ok) throw new Error(); return r.json(); });
+    await navigator.mediaDevices.getUserMedia({audio: true});
+    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
+    conv = await Conversation.startSession({
+      signedUrl: signed_url,
+      onMessage: m => { if (m.source === "ai") estado.textContent = m.message; },
+      onDisconnect: () => { conv = null; pintarHuchas(); },
+    });
+    estado.textContent = "Clara te escucha.";
+  } catch {
+    estado.textContent = "La voz no está lista. Puedes escribir abajo.";
+  }
+};
+pintarHuchas();
+</script>
+</body>
+</html>

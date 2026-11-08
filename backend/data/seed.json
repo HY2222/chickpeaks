@@ -1,0 +1,221 @@
+{
+  "aviso": "Datos inventados para la demo. Ninguna persona es real.",
+  "personas": [
+    {
+      "id": "javi",
+      "nombre": "Javi",
+      "tipo": "adulto",
+      "pronombre": "él",
+      "saldo_inicial_anio": 1240.0,
+      "ingresos_mensuales": [
+        {
+          "concepto": "Nómina del centro especial de empleo",
+          "importe": 780.0,
+          "dia": 1
+        },
+        {
+          "concepto": "Pensión no contributiva",
+          "importe": 290.0,
+          "dia": 5
+        }
+      ],
+      "huchas": [
+        {
+          "id": "casa",
+          "nombre": "Casa",
+          "pictograma": "casa",
+          "limite_mensual": 450.0
+        },
+        {
+          "id": "comida",
+          "nombre": "Comida",
+          "pictograma": "comida",
+          "limite_mensual": 220.0
+        },
+        {
+          "id": "mis_cosas",
+          "nombre": "Mis cosas",
+          "pictograma": "bolsa",
+          "limite_mensual": 150.0
+        },
+        {
+          "id": "ocio",
+          "nombre": "Salir",
+          "pictograma": "amigos",
+          "limite_mensual": 80.0
+        },
+        {
+          "id": "ahorro",
+          "nombre": "Ahorro",
+          "pictograma": "hucha",
+          "limite_mensual": 100.0
+        }
+      ],
+      "gastos_recurrentes": [
+        {
+          "concepto": "Alquiler de la habitación",
+          "importe": 350.0,
+          "hucha": "casa",
+          "dia": 2,
+          "destinatario": "Piso compartido Lavapiés"
+        },
+        {
+          "concepto": "Luz",
+          "importe": 38.0,
+          "hucha": "casa",
+          "dia": 10,
+          "destinatario": "Compañía de la luz"
+        },
+        {
+          "concepto": "Abono de transporte",
+          "importe": 20.0,
+          "hucha": "casa",
+          "dia": 3,
+          "destinatario": "Consorcio de Transportes"
+        },
+        {
+          "concepto": "Supermercado",
+          "importe": 170.0,
+          "hucha": "comida",
+          "dia": 8,
+          "destinatario": "Supermercado del barrio"
+        },
+        {
+          "concepto": "Ahorro del mes",
+          "importe": 100.0,
+          "hucha": "ahorro",
+          "dia": 6,
+          "destinatario": "Cuenta de ahorro"
+        }
+      ],
+      "movimientos_mes_actual": [
+        {
+          "fecha_dia": 4,
+          "concepto": "Camiseta",
+          "importe": 30.0,
+          "hucha": "mis_cosas",
+          "destinatario": "Tienda de ropa"
+        },
+        {
+          "fecha_dia": 6,
+          "concepto": "Cine con amigos",
+          "importe": 12.0,
+          "hucha": "ocio",
+          "destinatario": "Cines del centro"
+        }
+      ],
+      "destinatarios_conocidos": [
+        "Piso compartido Lavapiés",
+        "Compañía de la luz",
+        "Consorcio de Transportes",
+        "Supermercado del barrio",
+        "Cuenta de ahorro",
+        "Tienda de ropa",
+        "Cines del centro",
+        "Ana"
+      ],
+      "circulo_apoyo": [
+        {
+          "id": "ana",
+          "nombre": "Ana",
+          "relacion": "hermana",
+          "nivel": 2,
+          "otorgado_por": "persona",
+          "consiente_avisos_abuso": true
+        },
+        {
+          "id": "fundacion",
+          "nombre": "Fundación tutelar (ejemplo)",
+          "relacion": "curadora",
+          "nivel": 4,
+          "otorgado_por": "documento",
+          "documento": "Resolución judicial de curatela (ejemplo)",
+          "alcance_documento": [
+            "ver_movimientos",
+            "registrar_gastos",
+            "preparar_rendicion_cuentas"
+          ],
+          "consiente_avisos_abuso": false
+        }
+      ]
+    },
+    {
+      "id": "lucia",
+      "nombre": "Lucía",
+      "tipo": "menor",
+      "edad": 14,
+      "pronombre": "ella",
+      "saldo_inicial_anio": 60.0,
+      "ingresos_mensuales": [
+        {
+          "concepto": "Paga",
+          "importe": 80.0,
+          "dia": 1
+        }
+      ],
+      "huchas": [
+        {
+          "id": "mis_cosas",
+          "nombre": "Mis cosas",
+          "pictograma": "bolsa",
+          "limite_mensual": 30.0
+        },
+        {
+          "id": "ocio",
+          "nombre": "Salir",
+          "pictograma": "amigos",
+          "limite_mensual": 25.0
+        },
+        {
+          "id": "ahorro",
+          "nombre": "Ahorro",
+          "pictograma": "hucha",
+          "limite_mensual": 25.0
+        }
+      ],
+      "metas": [
+        {
+          "id": "consola",
+          "nombre": "Consola",
+          "importe": 300.0,
+          "ahorrado": 175.0,
+          "aporte_mensual": 25.0
+        }
+      ],
+      "gastos_recurrentes": [
+        {
+          "concepto": "Ahorro del mes",
+          "importe": 25.0,
+          "hucha": "ahorro",
+          "dia": 2,
+          "destinatario": "Hucha de la consola"
+        }
+      ],
+      "movimientos_mes_actual": [
+        {
+          "fecha_dia": 5,
+          "concepto": "Merienda",
+          "importe": 6.0,
+          "hucha": "ocio",
+          "destinatario": "Cafetería"
+        }
+      ],
+      "destinatarios_conocidos": [
+        "Hucha de la consola",
+        "Cafetería",
+        "Mamá"
+      ],
+      "circulo_apoyo": [
+        {
+          "id": "mama",
+          "nombre": "Mamá",
+          "relacion": "madre",
+          "nivel": 2,
+          "otorgado_por": "ley",
+          "consiente_avisos_abuso": true,
+          "documento": "Patria potestad (menor de edad)"
+        }
+      ]
+    }
+  ]
+}
