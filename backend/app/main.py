@@ -1,6 +1,6 @@
 """API de Willo.
 
-Las rutas de /api/personas/{id}/... son las herramientas que usa Clara,
+Las rutas de /api/personas/{id}/... son las herramientas que usa Noa,
 el agente de voz de ElevenLabs (ver agent/tools.json), y las pantallas del frontend.
 """
 
@@ -104,7 +104,7 @@ def personas():
 
 @app.get("/api/personas/{persona_id}/presupuesto", dependencies=[Depends(token_herramientas)])
 def presupuesto(persona_id: str):
-    """Herramienta de Clara: cuánto queda en cada hucha este mes."""
+    """Herramienta de Noa: cuánto queda en cada hucha este mes."""
     p = _persona(persona_id)
     huchas = budget.estado_huchas(p)
     frases = [f"En {h['nombre'].lower()} te quedan {easyread.euros(h['quedan'])}." for h in huchas]
@@ -114,7 +114,7 @@ def presupuesto(persona_id: str):
 
 @app.post("/api/personas/{persona_id}/evaluar_compra", dependencies=[Depends(token_herramientas)])
 def evaluar_compra(persona_id: str, compra: Compra):
-    """Herramienta de Clara: ¿puedo comprarlo? Da cifras, no recomienda."""
+    """Herramienta de Noa: ¿puedo comprarlo? Da cifras, no recomienda."""
     p = _persona(persona_id)
     try:
         r = budget.evaluar_compra(p, compra.importe, compra.concepto, compra.hucha)
@@ -129,7 +129,7 @@ def evaluar_compra(persona_id: str, compra: Compra):
 
 @app.post("/api/personas/{persona_id}/decisiones", dependencies=[Depends(token_herramientas)])
 def registrar_decision(persona_id: str, d: Decision):
-    """Herramienta de Clara: guarda lo que decidió la persona. La app respeta la decisión."""
+    """Herramienta de Noa: guarda lo que decidió la persona. La app respeta la decisión."""
     p = _persona(persona_id)
     ahora = datetime.combine(hoy(), datetime.now().time()).isoformat(timespec="seconds")
     reg = {**d.model_dump(), "fecha": ahora}
@@ -158,7 +158,7 @@ def ver_decisiones(persona_id: str):
 
 @app.post("/api/personas/{persona_id}/evaluar_riesgo", dependencies=[Depends(token_herramientas)])
 def evaluar_riesgo(persona_id: str, pago: Pago):
-    """Herramienta de Clara: escudo antiestafas. Nunca bloquea."""
+    """Herramienta de Noa: escudo antiestafas. Nunca bloquea."""
     p = _persona(persona_id)
     r = risk.evaluar_pago(p, pago.destinatario, pago.importe, pago.contexto)
     r["avisados"] = []
@@ -279,7 +279,7 @@ def comprobar_lectura_facil(t: Texto):
 
 @app.get("/api/voz/signed-url")
 async def signed_url():
-    """URL firmada para hablar con Clara sin exponer la API key en el navegador."""
+    """URL firmada para hablar con Noa sin exponer la API key en el navegador."""
     key, agent = os.getenv("ELEVENLABS_API_KEY"), os.getenv("ELEVENLABS_AGENT_ID")
     if not key or not agent:
         raise HTTPException(503, "Faltan ELEVENLABS_API_KEY o ELEVENLABS_AGENT_ID en .env")
@@ -295,6 +295,13 @@ async def signed_url():
 def reset():
     store.reset()
     return {"ok": True}
+
+
+@app.get("/sw.js")
+def service_worker():
+    """El service worker va en la raíz para que la PWA controle toda la app."""
+    return FileResponse(STATIC / "sw.js", media_type="application/javascript",
+                        headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/demo")
