@@ -177,8 +177,8 @@ def evaluar_riesgo(persona_id: str, pago: Pago):
                  f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
                  f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
                  f"La decisión es suya. Llámale con calma.")
-        for m in support.con_permiso(p, "recibir_avisos_abuso"):
-            avisar(p, m, "posible_abuso", texto)
+        for m in support.con_permiso(p, "recibir_avisos_estafa"):
+            avisar(p, m, "posible_estafa", texto)
             r["avisados"].append(m["nombre"])
         if r["avisados"]:
             r["texto_lectura_facil"] += f" Como acordaste, he avisado a {' y '.join(r['avisados'])}."

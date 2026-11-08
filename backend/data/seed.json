@@ -143,7 +143,7 @@
           "relacion": "hermana",
           "nivel": 3,
           "otorgado_por": "persona",
-          "consiente_avisos_abuso": true
+          "consiente_avisos_estafa": true
         }
       ],
       "metas": [
@@ -236,7 +236,7 @@
           "relacion": "madre",
           "nivel": 2,
           "otorgado_por": "ley",
-          "consiente_avisos_abuso": true,
+          "consiente_avisos_estafa": true,
           "documento": "Patria potestad (menor de edad)"
         }
       ]

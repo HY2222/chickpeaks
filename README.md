@@ -71,7 +71,7 @@ cd backend && python -m pytest -q
 |---|---|---|
 | N0 · Por defecto | Solo la persona usa la app y decide | — |
 | N1 · Compartir | Ver las decisiones que ella comparte. Se puede retirar | La persona |
-| N2 · Apoyo | Avisos de posible abuso (con consentimiento) y «pausa para pensar» que activa ella. Nunca bloqueo | La persona |
+| N2 · Apoyo | Avisos de posible estafa (con consentimiento) y «pausa para pensar» que activa ella. Nunca bloqueo | La persona |
 | N3 · Guardador de hecho | Registrar gastos y preparar la rendición de cuentas | La ley |
 | N4 · Poder preventivo o curatela | Solo lo que diga el documento | Escritura o resolución judicial |
 

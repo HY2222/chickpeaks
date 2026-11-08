@@ -30,7 +30,7 @@ Reglas para todos:
 | 9 Móvil de Ana | `GET /api/personas/javi/avisos?para=ana` | ✏️ (estado del aviso) |
 | 10 Informe | `GET /api/personas/javi/informe_anual/resumen` | ✏️ (añadir avisos de estafa) |
 | 10 PDF | `GET /api/personas/javi/informe_anual?preparado_por=ana` | ✅ |
-| 11 Detalle estafas | `GET /api/personas/javi/avisos?tipo=posible_abuso` | ✏️ (filtro y resultado) |
+| 11 Detalle estafas | `GET /api/personas/javi/avisos?tipo=posible_estafa` | ✏️ (filtro y resultado) |
 | Demo | `POST /api/demo/reset` | ✅ |
 
 ---
@@ -197,7 +197,7 @@ Lo usa la pantalla 11 ("Dinero no enviado").
 Cada aviso trae ahora `id`, `estado` y `resultado`:
 ```json
 [
-  {"id": "av_7", "tipo": "posible_abuso", "para": "ana", "fecha": "2026-11-08T19:10:00",
+  {"id": "av_7", "tipo": "posible_estafa", "para": "ana", "fecha": "2026-11-08T19:10:00",
    "estado": "javi_pide_hablar", "resultado": {"enviado": false},
    "destinatario": "Carlos", "importe": 300.0,
    "senales": ["Carlos es una persona nueva.", "Te pide prisa.", "300 € es mucho para ti este mes."],
@@ -222,7 +222,7 @@ La pantalla 10 enseña: Dinero que entró = `total_ingresos`, Dinero que gastó 
 ### ✅ `GET /api/personas/javi/informe_anual?preparado_por=ana`
 Devuelve el PDF. Ana está en "Guardar" (nivel 3), así que tiene permiso. Con "Apoyar" devuelve `403`.
 
-### ✏️ `GET /api/personas/javi/avisos?tipo=posible_abuso`
+### ✏️ `GET /api/personas/javi/avisos?tipo=posible_estafa`
 Pantalla 11: añadir el filtro `tipo`. Cada aviso trae `senales` y `resultado`, como arriba.
 
 ---

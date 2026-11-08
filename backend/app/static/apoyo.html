@@ -167,7 +167,7 @@ async function pintarAna() {
   // (botón "Avisar a Ana" de la pantalla 8). Las señales salen del aviso del backend.
   const pidio = [...decisiones].reverse().find(d =>
     d.compartir && d.decision === "hablarlo" && /^enviar /i.test(d.concepto));
-  const avisoEstafa = avisos.find(a => a.tipo === "posible_abuso");
+  const avisoEstafa = avisos.find(a => a.tipo === "posible_estafa");
   if (pidio && avisoEstafa) {
     const e = leerAvisoEstafa(avisoEstafa);
     $("p9-estafa").innerHTML = `
@@ -211,7 +211,7 @@ const cifra = n => `${n.toLocaleString("de-DE", {maximumFractionDigits: 2})} €
 async function pausasDeEstafa() {
   const avisos = await api("avisos");
   const unicas = new Map();
-  for (const a of avisos.filter(a => a.tipo === "posible_abuso")) unicas.set(a.fecha + a.texto, a);
+  for (const a of avisos.filter(a => a.tipo === "posible_estafa")) unicas.set(a.fecha + a.texto, a);
   return [...unicas.values()].reverse();   // de la más antigua a la más nueva
 }
 
