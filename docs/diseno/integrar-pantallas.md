@@ -122,8 +122,8 @@ Reglas de lectura fácil (obligatorias):
 
 **7 · Noa explica el documento**
 - Tarjeta: pictograma coche + "Multa de aparcamiento" / "90 €".
-- "Noa dice:" "No estaba en tu plan." / "Si la pagas, te quedan 120 € para tus cosas." / "Tienes hasta el 20 de diciembre."
-- Tarjeta salvia "Ahora: 210 €" / "Si pagas: 120 €" con barras.
+- "Noa dice:" "No estaba en tu plan." / "Si la pagas, te quedan 75 € para tus cosas." / "Tienes hasta el 20 de diciembre."
+- Tarjeta salvia "Ahora: 165 €" / "Si pagas: 75 €" con barras. (Va después de comprar la entrada: 210 − 45 = 165.)
 - "¿Quieres hablarlo con Ana?"
 - Botones: principal "Hablar con Ana", secundario "Ahora no". **Noa no paga nada.**
 
@@ -139,7 +139,9 @@ Reglas de lectura fácil (obligatorias):
 
 **9 · Móvil de Ana** · móvil de Ana
 - Pictograma persona + "Hola, Ana" + en gris "Ayudas a Javi como: Guardar".
-- Caja de aviso: "Posible estafa" / "Javi quería enviar 300 € a Carlos y ha pedido hablar contigo." / "• Carlos es nuevo • Pide prisa • Cantidad alta" / botón aviso "Llamar a Javi".
+- Caja de aviso: "Posible estafa" / "Javi quiere enviar 300 € a Carlos." / "• Carlos es nuevo • Pide prisa • Cantidad alta" / botón aviso "Llamar a Javi".
+- **Sale en cuanto aparece la pausa para pensar** (si Javi dio permiso antes, modo Apoyar o superior), para que Ana pueda llamarle enseguida.
+- Si Javi pulsa "Avisar a Ana", **no se crea un segundo aviso**: el mismo cambia a "Javi ha pedido hablar contigo".
 - Tarjeta blanca con campana: "Javi ha pagado una entrada de 45 €." / "Lo decidió él. · Hoy, 19:02".
 - Gris: "Tú no puedes bloquear pagos. Javi decide y tú le apoyas."
 - Botón secundario "Informe anual" → pantalla 10.
@@ -172,7 +174,7 @@ Reglas de lectura fácil (obligatorias):
 
 ## 9. Pendiente (lo hacemos en la fase 0, no lo inventes)
 
-- **Datos de ejemplo:** el `backend/data/seed.json` actual tiene otros números (Javi cobra 780 € + 290 €). Los vamos a cuadrar con el diseño (980 € al mes, 210 € para sus cosas). Hasta entonces, usa lo que devuelva el backend.
+- **Datos de ejemplo:** cambiar `backend/data/seed.json` según `docs/diseno/datos-ejemplo.md` (980 € al mes, 210 € para sus cosas).
 - **Endpoint para leer documentos** (pantallas 5-7): todavía no existe. Lo definimos en el contrato de endpoints. Mientras, usa datos falsos fijos (la multa de 90 €).
 - Endpoints que ya existen y sirven: `GET /api/personas/{id}/presupuesto`, `GET .../metas`, `POST .../evaluar_compra`, `POST .../gastos`, `POST .../evaluar_riesgo`, `POST .../pausa`, `GET .../avisos`, `GET .../informe_anual/resumen`, `GET .../informe_anual`. Compruébalos en `backend/app/main.py`.
 
