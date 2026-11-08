@@ -1,7 +1,7 @@
-# Willo · Contrato de endpoints (borrador para revisar)
+# Willo · Contrato de endpoints
 
 Qué pide cada pantalla al backend y qué le devuelve. Sirve para que pantallas, backend y Noa (ElevenLabs) hablen el mismo idioma.
-Revisan: Inés y Cristina. Fecha: 8 de noviembre de 2026.
+Revisado por Inés (8 nov). Cristina: echarle un vistazo. Fecha: 8 de noviembre de 2026.
 
 Leyenda: ✅ ya existe · ✏️ existe pero hay que cambiarlo · 🆕 hay que crearlo.
 
@@ -243,8 +243,8 @@ En la API van como número; en pantalla siempre el nombre.
 
 ---
 
-## Para decidir (Inés y Cristina)
+## Decidido (Inés, 8 de noviembre de 2026)
 
-1. ¿Leer documento en **dos pasos** (leer + confirmar), como aquí, o en uno?
-2. ¿Qué modelo de Claude con visión usamos? Propuesta: el más barato que lea bien, probado con 5 fotos reales de facturas.
-3. ¿Guardamos el resultado del envío (`/resultado`) o la pantalla 11 lo deduce de las decisiones?
+1. **Leer documento en dos pasos** (`/documentos/leer` y luego `/documentos/confirmar`). Javi comprueba lo leído antes de que se hagan cuentas, porque la IA puede leer mal una cifra. Pantallas 5, 6 y 7.
+2. **Modelo: Claude Haiku** (con visión), con la clave de la fase 1. Antes, probarlo con 5 fotos reales: factura, ticket, multa, carta del banco y una foto mala. Si falla con las buenas, cambiar a Sonnet (una línea de código).
+3. **Guardar el resultado del envío** con `POST /avisos/{aviso_id}/resultado`. Se apunta igual si Javi no lo envía o si lo envía, sin juzgarle. Lo usan la pantalla 11 y el informe para el juzgado.
