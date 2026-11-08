@@ -1,0 +1,71 @@
+{
+  "_nota": "Herramientas webhook (server tools) de Clara. Crear cada una en el panel de ElevenLabs Agents > Tools > Webhook con estos datos. Sustituid BASE_URL por la URL pública del backend (Vercel/Render o un túnel tipo ngrok en local). Si definís WILLO_TOOL_TOKEN, añadid la cabecera X-Willo-Token en cada herramienta. El persona_id está fijo en 'javi' para la demo.",
+  "tools": [
+    {
+      "type": "webhook",
+      "name": "consultar_huchas",
+      "description": "Devuelve cuánto dinero le queda este mes en cada hucha (casa, comida, mis cosas, salir, ahorro) y un texto en lectura fácil.",
+      "api_schema": {
+        "url": "BASE_URL/api/personas/javi/presupuesto",
+        "method": "GET"
+      }
+    },
+    {
+      "type": "webhook",
+      "name": "evaluar_compra",
+      "description": "Calcula cuánto le quedaría si compra algo. No recomienda. Devuelve texto_lectura_facil para leerlo.",
+      "api_schema": {
+        "url": "BASE_URL/api/personas/javi/evaluar_compra",
+        "method": "POST",
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "importe": {"type": "number", "description": "Precio en euros"},
+            "concepto": {"type": "string", "description": "Qué quiere comprar, con artículo. Ej: 'las zapatillas'"},
+            "hucha": {"type": "string", "description": "Opcional: casa, comida, mis_cosas, ocio o ahorro. Por defecto mis_cosas"}
+          },
+          "required": ["importe", "concepto"]
+        }
+      }
+    },
+    {
+      "type": "webhook",
+      "name": "guardar_decision",
+      "description": "Guarda lo que la persona ha decidido y avisa a su círculo de apoyo si ella quiere compartirlo.",
+      "api_schema": {
+        "url": "BASE_URL/api/personas/javi/decisiones",
+        "method": "POST",
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "concepto": {"type": "string"},
+            "importe": {"type": "number"},
+            "decision": {"type": "string", "enum": ["comprar", "esperar", "hablarlo"]},
+            "palabras_persona": {"type": "string", "description": "Lo que dijo, con sus palabras exactas"},
+            "pidio_apoyo": {"type": "boolean"},
+            "compartir": {"type": "boolean", "description": "true si quiere que su círculo de apoyo lo vea"}
+          },
+          "required": ["concepto", "importe", "decision"]
+        }
+      }
+    },
+    {
+      "type": "webhook",
+      "name": "evaluar_pago",
+      "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea.",
+      "api_schema": {
+        "url": "BASE_URL/api/personas/javi/evaluar_riesgo",
+        "method": "POST",
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "destinatario": {"type": "string", "description": "A quién quiere enviar el dinero"},
+            "importe": {"type": "number"},
+            "contexto": {"type": "string", "description": "Resumen de lo que ha contado: quién se lo pide, cómo, por qué"}
+          },
+          "required": ["destinatario", "importe"]
+        }
+      }
+    }
+  ]
+}

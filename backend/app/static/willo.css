@@ -1,0 +1,21 @@
+:root { --bg: #fffdf7; --fg: #1a1a1a; --accent: #1f4fd1; --soft: #eef2fb; --warn: #b3261e; }
+@media (prefers-color-scheme: dark) { :root { --bg: #15161a; --fg: #f2f2f2; --accent: #8fb0ff; --soft: #23262e; --warn: #ff8a80; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 20px/1.5 system-ui, sans-serif; }
+main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 2rem; margin: 0 0 4px; }
+.sub { margin: 0 0 16px; }
+.huchas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.hucha { background: var(--soft); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; }
+.hucha .cifra { font-size: 1.8rem; font-weight: 700; }
+.fila { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 16px; }
+label { display: flex; flex-direction: column; gap: 4px; }
+input { font: inherit; padding: 10px; border-radius: 10px; border: 2px solid var(--fg); background: var(--bg); color: var(--fg); }
+.grande, .boton { font: inherit; font-weight: 700; padding: 14px 20px; border-radius: 14px; border: none;
+  background: var(--accent); color: var(--bg); cursor: pointer; text-decoration: none; display: inline-block; min-height: 56px; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 4px solid var(--accent); outline-offset: 2px; }
+.respuesta { background: var(--soft); border-radius: 16px; padding: 16px; margin: 16px 0; font-size: 1.3rem; }
+.avisos { list-style: none; padding: 0; }
+.avisos li { background: var(--soft); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+.avisos li.posible_abuso { border-left: 6px solid var(--warn); }
+.aviso { opacity: .7; font-size: .9rem; margin-top: 32px; }

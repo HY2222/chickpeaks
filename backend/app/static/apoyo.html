@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Willo · Círculo de apoyo</title>
+<link rel="stylesheet" href="/static/willo.css">
+</head>
+<body>
+<main>
+  <h1>Móvil de Ana</h1>
+  <p class="sub">Solo ves lo que Javi decide compartir.</p>
+  <ul id="avisos" class="avisos" aria-live="polite"></ul>
+
+  <h2>Persona de apoyo con curatela (N4)</h2>
+  <form id="gasto" class="fila">
+    <label>Dicta o escribe un gasto <input id="frase" value="He pagado 45 euros de luz de Javi"></label>
+    <button class="grande">Apuntar</button>
+  </form>
+  <p id="gasto-ok" class="sub" aria-live="polite"></p>
+  <a class="grande boton" href="/api/personas/javi/informe_anual?preparado_por=fundacion">Descargar informe para el juzgado</a>
+  <p class="aviso">Demo con datos inventados.</p>
+</main>
+<script>
+async function avisos() {
+  const a = await fetch("/api/personas/javi/avisos?para=ana").then(r => r.json());
+  document.getElementById("avisos").innerHTML = a.length
+    ? a.map(x => `<li class="${x.tipo}">${x.texto}</li>`).join("")
+    : "<li>Sin avisos.</li>";
+}
+document.getElementById("gasto").onsubmit = async e => {
+  e.preventDefault();
+  const r = await fetch("/api/personas/javi/gastos", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({texto: document.getElementById("frase").value, registrado_por: "fundacion"})});
+  const d = await r.json();
+  document.getElementById("gasto-ok").textContent = r.ok ? `Apuntado: ${d.concepto}, ${d.importe} €, hucha ${d.hucha}.` : d.detail;
+};
+avisos(); setInterval(avisos, 2000);
+</script>
+</body>
+</html>
