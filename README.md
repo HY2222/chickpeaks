@@ -1,8 +1,8 @@
 # Willo · *your will, your money*
 
-Willo es un asistente de voz en **lectura fácil** para que las personas con discapacidad intelectual decidan sobre su propio dinero, con los apoyos que ellas eligen (Ley 8/2021). El asistente se llama **Clara** y funciona con **ElevenLabs**.
+Willo es una app con asistente de voz en **lectura fácil** para que las personas con discapacidad intelectual decidan sobre su propio dinero, con los apoyos que ellas eligen (Ley 8/2021). La asistente se llama **Noa** y funciona con **ElevenLabs**.
 
-- **La persona** pregunta a Clara por voz o por texto: «¿Puedo comprarme las zapatillas?». Clara responde: «En tu hucha de mis cosas te quedan 120 €. Si compras las zapatillas, te quedan 40 €. Tú decides.» La IA explica y nunca recomienda. **Las cuentas las hace el código, no el modelo.**
+- **La persona** pregunta a Noa por voz o por texto: «¿Puedo comprarme las zapatillas?». Noa responde: «En tu hucha de mis cosas te quedan 120 €. Si compras las zapatillas, te quedan 40 €. Tú decides.» La IA explica y nunca recomienda. **Las cuentas las hace el código, no el modelo.**
 - **Su decisión queda registrada** como constancia de su voluntad, y solo se comparte si ella quiere.
 - **Escudo antiestafas** con reglas explicables. Avisa al círculo de apoyo (con consentimiento previo) y **nunca bloquea**.
 - **Círculo de apoyo** en niveles N0 a N4 en vez de «control parental».
@@ -29,7 +29,7 @@ uvicorn app.main:app --reload
 O con Docker, desde la raíz: `docker compose up --build`
 
 Después abrid:
-- http://localhost:8000/demo · móvil de Javi (huchas, «¿Puedo comprarlo?», botón para hablar con Clara)
+- http://localhost:8000/demo · móvil de Javi (huchas, «¿Puedo comprarlo?», botón para hablar con Noa)
 - http://localhost:8000/demo/apoyo · móvil de Ana y panel de la curadora (avisos, gasto dictado, informe PDF)
 - http://localhost:8000/docs · todas las rutas de la API
 
@@ -41,9 +41,9 @@ Para que la demo empiece siempre igual: `WILLO_HOY=2026-11-08` en `.env` y `POST
 cd backend && python -m pytest -q
 ```
 
-## Configurar a Clara en ElevenLabs
+## Configurar a Noa en ElevenLabs
 
-1. Crear un agente en ElevenLabs Agents y pegar el prompt de [`agent/clara_prompt.md`](agent/clara_prompt.md).
+1. Crear un agente en ElevenLabs Agents y pegar el prompt de [`agent/noa_prompt.md`](agent/noa_prompt.md).
 2. Crear la voz con Voice Design (cálida, clara, ritmo pausado). No clonamos voces reales.
 3. Añadir las 4 herramientas webhook de [`agent/tools.json`](agent/tools.json), con la URL pública del backend (en local, con un túnel como ngrok).
 4. Poner `ELEVENLABS_API_KEY` y `ELEVENLABS_AGENT_ID` en `.env`. El navegador pide una URL firmada a `/api/voz/signed-url`, así la clave nunca sale del servidor.
@@ -52,8 +52,8 @@ cd backend && python -m pytest -q
 
 | Producto | Para qué |
 |---|---|
-| Agents | Clara: conversación por voz con herramientas e interrupciones |
-| Voice Design | La voz de Clara, diseñada para lectura fácil |
+| Agents | Noa: conversación por voz con herramientas e interrupciones |
+| Voice Design | La voz de Noa, diseñada para lectura fácil |
 | Scribe (speech to text) | Gastos dictados por la persona de apoyo (`/api/gastos/transcribir`) |
 | Sound Effects | Sonidos de confirmación de la app (pendiente) |
 
@@ -71,7 +71,7 @@ cd backend && python -m pytest -q
 
 | Ruta | Qué hace |
 |---|---|
-| `GET /api/personas/{id}/presupuesto` | Lo que queda en cada hucha (herramienta de Clara) |
+| `GET /api/personas/{id}/presupuesto` | Lo que queda en cada hucha (herramienta de Noa) |
 | `POST /api/personas/{id}/evaluar_compra` | ¿Puedo comprarlo? Cifras y texto en lectura fácil |
 | `POST /api/personas/{id}/decisiones` | Guarda la decisión y avisa al círculo si ella quiere |
 | `POST /api/personas/{id}/evaluar_riesgo` | Escudo antiestafas |
@@ -85,7 +85,7 @@ cd backend && python -m pytest -q
 ## Estructura
 
 ```
-agent/            prompt y herramientas de Clara (ElevenLabs)
+agent/            prompt y herramientas de Noa (ElevenLabs)
 backend/app/      API FastAPI
   budget.py       cuentas de las huchas (nunca el modelo)
   easyread.py     cifras y comprobador de lectura fácil

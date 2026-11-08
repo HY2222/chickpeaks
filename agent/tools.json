@@ -1,5 +1,5 @@
 {
-  "_nota": "Herramientas webhook (server tools) de Clara. Crear cada una en el panel de ElevenLabs Agents > Tools > Webhook con estos datos. Sustituid BASE_URL por la URL pública del backend (Vercel/Render o un túnel tipo ngrok en local). Si definís WILLO_TOOL_TOKEN, añadid la cabecera X-Willo-Token en cada herramienta. El persona_id está fijo en 'javi' para la demo.",
+  "_nota": "Herramientas webhook (server tools) de Noa. Crear cada una en el panel de ElevenLabs Agents > Tools > Webhook con estos datos. Sustituid BASE_URL por la URL pública del backend (Vercel/Render o un túnel tipo ngrok en local). Si definís WILLO_TOOL_TOKEN, añadid la cabecera X-Willo-Token en cada herramienta. El persona_id está fijo en 'javi' para la demo.",
   "tools": [
     {
       "type": "webhook",
