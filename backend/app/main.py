@@ -297,6 +297,13 @@ def reset():
     return {"ok": True}
 
 
+@app.get("/sw.js")
+def service_worker():
+    """El service worker va en la raíz para que la PWA controle toda la app."""
+    return FileResponse(STATIC / "sw.js", media_type="application/javascript",
+                        headers={"Cache-Control": "no-cache"})
+
+
 @app.get("/demo")
 def demo_persona():
     return FileResponse(STATIC / "persona.html")

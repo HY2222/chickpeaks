@@ -33,6 +33,14 @@ Después abrid:
 - http://localhost:8000/demo/apoyo · móvil de Ana y panel de la curadora (avisos, gasto dictado, informe PDF)
 - http://localhost:8000/docs · todas las rutas de la API
 
+### Instalar Willo en el móvil (PWA)
+
+Willo es una **app web instalable (PWA)**: se instala desde el navegador, aparece con su icono y se abre a pantalla completa.
+
+1. El móvil tiene que abrir la app por **https** (en local, con un túnel como ngrok o desplegada en Vercel/Render).
+2. Android (Chrome): menú ⋮ → **Instalar aplicación**. iPhone (Safari): botón compartir → **Añadir a pantalla de inicio**.
+3. `/demo` se instala como «Willo» (Javi) y `/demo/apoyo` como «Willo Apoyo» (Ana).
+
 Para que la demo empiece siempre igual: `WILLO_HOY=2026-11-08` en `.env` y `POST /api/demo/reset` antes de presentar.
 
 ## Tests

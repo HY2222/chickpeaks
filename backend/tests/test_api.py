@@ -117,3 +117,12 @@ def test_lectura_facil():
                "discrecionales, por lo que recomendamos reconsiderar la adquisición propuesta.")
     assert fernandez_huerta(facil) > fernandez_huerta(dificil)
     assert not comprobar(dificil)["es_facil"]
+
+
+def test_pwa_instalable(client):
+    sw = client.get("/sw.js")
+    assert sw.status_code == 200 and "javascript" in sw.headers["content-type"]
+    m = client.get("/static/manifest-persona.webmanifest").json()
+    assert m["display"] == "standalone" and m["start_url"] == "/demo"
+    assert {i["sizes"] for i in m["icons"]} == {"192x192", "512x512"}
+    assert 'rel="manifest"' in client.get("/demo").text
