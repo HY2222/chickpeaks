@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* Paleta y letra de la app Willo (docs/diseno/integrar-pantallas.md). */
+@theme {
+  --color-fondo: #F5F7F0;
+  --color-salvia: #D3DFC8;
+  --color-salvia-media: #A3B18F;
+  --color-verde: #3E5A34;
+  --color-texto: #1E2A1B;
+  --color-suave: #4A5745;
+  --color-aviso: #FBEFD0;
+  --font-sans: "Arimo", Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  @apply bg-texto font-sans antialiased;
+}
