@@ -13,6 +13,8 @@ Fecha: 8 de noviembre de 2026. Diseño: fase 0.
 Figma: https://www.figma.com/design/ZXcREoHSq2OEq8h1YKHJKQ
 (Las pantallas de reserva están en la página "Reserva" o en la fila de abajo, con nombre "R1" y "R2".)
 
+**Imágenes de cada pantalla:** `docs/diseno/pantallas/01-...png` a `11-...png`. Las de reserva están aparte en `docs/diseno/pantallas/reserva/` (no construir).
+
 ## 2. Antes de empezar
 
 1. **Acceso a Figma.** Inés comparte el archivo: botón **Share** → escribir el correo del compañero (o "Anyone with the link can view").
@@ -177,7 +179,8 @@ Reglas de lectura fácil (obligatorias):
 ## 10. Prompt para pegar en Claude Code
 
 ```
-Lee docs/diseno/integrar-pantallas.md y docs/diseno/guion-demo.md.
+Lee docs/diseno/integrar-pantallas.md y docs/diseno/guion-demo.md, y mira las imágenes
+de docs/diseno/pantallas/ (01 a 11). Ignora la carpeta reserva/.
 Quiero rehacer las pantallas de la demo de Willo en backend/app/static/
 (persona.html para Javi, apoyo.html para Ana, willo.css) siguiendo ese documento.
 
