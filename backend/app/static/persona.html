@@ -355,12 +355,19 @@ AL_ENTRAR["2"] = async () => {
         evaluar_compra: async ({importe, concepto}) => {
           estado.pregunta = {texto: $("p2-oido").textContent, importe: Number(importe), concepto: concepto || "esto"};
           estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto, hucha: "mis_cosas"});
+          estado.dichoNoa = null;
+          estado.esperandoNoa = true;   // la próxima frase de Noa es la explicación de esta compra
           return JSON.stringify(estado.respuesta);
         },
       },
       onMessage: m => {
         if (m.source === "user") oido(m.message);
-        else if (m.source === "ai" && estado.respuesta) location.hash = "#3"; // Noa contesta → pantalla 3
+        else if (m.source === "ai" && estado.esperandoNoa) {
+          // Noa explica la compra → pantalla 3 con lo que ha dicho ella, palabra por palabra.
+          estado.esperandoNoa = false;
+          estado.dichoNoa = m.message;
+          if (location.hash === "#3") AL_ENTRAR["3"](); else location.hash = "#3";
+        }
       },
       onModeChange: ({mode}) => $("p2-micro").classList.toggle("activo", mode === "listening"),
       // Si Noa cuelga sola (Javi dice que no necesita nada más), volvemos al inicio.
@@ -420,7 +427,17 @@ AL_ENTRAR["3"] = async () => {
   } else {
     frases.push(`Cuesta ${euros(r.importe)}.`, `Te faltan ${euros(-r.quedan_despues)}.`);
   }
-  $("p3-frases").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
+  // Con Noa conectada, la pantalla muestra lo que Noa ha dicho de verdad (sin las marcas
+  // de tono como [cálido]). Sin Noa, las frases de arriba, que lee la voz del navegador.
+  if (conv && estado.dichoNoa) {
+    frases.length = 0;
+    frases.push(...estado.dichoNoa
+      .replace(/\[[^\]]*\]/g, "")
+      .split(/(?<=[.!?])\s+/)
+      .map(f => f.trim())
+      .filter(f => f && !/^tú decides\.?$/i.test(f)));  // "Tú decides." ya sale en grande
+  }
+  $("p3-frases").innerHTML = frases.map(f => `<p>${f.replace(/[<>&]/g, "")}</p>`).join("");
 
   // Escala de las barras: lo que tiene la hucha cada mes.
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
