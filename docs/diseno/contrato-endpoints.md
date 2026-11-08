@@ -117,7 +117,8 @@ Respuesta:
   "texto_lectura_facil": "He leído: multa de aparcamiento. 90 €. Hay que pagar antes del 20 de diciembre. ¿Es correcto?"
 }
 ```
-Valores de `tipo`: `factura`, `recibo`, `nomina`, `multa`, `carta_banco`, `otro`.
+Valores de `tipo`: `factura`, `recibo`, `ticket`, `nomina`, `multa`, `carta_banco`, `otro`.
+- `ticket`: el ticket de una compra que Javi ya ha hecho (tienda, bar, supermercado). `accion` suele ser `nada`: ya está pagado.
 Valores de `accion`: `pagar`, `nada`, `contestar`, `revisar`.
 Si Claude no puede leerlo → `422` con `"texto_lectura_facil": "No he podido leerlo bien. ¿Haces otra foto con más luz?"`.
 
@@ -140,6 +141,7 @@ Respuesta:
   "texto_lectura_facil": "No estaba en tu plan. Si la pagas, te quedan 75 € para tus cosas. Tienes hasta el 20 de diciembre. ¿Quieres hablarlo con Ana?"
 }
 ```
+- Si `tipo` es `ticket`, no se resta otra vez: el pago con tarjeta ya está en sus movimientos. Solo se explica: "Es el ticket de la tienda de ropa. Pagaste 30 €. Ya está apuntado. Te quedan 210 € para tus cosas." Si el gasto no aparece en sus movimientos (pagó en efectivo), se apunta como gasto de "Para tus cosas".
 - `en_plan` es `true` si el importe y el remitente coinciden con un gasto recurrente (por ejemplo, la luz). Entonces: "Ya estaba en tu plan. No tienes que hacer nada."
 - Si `sospechoso` es `true` (pantalla de reserva R1), no se hacen cuentas: "Cuidado. Este documento te pide tu clave del banco. Los bancos nunca piden eso..."
 - **No paga nada.** "Hablar con Ana" usa `POST /decisiones` con `"decision": "hablarlo"`.
