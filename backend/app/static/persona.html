@@ -84,7 +84,7 @@
     <div class="barra"><span id="p3-despues-barra"></span></div>
   </div>
 
-  <p class="tu-decides">Tú decides.</p>
+  <p class="tu-decides">Tú decides</p>
 
   <div class="botones">
     <button class="boton secundario" id="p3-escuchar">Escuchar otra vez</button>
@@ -122,7 +122,7 @@
   <div class="camara" aria-hidden="true"><svg class="marco" viewBox="0 0 170 235"><rect x="2" y="2" width="166" height="231" rx="8" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="16 10"/></svg></div>
 
   <div class="centrado">
-    <p style="font-size:20px">Pon el documento dentro del recuadro.</p>
+    <p style="font-size:20px">Pon el documento dentro del recuadro</p>
     <p class="suave" style="margin-top:16px">Willo no guarda la foto. Solo guarda lo que pone.</p>
   </div>
 
@@ -207,9 +207,9 @@
   <div class="caja-aviso" role="alert">
     <p class="titulo-aviso"><span data-icono="aviso"></span>Pausa para pensar</p>
     <div class="frases aviso-frases">
-      <p class="negrita">Espera un momento.</p>
+      <p class="negrita">Espera un momento</p>
       <div id="p8-razones"></div>
-      <p>Esto pasa a veces en las estafas.</p>
+      <p>Esto pasa a veces en las estafas</p>
     </div>
   </div>
 
@@ -236,6 +236,8 @@ const P = "javi";
 const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
 const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
 const $ = id => document.getElementById(id);
+// En pantalla, cada frase va en su línea: sin punto final (inés, 8 nov). Noa sí los usa al hablar.
+const sinPunto = s => s.replace(/\.\s*$/, "");
 const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
 const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
 
@@ -485,7 +487,7 @@ AL_ENTRAR["3"] = async () => {
       .map(f => f.trim())
       .filter(f => f && !/^tú decides\.?$/i.test(f)));  // "Tú decides." ya sale en grande
   }
-  $("p3-frases").innerHTML = frases.map(f => `<p>${f.replace(/[<>&]/g, "")}</p>`).join("");
+  $("p3-frases").innerHTML = frases.map(f => `<p>${sinPunto(f.replace(/[<>&]/g, ""))}</p>`).join("");
 
   // Escala de las barras: lo que tiene la hucha cada mes.
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
@@ -631,7 +633,7 @@ AL_ENTRAR["7"] = async () => {
     ? `Si la pagas, te quedan ${euros(r.quedan_despues)} para tus cosas.`
     : `Si la pagas, te faltan ${euros(-r.quedan_despues)} para tus cosas.`);
   frases.push(`Tienes hasta el ${d.fecha_limite}.`);
-  $("p7-frases").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
+  $("p7-frases").innerHTML = frases.map(f => `<p>${sinPunto(f)}</p>`).join("");
 
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
   const total = h?.limite_mensual || r.quedan_antes;
@@ -694,7 +696,7 @@ AL_ENTRAR["8"] = async () => {
     (ORDEN.indexOf(x.id) + 1 || 99) - (ORDEN.indexOf(y.id) + 1 || 99));
   const razones = [...new Set(senales.map(s => RAZONES[s.id]?.(b) ?? s.explicacion))];
   estado.razones = razones;
-  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${r}</p>`).join("");
+  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${sinPunto(r)}</p>`).join("");
   pintarIconos(document.querySelector('[data-pantalla="8"]'));
 
   if (!conv) decir(["Pausa para pensar.", "Espera un momento.", ...razones,
