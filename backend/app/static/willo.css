@@ -1,21 +1,230 @@
-:root { --bg: #fffdf7; --fg: #1a1a1a; --accent: #1f4fd1; --soft: #eef2fb; --warn: #b3261e; }
-@media (prefers-color-scheme: dark) { :root { --bg: #15161a; --fg: #f2f2f2; --accent: #8fb0ff; --soft: #23262e; --warn: #ff8a80; } }
+/* Willo · estilos de la demo (docs/diseno/integrar-pantallas.md, secciones 4 y 5). */
+:root {
+  --fondo: #F5F7F0;        /* fondo de pantalla */
+  --salvia: #D3DFC8;       /* tarjetas destacadas, círculos de pictograma, fondo de barras */
+  --salvia-media: #A3B18F;
+  --verde-oscuro: #3E5A34; /* botón principal, cifras importantes */
+  --texto: #1E2A1B;
+  --texto-suave: #4A5745;  /* textos secundarios */
+  --blanco: #FFFFFF;       /* tarjetas normales */
+  --aviso-fondo: #FBEFD0;  /* estafa y alertas (ámbar, no rojo, para no asustar) */
+  --aviso-borde: #C98A00;
+  --aviso-texto: #5C3D00;
+}
+
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 20px/1.5 system-ui, sans-serif; }
-main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
-h1 { font-size: 2rem; margin: 0 0 4px; }
-.sub { margin: 0 0 16px; }
-.huchas { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-.hucha { background: var(--soft); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; }
-.hucha .cifra { font-size: 1.8rem; font-weight: 700; }
-.fila { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 16px; }
-label { display: flex; flex-direction: column; gap: 4px; }
-input { font: inherit; padding: 10px; border-radius: 10px; border: 2px solid var(--fg); background: var(--bg); color: var(--fg); }
-.grande, .boton { font: inherit; font-weight: 700; padding: 14px 20px; border-radius: 14px; border: none;
-  background: var(--accent); color: var(--bg); cursor: pointer; text-decoration: none; display: inline-block; min-height: 56px; }
-button:focus-visible, a:focus-visible, input:focus-visible { outline: 4px solid var(--accent); outline-offset: 2px; }
-.respuesta { background: var(--soft); border-radius: 16px; padding: 16px; margin: 16px 0; font-size: 1.3rem; }
-.avisos { list-style: none; padding: 0; }
-.avisos li { background: var(--soft); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
-.avisos li.posible_abuso { border-left: 6px solid var(--warn); }
-.aviso { opacity: .7; font-size: .9rem; margin-top: 32px; }
+html, body { margin: 0; }
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  font-size: 18px;
+  line-height: 1.3;
+}
+h1, h2, h3, p { margin: 0; }
+
+/* ---------- Pantalla (móvil de referencia 390 × 844) ---------- */
+.pantalla {
+  max-width: 390px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 56px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.pantalla[hidden] { display: none; }
+.pantalla > .botones { margin-top: auto; } /* los botones siempre abajo */
+
+/* ---------- Textos ---------- */
+.titulo { font-size: 32px; font-weight: 700; line-height: 1.15; }
+.titulo-seccion { font-size: 24px; font-weight: 700; }
+.suave { color: var(--texto-suave); }
+.etiqueta { font-size: 18px; color: var(--texto-suave); }   /* "Noa ha oído:", "Noa dice:"… */
+.cifra { font-size: 56px; font-weight: 700; color: var(--verde-oscuro); line-height: 1.1; }
+.verde { color: var(--verde-oscuro); }
+.negrita { font-weight: 700; }
+.frases p + p { margin-top: 6px; }  /* una idea por frase, cada una en su línea */
+
+/* ---------- Cabecera: pictograma + saludo ---------- */
+.cabecera { display: flex; align-items: center; gap: 16px; }
+.cabecera .titulo { font-size: 32px; }
+.cabecera .suave { font-size: 18px; margin-top: 4px; }
+
+/* ---------- Pictograma: círculo salvia con icono verde oscuro ---------- */
+.picto {
+  flex: none;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--salvia);
+  color: var(--verde-oscuro);
+  display: grid; place-items: center;
+}
+.picto svg { width: 28px; height: 28px; }
+.picto.grande { width: 64px; height: 64px; }
+.picto.grande svg { width: 32px; height: 32px; }
+
+/* ---------- Tarjetas ---------- */
+.tarjeta { background: var(--blanco); border-radius: 20px; padding: 20px; }
+.tarjeta.destacada { background: var(--salvia); }
+.tarjeta.fila { display: flex; align-items: center; gap: 20px; }
+.tarjeta.fila > div { flex: 1; min-width: 0; }
+.tarjeta .nombre { font-size: 20px; font-weight: 700; }
+.lista { display: flex; flex-direction: column; gap: 20px; }
+
+/* Tarjeta "Este mes te quedan" */
+.saldo { padding: 24px 20px; }
+.saldo .cifra { margin: 20px 0 16px; }
+
+/* ---------- Barra de progreso ---------- */
+.barra {
+  height: 20px;
+  border-radius: 10px;
+  background: var(--salvia);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.destacada .barra { background: var(--blanco); }
+.barra > span {
+  display: block; height: 100%;
+  border-radius: 10px;
+  background: var(--verde-oscuro);
+  transition: width .4s ease;
+}
+
+/* ---------- Botones: 72 px, ancho completo, esquinas 20 px, texto 22 px negrita ---------- */
+.botones { display: flex; flex-direction: column; gap: 16px; }
+.boton {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+  min-height: 72px;
+  padding: 0 20px;
+  border-radius: 20px;
+  border: 3px solid var(--verde-oscuro);
+  background: var(--verde-oscuro);
+  color: var(--blanco);
+  font: 700 22px/1.2 Helvetica, Arial, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+.boton.secundario { background: var(--blanco); color: var(--verde-oscuro); }
+.boton.aviso { background: var(--aviso-borde); border-color: var(--aviso-borde); color: var(--blanco); }
+.boton:active { transform: scale(.98); }
+.boton:disabled { opacity: .6; cursor: default; }
+.boton:focus-visible, a:focus-visible {
+  outline: 4px solid var(--aviso-borde);
+  outline-offset: 3px;
+}
+
+/* ---------- Caja de aviso (ámbar, no rojo) ---------- */
+.caja-aviso {
+  background: var(--aviso-fondo);
+  border: 3px solid var(--aviso-borde);
+  border-radius: 20px;
+  padding: 20px;
+  color: var(--aviso-texto);
+}
+.caja-aviso .titulo-aviso {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 24px; font-weight: 700;
+}
+.caja-aviso .titulo-aviso svg { width: 34px; height: 34px; flex: none; color: var(--aviso-texto); stroke-width: 1.5; }
+
+/* ---------- Micrófono de Noa (pantalla 2) ---------- */
+.centrado { text-align: center; }
+.microfono {
+  width: 220px; height: 220px;
+  margin: auto;
+  border-radius: 50%;
+  background: var(--salvia);
+  display: grid; place-items: center;
+}
+.microfono-dentro {
+  width: 150px; height: 150px;
+  border-radius: 50%;
+  background: var(--verde-oscuro);
+  color: var(--blanco);
+  display: grid; place-items: center;
+}
+.microfono-dentro svg { width: 64px; height: 64px; stroke-width: 1.3; }
+.microfono.activo { animation: escucha 1.6s ease-in-out infinite; }
+@keyframes escucha {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(163, 177, 143, .55); }
+  50%      { box-shadow: 0 0 0 18px rgba(163, 177, 143, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .microfono.activo { animation: none; } }
+.transcripcion { font-size: 24px; font-weight: 700; line-height: 1.35; margin-top: 12px; }
+
+/* ---------- Respuesta de Noa (pantallas 3 y 7) ---------- */
+.noa-dice { font-size: 22px; line-height: 1.4; margin-top: 12px; }
+.noa-dice p + p { margin-top: 8px; }
+.comparar { padding: 24px 20px; }
+.comparar .negrita + .barra { margin-top: 10px; margin-bottom: 12px; }
+.comparar .barra:last-child { margin-bottom: 0; }
+.tu-decides { font-size: 32px; font-weight: 700; color: var(--verde-oscuro); }
+
+/* ---------- Aviso de pago (pantalla 4) ---------- */
+.picto.pagado { width: 120px; height: 120px; margin: 64px auto 0; }
+.picto.pagado svg { width: 64px; height: 64px; stroke-width: 1.2; }
+
+/* ---------- Cámara (pantalla 5) ---------- */
+.camara {
+  height: 300px;
+  border-radius: 20px;
+  background: #20251F;    /* recuadro oscuro de cámara (color de la imagen 05) */
+  display: grid; place-items: center;
+}
+.camara .marco { width: 170px; height: 235px; }
+
+/* ---------- Lo que Noa ha leído (pantalla 6) ---------- */
+.borde-salvia { border: 3px solid var(--salvia); }
+.leido { padding: 24px 20px; }
+.leido .cabecera { margin-bottom: 8px; }
+.leido .etiqueta { margin-top: 20px; }
+.dato { font-size: 24px; font-weight: 700; margin-top: 4px; }
+
+/* ---------- Pausa para pensar (pantalla 8) ---------- */
+.caja-aviso .titulo-aviso { font-size: 27px; white-space: nowrap; }
+.caja-aviso .titulo-aviso span { display: contents; }
+.aviso-frases { font-size: 20px; line-height: 1.3; margin-top: 12px; }
+.aviso-frases p + p, .aviso-frases div p, .aviso-frases div + p { margin-top: 8px; }
+
+/* ---------- Móvil de Ana (pantalla 9) ---------- */
+.tarjeta.aviso-ana { align-items: flex-start; }
+.aviso-ana .picto { width: 44px; height: 44px; }
+.aviso-ana .picto svg { width: 24px; height: 24px; }
+
+/* ---------- Informe anual (pantalla 10) ---------- */
+.resumen .etiqueta { margin-top: 14px; }
+.resumen .dato { font-size: 22px; margin-top: 2px; }
+.enlace {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 20px; font-weight: 700;
+  color: var(--verde-oscuro);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Detalle de estafas (pantalla 11) ---------- */
+.volver { font-size: 20px; font-weight: 700; color: var(--verde-oscuro); text-decoration: none; }
+.estafa .etiqueta { margin-top: 16px; }
+.estafa .etiqueta:first-child { margin-top: 0; }
+.razones { margin: 12px 0 0; padding: 0; list-style: none; font-size: 20px; line-height: 1.25; }
+.razones li::before { content: "• "; }
+.resultado {
+  margin-top: 16px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: var(--salvia);
+  color: var(--verde-oscuro);
+  font-size: 20px; font-weight: 700;
+}
+.resultado.enviado { background: var(--fondo); color: var(--texto); } /* sin juzgar: ni verde ni ámbar */
+
+/* Botón escondido "simular pago" (solo para la demo) */
+.escondido {
+  position: fixed; right: 0; bottom: 0;
+  width: 48px; height: 48px;
+  opacity: 0; border: 0; background: transparent; cursor: pointer;
+}

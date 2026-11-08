@@ -3,44 +3,304 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Willo · Círculo de apoyo</title>
+<title>Willo · Ana</title>
 <link rel="stylesheet" href="/static/willo.css">
 <link rel="manifest" href="/static/manifest-apoyo.webmanifest">
-<meta name="theme-color" content="#1f4fd1">
+<meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
 <script src="/static/pwa.js" defer></script>
 </head>
 <body>
-<main>
-  <h1>Móvil de Ana</h1>
-  <p class="sub">Solo ves lo que Javi decide compartir.</p>
-  <ul id="avisos" class="avisos" aria-live="polite"></ul>
 
-  <h2>Persona de apoyo con curatela (N4)</h2>
-  <form id="gasto" class="fila">
-    <label>Dicta o escribe un gasto <input id="frase" value="He pagado 45 euros de luz de Javi"></label>
-    <button class="grande">Apuntar</button>
-  </form>
-  <p id="gasto-ok" class="sub" aria-live="polite"></p>
-  <a class="grande boton" href="/api/personas/javi/informe_anual?preparado_por=fundacion">Descargar informe para el juzgado</a>
-  <p class="aviso">Demo con datos inventados.</p>
-</main>
-<script>
-async function avisos() {
-  const a = await fetch("/api/personas/javi/avisos?para=ana").then(r => r.json());
-  document.getElementById("avisos").innerHTML = a.length
-    ? a.map(x => `<li class="${x.tipo}">${x.texto}</li>`).join("")
-    : "<li>Sin avisos.</li>";
-}
-document.getElementById("gasto").onsubmit = async e => {
-  e.preventDefault();
-  const r = await fetch("/api/personas/javi/gastos", {method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({texto: document.getElementById("frase").value, registrado_por: "fundacion"})});
-  const d = await r.json();
-  document.getElementById("gasto-ok").textContent = r.ok ? `Apuntado: ${d.concepto}, ${d.importe} €, hucha ${d.hucha}.` : d.detail;
+<!-- 9 · Móvil de Ana -->
+<section class="pantalla" data-pantalla="9">
+  <header class="cabecera">
+    <span class="picto" data-icono="persona"></span>
+    <div>
+      <h1 class="titulo">Hola, Ana</h1>
+      <p class="suave" id="p9-como"></p>
+    </div>
+  </header>
+
+  <div id="p9-estafa" aria-live="assertive"></div>
+  <div class="lista" id="p9-avisos" aria-live="polite"></div>
+
+  <p class="suave">Tú no puedes bloquear pagos. Javi decide y tú le apoyas.</p>
+
+  <div class="botones">
+    <a class="boton secundario" href="#10">Informe anual</a>
+  </div>
+</section>
+
+<!-- 10 · Informe anual -->
+<section class="pantalla" data-pantalla="10" hidden>
+  <div>
+    <h1 class="titulo" style="font-size:34px" id="p10-titulo">Informe anual</h1>
+    <p class="suave" style="margin-top:12px">De Javi, para el juzgado. En lectura fácil.</p>
+  </div>
+
+  <div class="tarjeta borde-salvia leido resumen">
+    <div class="cabecera">
+      <span class="picto" data-icono="documento"></span>
+      <p class="nombre" style="font-size:22px">Resumen del año</p>
+    </div>
+    <p class="etiqueta">Dinero que entró</p>
+    <p class="dato" id="p10-entro">…</p>
+    <p class="etiqueta">Dinero que gastó</p>
+    <p class="dato" id="p10-gasto">…</p>
+    <p class="etiqueta">Ahorro en huchas</p>
+    <p class="dato" id="p10-ahorro">…</p>
+    <p class="etiqueta">Decisiones importantes</p>
+    <p class="dato" id="p10-decisiones">…</p>
+    <p class="etiqueta">Avisos de estafa</p>
+    <p class="dato" id="p10-estafas">…</p>
+    <a class="enlace" href="#11">Mostrar más&nbsp; ›</a>
+  </div>
+
+  <p class="suave" id="p10-mensaje" aria-live="polite" hidden></p>
+
+  <div class="botones">
+    <button class="boton" id="p10-pdf">Descargar PDF</button>
+    <button class="boton secundario" id="p10-compartir">Compartir</button>
+  </div>
+</section>
+
+<!-- 11 · Detalle de estafas -->
+<section class="pantalla" data-pantalla="11" hidden>
+  <a class="volver" href="#10">‹ Volver al informe</a>
+  <div>
+    <h1 class="titulo" style="font-size:34px">Avisos de estafa</h1>
+    <p class="suave" style="font-size:20px;margin-top:16px">Lo que pasó cada vez que Willo hizo una pausa para pensar.</p>
+  </div>
+
+  <div class="lista" id="p11-lista"></div>
+
+  <p class="suave">Si Javi decide enviar el dinero igualmente, aquí pone «Dinero enviado» y la cantidad. Willo no lo esconde ni lo juzga.</p>
+</section>
+
+<script type="module">
+const P = "javi", YO = "ana";
+const api = r => fetch(`/api/personas/${P}/${r}`).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
+const $ = id => document.getElementById(id);
+const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+
+// ---------- Pictogramas (iconos Lucide; en la versión final, ARASAAC) ----------
+const ICONOS = {
+  persona: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+  campana: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  aviso: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  documento: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
 };
-avisos(); setInterval(avisos, 2000);
+const icono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[n]}</svg>`;
+const pintarIconos = (raiz = document) => raiz.querySelectorAll("[data-icono]").forEach(e => e.innerHTML = icono(e.dataset.icono));
+
+// ---------- Navegación: /demo/apoyo#9 … #11 ----------
+const AL_ENTRAR = {};
+let repetir = null;
+function mostrar() {
+  const n = location.hash.slice(1) || "9";
+  document.querySelectorAll(".pantalla").forEach(s => s.hidden = s.dataset.pantalla !== n);
+  window.scrollTo(0, 0);
+  clearInterval(repetir);
+  AL_ENTRAR[n]?.();
+}
+window.addEventListener("hashchange", mostrar);
+
+// ---------- 9 · Móvil de Ana ----------
+// Ana solo ve lo que Javi eligió compartir: sus decisiones con "compartir" (GET /decisiones)
+// y los avisos que le llegan a ella (GET /avisos?para=ana). Se actualiza cada 2 segundos.
+
+// Nombres del círculo de apoyo (guion v4) para los niveles del backend.
+const NIVELES = {0: "Solo yo", 1: "Ver", 2: "Apoyar", 3: "Guardar", 4: "Representar"};
+
+// El aviso de estafa del backend trae las señales (reglas fijas) en texto.
+// Para cada una: etiqueta corta (pantalla 9) y frase en pasado (pantalla 11).
+const SENALES = [
+  [/nunca has enviado|desde hace poco/i, d => `${d} es nuevo`, d => `${d} era una persona nueva.`],
+  [/prisa/i, () => "Pide prisa", () => "Le pedía prisa."],
+  [/más de lo que te queda/i, () => "Cantidad alta", () => "Era mucho dinero para ese mes."],
+  [/no se lo cuentes/i, () => "Pide secreto", () => "Le pedía que no se lo contara a nadie."],
+  [/código/i, () => "Pide un código", () => "Le pedía un código."],
+  [/has ganado/i, () => "Promete un premio", () => "Le prometía un premio."],
+  [/banco, de hacienda/i, () => "Se hace pasar por otro", () => "Decía ser del banco o de la policía."],
+];
+function leerAvisoEstafa(a) {
+  const destinatario = a.texto.match(/para (.+?)\. Señales/)?.[1] ?? "alguien";
+  const importe = a.texto.match(/Le piden (.+?) para/)?.[1] ?? "";
+  const senales = a.texto.match(/Señales: (.+?)\. La decisión/)?.[1] ?? "";
+  const hay = SENALES.filter(([re]) => re.test(senales));
+  const etiquetas = [...new Set(hay.map(([, f]) => f(destinatario)))];
+  const razones = [...new Set(hay.map(([, , f]) => f(destinatario)))];
+  return {destinatario, importe, etiquetas, razones};
+}
+
+// Hora de una decisión: "Hoy, 19:02" o "8 de noviembre, 19:02".
+function cuando(fechaIso, hoyIso) {
+  const f = new Date(fechaIso);
+  const hora = f.toLocaleTimeString("es-ES", {hour: "2-digit", minute: "2-digit"});
+  if (fechaIso.slice(0, 10) === hoyIso) return `Hoy, ${hora}`;
+  return `${f.toLocaleDateString("es-ES", {day: "numeric", month: "long"})}, ${hora}`;
+}
+
+// Frase en lectura fácil para cada decisión que Javi compartió.
+function fraseDecision(d) {
+  const c = d.concepto;
+  if (d.decision === "comprar") {
+    if (/^enviar /i.test(c)) return `Javi ha enviado ${c.replace(/^enviar /i, "")}.`;
+    const cosa = c.replace(/^la /i, "una ").replace(/^el /i, "un ").replace(/\s+del?\s.*$/i, "");
+    return `Javi ha pagado ${cosa} de ${euros(d.importe)}.`;
+  }
+  if (d.decision === "hablarlo") return `Javi quiere hablar contigo de ${c}.`;
+  return `Javi ha decidido esperar: ${c}.`;
+}
+
+async function pintarAna() {
+  const [circulo, decisiones, avisos, presupuesto] = await Promise.all([
+    api("circulo"), api("decisiones"), api(`avisos?para=${YO}`), api("presupuesto")]);
+
+  const yo = circulo.find(m => m.id === YO);
+  $("p9-como").textContent = `Ayudas a Javi como: ${NIVELES[yo?.nivel] ?? "—"}`;
+
+  // Caja "Posible estafa": solo cuando Javi ha pedido hablar con Ana de un envío de dinero
+  // (botón "Avisar a Ana" de la pantalla 8). Las señales salen del aviso del backend.
+  const pidio = [...decisiones].reverse().find(d =>
+    d.compartir && d.decision === "hablarlo" && /^enviar /i.test(d.concepto));
+  const avisoEstafa = avisos.find(a => a.tipo === "posible_abuso");
+  if (pidio && avisoEstafa) {
+    const e = leerAvisoEstafa(avisoEstafa);
+    $("p9-estafa").innerHTML = `
+      <div class="caja-aviso" role="alert">
+        <p class="titulo-aviso"><span data-icono="aviso"></span>Posible estafa</p>
+        <p style="margin-top:12px">Javi quería enviar ${esc(e.importe || euros(pidio.importe))} a ${esc(e.destinatario)} y ha pedido hablar contigo.</p>
+        <p class="negrita" style="margin-top:12px">${e.etiquetas.map(t => `• ${esc(t)}`).join("&nbsp; ")}</p>
+        <!-- TODO: el teléfono de Javi no está en seed.json; "tel:" abre el marcador vacío. -->
+        <a class="boton aviso" style="margin-top:16px" href="tel:" id="p9-llamar">Llamar a Javi</a>
+      </div>`;
+  } else {
+    $("p9-estafa").innerHTML = "";
+  }
+
+  // Tarjetas con campana: lo que Javi decidió y quiso compartir (lo más nuevo arriba).
+  // El envío de la caja de estafa no se repite aquí.
+  const visibles = decisiones.filter(d => d.compartir && d !== pidio).reverse();
+  $("p9-avisos").innerHTML = visibles.map(d => `
+    <div class="tarjeta fila aviso-ana">
+      <span class="picto" data-icono="campana"></span>
+      <div>
+        <p class="nombre">${esc(fraseDecision(d))}</p>
+        <p class="suave" style="margin-top:8px">${d.decision === "comprar" ? "Lo decidió él. · " : ""}${cuando(d.fecha, presupuesto.fecha)}</p>
+      </div>
+    </div>`).join("");
+
+  pintarIconos($("p9-estafa"));
+  pintarIconos($("p9-avisos"));
+}
+
+AL_ENTRAR["9"] = () => { pintarAna(); repetir = setInterval(pintarAna, 2000); };
+
+// ---------- 10 · Informe anual ----------
+// Las cifras salen del backend (GET /informe_anual/resumen), no de Figma.
+// Cifras con punto de miles, como en el diseño: 11.760 €
+const cifra = n => `${n.toLocaleString("de-DE", {maximumFractionDigits: 2})} €`;
+
+// Avisos de estafa = pausas con riesgo alto que avisaron al círculo de apoyo.
+// TODO: el resumen del backend aún no trae este número; se cuenta desde GET /avisos
+// (un aviso por pausa, aunque llegue a varias personas).
+async function pausasDeEstafa() {
+  const avisos = await api("avisos");
+  const unicas = new Map();
+  for (const a of avisos.filter(a => a.tipo === "posible_abuso")) unicas.set(a.fecha + a.texto, a);
+  return [...unicas.values()].reverse();   // de la más antigua a la más nueva
+}
+
+AL_ENTRAR["10"] = async () => {
+  $("p10-mensaje").hidden = true;
+  const [r, pausas] = await Promise.all([api("informe_anual/resumen"), pausasDeEstafa()]);
+  $("p10-titulo").textContent = `Informe anual ${r.anio}`;
+  $("p10-entro").textContent = cifra(r.total_ingresos);
+  $("p10-gasto").textContent = cifra(r.total_gastos);
+  $("p10-ahorro").textContent = cifra(r.traspasado_a_ahorro);
+  $("p10-decisiones").textContent = r.decisiones.length;
+  $("p10-estafas").textContent = pausas.length;
+};
+
+// El PDF lo genera el backend. Solo lo puede preparar quien tenga permiso de rendir cuentas
+// (nivel "Guardar" o más). Si no, el backend responde 403 y se explica en la pantalla.
+const URL_PDF = `/api/personas/${P}/informe_anual?preparado_por=${YO}`;
+
+async function pedirPdf() {
+  const r = await fetch(URL_PDF);
+  if (r.ok) return new File([await r.blob()], `informe_${P}.pdf`, {type: "application/pdf"});
+  $("p10-mensaje").textContent = r.status === 403
+    ? "Para descargar el informe para el juzgado tienes que ayudar a Javi como: Guardar."
+    : "No se ha podido preparar el PDF. Prueba otra vez.";
+  $("p10-mensaje").hidden = false;
+  return null;
+}
+
+$("p10-pdf").onclick = async () => {
+  const pdf = await pedirPdf();
+  if (!pdf) return;
+  const a = Object.assign(document.createElement("a"), {href: URL.createObjectURL(pdf), download: pdf.name});
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+// Compartir: en el móvil abre el menú de compartir del sistema con el PDF; si no se puede, lo descarga.
+$("p10-compartir").onclick = async () => {
+  const pdf = await pedirPdf();
+  if (!pdf) return;
+  if (navigator.canShare?.({files: [pdf]})) {
+    await navigator.share({files: [pdf], title: "Informe anual de Javi"}).catch(() => {});
+  } else {
+    $("p10-pdf").click();
+  }
+};
+
+// ---------- 11 · Detalle de estafas ----------
+// Una tarjeta por cada pausa para pensar con aviso (GET /avisos). Lo que decidió Javi sale de
+// sus decisiones sobre envíos de dinero (GET /decisiones): cada intento de envío termina en una
+// decisión (Avisar a Ana / No enviar / Enviar igualmente), así que la pausa n.º 1 va con la
+// decisión n.º 1, la 2 con la 2, etc. Si Javi envió el dinero, se dice tal cual: sin esconderlo ni juzgarlo.
+const QUE_DECIDIO = {
+  hablarlo: {texto: "Avisó a Ana y no envió el dinero.", enviado: false},
+  esperar: {texto: "No envió el dinero.", enviado: false},
+  comprar: {texto: "Envió el dinero.", enviado: true},
+};
+
+AL_ENTRAR["11"] = async () => {
+  const [pausas, decisiones] = await Promise.all([pausasDeEstafa(), api("decisiones")]);
+  const envios = decisiones.filter(d => /^enviar /i.test(d.concepto));
+
+  const tarjetas = pausas.map((a, i) => {
+    const e = leerAvisoEstafa(a);
+    const d = envios[i];
+    const medio = d?.concepto.match(/por (\w+)$/)?.[1] ?? "Envío";
+    const fecha = new Date(d?.fecha ?? a.fecha).toLocaleDateString("es-ES", {day: "numeric", month: "long", year: "numeric"});
+    const q = d ? QUE_DECIDIO[d.decision] : null;
+    const resultado = !q ? "" : q.enviado
+      ? `<p class="resultado enviado">Dinero enviado: ${esc(e.importe || euros(d.importe))}</p>`
+      : `<p class="resultado">✓&nbsp; Dinero no enviado</p>`;
+    return `
+      <div class="tarjeta borde-salvia leido estafa">
+        <p class="etiqueta">${esc(fecha)}</p>
+        <p class="nombre" style="font-size:24px;margin-top:12px">${esc(medio)} de ${esc(e.importe)} a ${esc(e.destinatario)}</p>
+        <p class="etiqueta">Por qué hubo pausa:</p>
+        <ul class="razones">${e.razones.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+        <p class="etiqueta">Qué decidió Javi:</p>
+        <p class="negrita" style="font-size:20px;margin-top:12px">${q ? q.texto : "Todavía no ha decidido."}</p>
+        ${resultado}
+      </div>`;
+  }).reverse();   // lo más nuevo arriba
+
+  $("p11-lista").innerHTML = tarjetas.join("") ||
+    `<p class="tarjeta">No ha habido ninguna pausa para pensar este año.</p>`;
+};
+
+pintarIconos();
+mostrar();
 </script>
 </body>
 </html>
