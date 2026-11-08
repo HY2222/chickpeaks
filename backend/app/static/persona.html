@@ -305,12 +305,13 @@ let conv = null;
 function entenderPregunta(texto) {
   const num = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:€|euros?)/i);
   if (!num) return null;
-  const cosa = texto.match(/comprar\s+(.+?)\s*(?:[?¿.,]|$)/i);
-  return {texto, importe: parseFloat(num[1].replace(",", ".")), concepto: cosa ? cosa[1] : "esto"};
+  const cosa = texto.match(/(?:comprar(?:me)?|en)\s+((?:el|la|los|las|un|una|unos|unas)\s+[^?¿.,]+?|[^?¿.,\d]+?)\s*(?:[?¿.,]|$)/i);
+  return {texto, importe: parseFloat(num[1].replace(",", ".")), concepto: cosa ? cosa[1].replace(/\s+(?:de|por)\s+\d.*$/i, "") : "esto"};
 }
 
 async function oido(texto) {
   $("p2-oido").textContent = `«${texto}»`;
+  if (conv) return;   // con Noa conectada, las cifras llegan por la herramienta evaluar_compra
   const q = entenderPregunta(texto);
   if (!q) return;
   estado.pregunta = q;
@@ -348,6 +349,15 @@ AL_ENTRAR["2"] = async () => {
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     conv = await Conversation.startSession({
       signedUrl: signed_url,
+      // Herramienta de Noa que corre en esta pantalla: así Noa y la pantalla usan
+      // las mismas cifras. Las cuentas las hace el backend, no la IA.
+      clientTools: {
+        evaluar_compra: async ({importe, concepto}) => {
+          estado.pregunta = {texto: $("p2-oido").textContent, importe: Number(importe), concepto: concepto || "esto"};
+          estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto, hucha: "mis_cosas"});
+          return JSON.stringify(estado.respuesta);
+        },
+      },
       onMessage: m => {
         if (m.source === "user") oido(m.message);
         else if (m.source === "ai" && estado.respuesta) location.hash = "#3"; // Noa contesta → pantalla 3
