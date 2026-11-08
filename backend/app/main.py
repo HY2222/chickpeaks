@@ -107,9 +107,19 @@ def presupuesto(persona_id: str):
     """Herramienta de Noa: cuánto queda en cada hucha este mes."""
     p = _persona(persona_id)
     huchas = budget.estado_huchas(p)
-    frases = [f"En {h['nombre'].lower()} te quedan {easyread.euros(h['quedan'])}." for h in huchas]
+    # Javi solo piensa en lo que puede gastar. Casa, comida y ahorro ya están apartados.
+    frases = [f"Te quedan {easyread.euros(h['quedan'])} para {budget.nombre_en_frase(h)}."
+              for h in huchas if h["id"] not in ("casa", "comida", "ahorro")]
+    if any(g["hucha"] in ("casa", "comida") for g in p.get("gastos_recurrentes", [])):
+        frases.append("Lo de casa y comida ya está guardado.")
     return {"persona": p["nombre"], "fecha": hoy().isoformat(), "huchas": huchas,
             "texto_lectura_facil": " ".join(frases)}
+
+
+@app.get("/api/personas/{persona_id}/pagos_del_mes", dependencies=[Depends(token_herramientas)])
+def pagos_del_mes(persona_id: str):
+    """Herramienta de Noa: qué pagos fijos hay este mes y si ya se han pagado. Willo no paga nada."""
+    return budget.pagos_del_mes(_persona(persona_id))
 
 
 @app.post("/api/personas/{persona_id}/evaluar_compra", dependencies=[Depends(token_herramientas)])
@@ -167,8 +177,8 @@ def evaluar_riesgo(persona_id: str, pago: Pago):
                  f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
                  f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
                  f"La decisión es suya. Llámale con calma.")
-        for m in support.con_permiso(p, "recibir_avisos_abuso"):
-            avisar(p, m, "posible_abuso", texto)
+        for m in support.con_permiso(p, "recibir_avisos_estafa"):
+            avisar(p, m, "posible_estafa", texto)
             r["avisados"].append(m["nombre"])
         if r["avisados"]:
             r["texto_lectura_facil"] += f" Como acordaste, he avisado a {' y '.join(r['avisados'])}."
@@ -225,6 +235,8 @@ def registrar_gasto(persona_id: str, g: GastoDictado):
         gasto = expenses.interpretar(g.texto)
     except ValueError as e:
         raise HTTPException(422, str(e))
+    if gasto["hucha"] not in {h["id"] for h in p["huchas"]}:
+        gasto["hucha"] = "mis_cosas"  # p. ej. "cine": Javi no tiene hucha de ocio, va a sus cosas
     mov = {"fecha": hoy().isoformat(), "concepto": gasto["concepto"], "importe": gasto["importe"],
            "tipo": "gasto", "hucha": gasto["hucha"], "destinatario": None,
            "registrado_por": m["nombre"], "texto_original": g.texto}

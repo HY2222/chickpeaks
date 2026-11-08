@@ -30,6 +30,12 @@
     <div class="barra"><span id="p1-barra" style="width:0"></span></div>
   </div>
 
+  <!-- Pagos fijos del mes: el banco los paga solo, Willo nunca paga. Sin cifras, solo para tranquilizar. -->
+  <div class="tarjeta pagos-tarjeta" id="p1-pagos-tarjeta" hidden>
+    <p class="nombre"><span class="check" data-icono="hecho"></span>Ya está guardado este mes</p>
+    <div class="pagos" id="p1-pagos"></div>
+  </div>
+
   <h2 class="titulo-seccion">Tus huchas</h2>
   <div class="lista" id="p1-huchas" aria-live="polite"></div>
 
@@ -78,7 +84,7 @@
     <div class="barra"><span id="p3-despues-barra"></span></div>
   </div>
 
-  <p class="tu-decides">Tú decides.</p>
+  <p class="tu-decides">Tú decides</p>
 
   <div class="botones">
     <button class="boton secundario" id="p3-escuchar">Escuchar otra vez</button>
@@ -116,7 +122,7 @@
   <div class="camara" aria-hidden="true"><svg class="marco" viewBox="0 0 170 235"><rect x="2" y="2" width="166" height="231" rx="8" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="16 10"/></svg></div>
 
   <div class="centrado">
-    <p style="font-size:20px">Pon el documento dentro del recuadro.</p>
+    <p style="font-size:20px">Pon el documento dentro del recuadro</p>
     <p class="suave" style="margin-top:16px">Willo no guarda la foto. Solo guarda lo que pone.</p>
   </div>
 
@@ -201,9 +207,9 @@
   <div class="caja-aviso" role="alert">
     <p class="titulo-aviso"><span data-icono="aviso"></span>Pausa para pensar</p>
     <div class="frases aviso-frases">
-      <p class="negrita">Espera un momento.</p>
+      <p class="negrita">Espera un momento</p>
       <div id="p8-razones"></div>
-      <p>Esto pasa a veces en las estafas.</p>
+      <p>Esto pasa a veces en las estafas</p>
     </div>
   </div>
 
@@ -230,6 +236,8 @@ const P = "javi";
 const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
 const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
 const $ = id => document.getElementById(id);
+// En pantalla, cada frase va en su línea: sin punto final (inés, 8 nov). Noa sí los usa al hablar.
+const sinPunto = s => s.replace(/\.\s*$/, "");
 const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
 const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
 
@@ -244,6 +252,10 @@ const ICONOS = {
   coche: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
   documento: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
   enviar: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
+  casa: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  comida: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  luz: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  bus: '<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>',
   aviso: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
 };
 
@@ -265,7 +277,7 @@ function mostrar() {
 window.addEventListener("hashchange", mostrar);
 
 // ---------- 1 · Inicio de Javi ----------
-// "Este mes te quedan" = lo que queda en la hucha "Mis cosas" (la misma que usa evaluar_compra).
+// "Este mes te quedan" = lo que queda en la hucha "Para tus cosas" (id mis_cosas, la misma que usa evaluar_compra).
 AL_ENTRAR["1"] = async () => {
   const d = await api("presupuesto");
   const fecha = new Date(d.fecha + "T12:00");
@@ -277,13 +289,14 @@ AL_ENTRAR["1"] = async () => {
   $("p1-quedan").textContent = euros(h.quedan);
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
 
-  let metas = await api("metas").catch(() => []);
-  if (!metas.length) {
-    // TODO: Javi todavía no tiene huchas de ahorro en backend/data/seed.json (solo Lucía).
-    // Datos falsos fijos del diseño hasta que se cuadre el seed (fase 0).
-    metas = [{nombre: "Viaje a Valencia", ahorrado: 120, importe: 300},
-             {nombre: "Móvil nuevo", ahorrado: 45, importe: 200}];
-  }
+  // Pagos fijos (alquiler, luz...): solo el nombre y el pictograma, sin cifras.
+  const {pagos} = await api("pagos_del_mes").catch(() => ({pagos: []}));
+  $("p1-pagos-tarjeta").hidden = !pagos.length;
+  $("p1-pagos").innerHTML = pagos.map(p => `
+    <span class="pago"><span data-icono="${ICONOS[p.pictograma] ? p.pictograma : "hecho"}"></span>${mayuscula(sinArticulo(p.corto))}</span>`).join("");
+  pintarIconos($("p1-pagos-tarjeta"));
+
+  const metas = await api("metas").catch(() => []);
   $("p1-huchas").innerHTML = metas.map(m => `
     <div class="tarjeta fila" style="padding-right:40px">
       <span class="picto" data-icono="hucha"></span>
@@ -397,6 +410,36 @@ $("p2-parar").onclick = async () => {
 };
 window.addEventListener("hashchange", () => { if (location.hash === "#1") pararVoz(); });
 
+// ---------- Cifras dichas por Noa → números ("ciento veinte euros" → "120 €") ----------
+// Noa escribe los números en palabras para que la voz los lea bien. En pantalla, mejor cifras.
+const NUM = {cero: 0, un: 1, uno: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7,
+  ocho: 8, nueve: 9, diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15,
+  "dieciséis": 16, dieciseis: 16, diecisiete: 17, dieciocho: 18, diecinueve: 19, veinte: 20,
+  "veintiún": 21, veintiun: 21, veintiuno: 21, veintiuna: 21, "veintidós": 22, veintidos: 22,
+  "veintitrés": 23, veintitres: 23, veinticuatro: 24, veinticinco: 25, "veintiséis": 26, veintiseis: 26,
+  veintisiete: 27, veintiocho: 28, veintinueve: 29, treinta: 30, cuarenta: 40, cincuenta: 50,
+  sesenta: 60, setenta: 70, ochenta: 80, noventa: 90, cien: 100, ciento: 100,
+  doscientos: 200, doscientas: 200, trescientos: 300, trescientas: 300, cuatrocientos: 400,
+  cuatrocientas: 400, quinientos: 500, quinientas: 500, seiscientos: 600, seiscientas: 600,
+  setecientos: 700, setecientas: 700, ochocientos: 800, ochocientas: 800, novecientos: 900, novecientas: 900};
+const PALABRA_NUM = `(?:${Object.keys(NUM).sort((a, b) => b.length - a.length).join("|")}|mil)`;
+const SERIE_NUM = `${PALABRA_NUM}(?:\\s+(?:y\\s+)?${PALABRA_NUM})*`;
+function palabrasANumero(txt) {
+  let total = 0, actual = 0;
+  for (const p of txt.toLowerCase().split(/\s+/)) {
+    if (p === "y") continue;
+    if (p === "mil") { total += (actual || 1) * 1000; actual = 0; }
+    else actual += NUM[p];
+  }
+  return total + actual;
+}
+function cifrasEnNumeros(texto) {
+  return texto
+    .replace(new RegExp(`\\b(${SERIE_NUM})\\s+euros?\\b`, "gi"), (_, n) => `${palabrasANumero(n)} €`)
+    .replace(new RegExp(`\\b(día|días)\\s+(${SERIE_NUM})\\b`, "gi"), (_, d, n) => `${d} ${palabrasANumero(n)}`)
+    .replace(/(\d+) euros?\b/gi, "$1 €");
+}
+
 // ---------- 3 · Respuesta de Noa ----------
 // Todas las cifras vienen de evaluar_compra (backend). Noa explica, no recomienda.
 const sinArticulo = s => s.replace(/^(la|el|los|las|un|una|unos|unas)\s+/i, "");
@@ -438,13 +481,13 @@ AL_ENTRAR["3"] = async () => {
   // de tono como [cálido]). Sin Noa, las frases de arriba, que lee la voz del navegador.
   if (conv && estado.dichoNoa) {
     frases.length = 0;
-    frases.push(...estado.dichoNoa
+    frases.push(...cifrasEnNumeros(estado.dichoNoa)
       .replace(/\[[^\]]*\]/g, "")
       .split(/(?<=[.!?])\s+/)
       .map(f => f.trim())
       .filter(f => f && !/^tú decides\.?$/i.test(f)));  // "Tú decides." ya sale en grande
   }
-  $("p3-frases").innerHTML = frases.map(f => `<p>${f.replace(/[<>&]/g, "")}</p>`).join("");
+  $("p3-frases").innerHTML = frases.map(f => `<p>${sinPunto(f.replace(/[<>&]/g, ""))}</p>`).join("");
 
   // Escala de las barras: lo que tiene la hucha cada mes.
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
@@ -562,7 +605,7 @@ $("p6-si").onclick = () => { estado.documento.confirmado = true; location.hash =
 $("p6-no").onclick = () => { estado.documento = null; location.hash = "#5"; };
 
 // ---------- 7 · Noa explica el documento ----------
-// Las cuentas las hace el backend con evaluar_compra (resta el importe de "Mis cosas").
+// Las cuentas las hace el backend con evaluar_compra (resta el importe de "Para tus cosas").
 // Solo calcula: no paga nada ni apunta ningún gasto. Noa no paga nada.
 const conceptoDocumento = d => `la ${d.tipo.toLowerCase()}`;   // "la multa de aparcamiento"
 
@@ -590,7 +633,7 @@ AL_ENTRAR["7"] = async () => {
     ? `Si la pagas, te quedan ${euros(r.quedan_despues)} para tus cosas.`
     : `Si la pagas, te faltan ${euros(-r.quedan_despues)} para tus cosas.`);
   frases.push(`Tienes hasta el ${d.fecha_limite}.`);
-  $("p7-frases").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
+  $("p7-frases").innerHTML = frases.map(f => `<p>${sinPunto(f)}</p>`).join("");
 
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
   const total = h?.limite_mensual || r.quedan_antes;
@@ -653,7 +696,7 @@ AL_ENTRAR["8"] = async () => {
     (ORDEN.indexOf(x.id) + 1 || 99) - (ORDEN.indexOf(y.id) + 1 || 99));
   const razones = [...new Set(senales.map(s => RAZONES[s.id]?.(b) ?? s.explicacion))];
   estado.razones = razones;
-  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${r}</p>`).join("");
+  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${sinPunto(r)}</p>`).join("");
   pintarIconos(document.querySelector('[data-pantalla="8"]'));
 
   if (!conv) decir(["Pausa para pensar.", "Espera un momento.", ...razones,

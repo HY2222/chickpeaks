@@ -3,7 +3,7 @@
 Niveles, de menos a más. Cada nivel incluye lo de los anteriores:
   N0  Por defecto: solo la persona usa la app y decide.
   N1  Compartir: la persona de apoyo ve lo que ella elige. Se puede retirar.
-  N2  Apoyo: avisos de posible abuso (con consentimiento previo) y
+  N2  Apoyo: avisos de posible estafa (con consentimiento previo) y
       "pausa para pensar" que activa la propia persona. Nunca bloqueo.
   N3  Guardador de hecho: registra gastos y prepara la rendición de cuentas.
   N4  Poder preventivo o curatela: solo lo que diga el documento, nada más.
@@ -27,7 +27,7 @@ NIVELES = {
 # Permiso -> nivel mínimo
 _PERMISOS = {
     "ver_decisiones": 1,
-    "recibir_avisos_abuso": 2,
+    "recibir_avisos_estafa": 2,
     "registrar_gastos": 3,
     "preparar_rendicion_cuentas": 3,
 }
@@ -40,11 +40,11 @@ def puede(miembro: dict[str, Any], permiso: str) -> bool:
         alcance = set(miembro.get("alcance_documento", []))
         if permiso == "ver_decisiones":
             return "ver_movimientos" in alcance
-        if permiso == "recibir_avisos_abuso":
-            return miembro.get("consiente_avisos_abuso", False)
+        if permiso == "recibir_avisos_estafa":
+            return miembro.get("consiente_avisos_estafa", False)
         return permiso in alcance
-    if permiso == "recibir_avisos_abuso":
-        return nivel >= 2 and miembro.get("consiente_avisos_abuso", False)
+    if permiso == "recibir_avisos_estafa":
+        return nivel >= 2 and miembro.get("consiente_avisos_estafa", False)
     return nivel >= _PERMISOS.get(permiso, 99)
 
 

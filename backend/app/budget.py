@@ -26,6 +26,36 @@ def estado_huchas(persona: dict[str, Any]) -> list[dict[str, Any]]:
     return salida
 
 
+def nombre_en_frase(h: dict[str, Any]) -> str:
+    """"Para tus cosas" -> "tus cosas"; "Mis cosas" -> "mis cosas"."""
+    nombre = h["nombre"].lower()
+    return nombre[5:] if nombre.startswith("para ") else nombre
+
+
+def pagos_del_mes(persona: dict[str, Any]) -> dict[str, Any]:
+    """Pagos fijos del mes (alquiler, luz...). Los hace el banco solo; Willo nunca paga.
+    Sirve para que Javi sepa qué está pagado y qué falta, y que el dinero ya está guardado."""
+    h = hoy()
+    pagos = []
+    for g in sorted(persona.get("gastos_recurrentes", []), key=lambda g: g["dia"]):
+        if g["hucha"] == "ahorro":
+            continue  # las huchas de ahorro salen en "Tus huchas", no aquí
+        pagos.append({"concepto": g["concepto"], "importe": g["importe"], "dia": g["dia"],
+                      "corto": g.get("corto", g["concepto"].lower()),
+                      "pictograma": g.get("pictograma", g["hucha"]),
+                      "pagado": g["dia"] <= h.day})
+    pagados = [p for p in pagos if p["pagado"]]
+    faltan = [p for p in pagos if not p["pagado"]]
+    # Una idea por frase (lectura fácil).
+    frases = [f"Ya has pagado {p['corto']}: {euros(p['importe'])}." for p in pagados]
+    frases += [f"{p['corto'].capitalize()} se paga el día {p['dia']}: {euros(p['importe'])}." for p in faltan]
+    if faltan:
+        frases.append("Ese dinero ya está guardado. Se paga solo.")
+    if not pagos:
+        frases.append("Este mes no tienes pagos fijos.")
+    return {"pagos": pagos, "texto_lectura_facil": " ".join(frases)}
+
+
 def buscar_hucha(persona: dict[str, Any], hucha_id: str | None) -> dict[str, Any]:
     huchas = estado_huchas(persona)
     if hucha_id:
@@ -46,7 +76,7 @@ def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
     h = buscar_hucha(persona, hucha_id)
     quedan_despues = round(h["quedan"] - importe, 2)
     alcanza = quedan_despues >= 0
-    frases = [f"En tu hucha de {h['nombre'].lower()} te quedan {euros(h['quedan'])}."]
+    frases = [f"En la hucha de {nombre_en_frase(h)} te quedan {euros(h['quedan'])}."]
     if alcanza:
         frases.append(f"Si compras {concepto}, te quedan {euros(quedan_despues)}.")
     else:

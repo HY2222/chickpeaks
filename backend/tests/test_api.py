@@ -6,21 +6,22 @@ from app.expenses import interpretar
 def test_presupuesto(client):
     r = client.get("/api/personas/javi/presupuesto").json()
     mis_cosas = next(h for h in r["huchas"] if h["id"] == "mis_cosas")
-    assert mis_cosas["quedan"] == 120  # 150 - camiseta de 30
+    assert mis_cosas["quedan"] == 210  # 288 - 78 ya gastados (datos-ejemplo.md)
+    assert mis_cosas["nombre"] == "Para tus cosas"
 
 
 def test_zapatillas_alcanza(client):
     r = client.post("/api/personas/javi/evaluar_compra", json={"importe": 80, "concepto": "las zapatillas"}).json()
-    assert r["quedan_antes"] == 120 and r["quedan_despues"] == 40 and r["alcanza"]
-    assert "te quedan 40 €" in r["texto_lectura_facil"]
+    assert r["quedan_antes"] == 210 and r["quedan_despues"] == 130 and r["alcanza"]
+    assert "te quedan 130 €" in r["texto_lectura_facil"]
     assert "Tú decides" in r["texto_lectura_facil"]
     assert comprobar(r["texto_lectura_facil"])["es_facil"]
 
 
 def test_no_alcanza_no_recomienda(client):
-    r = client.post("/api/personas/javi/evaluar_compra", json={"importe": 200, "concepto": "un móvil"}).json()
+    r = client.post("/api/personas/javi/evaluar_compra", json={"importe": 250, "concepto": "un móvil"}).json()
     assert not r["alcanza"]
-    assert "Te faltan 80 €" in r["texto_lectura_facil"]
+    assert "Te faltan 40 €" in r["texto_lectura_facil"]
     assert "no deberías" not in r["texto_lectura_facil"].lower()
 
 
@@ -32,7 +33,7 @@ def test_decision_compra_avisa_a_ana(client):
     av = client.get("/api/personas/javi/avisos?para=ana").json()
     assert av[0]["texto"] == "Javi compró zapatillas. Lo decidió él."
     pres = client.get("/api/personas/javi/presupuesto").json()
-    assert next(h for h in pres["huchas"] if h["id"] == "mis_cosas")["quedan"] == 40
+    assert next(h for h in pres["huchas"] if h["id"] == "mis_cosas")["quedan"] == 130
 
 
 def test_decision_no_compartida(client):
@@ -82,7 +83,8 @@ def test_circulo_persona_retira_apoyo(client):
 
 
 def test_circulo_documento_no_se_cambia_desde_app(client):
-    assert client.put("/api/personas/javi/circulo/fundacion", json={"nivel": 0}).status_code == 403
+    # La madre de Lucía tiene el apoyo por ley (patria potestad): no se quita desde la app.
+    assert client.put("/api/personas/lucia/circulo/mama", json={"nivel": 0}).status_code == 403
 
 
 def test_apoyar_no_puede_registrar_gastos(client):
@@ -94,9 +96,9 @@ def test_apoyar_no_puede_registrar_gastos(client):
 
 def test_curadora_registra_gasto_y_genera_informe(client):
     r = client.post("/api/personas/javi/gastos",
-                    json={"texto": "He pagado 45 euros de luz de Javi", "registrado_por": "fundacion"}).json()
+                    json={"texto": "He pagado 45 euros de luz de Javi", "registrado_por": "ana"}).json()
     assert r["importe"] == 45 and r["hucha"] == "casa"
-    pdf = client.get("/api/personas/javi/informe_anual?preparado_por=fundacion")
+    pdf = client.get("/api/personas/javi/informe_anual?preparado_por=ana")
     assert pdf.status_code == 200 and pdf.content[:4] == b"%PDF"
     # Ana es "Guardar" (N3): puede preparar el informe. Con "Apoyar" (N2), no.
     assert client.get("/api/personas/javi/informe_anual?preparado_por=ana").status_code == 200
@@ -107,7 +109,7 @@ def test_curadora_registra_gasto_y_genera_informe(client):
 def test_resumen_cuadra(client):
     r = client.get("/api/personas/javi/informe_anual/resumen").json()
     assert r["saldo_final"] == round(r["saldo_inicial"] + r["total_ingresos"] - r["total_gastos"], 2)
-    assert r["total_ingresos"] == 11 * 1070  # enero a noviembre
+    assert r["total_ingresos"] == 11 * 980  # enero a noviembre
 
 
 def test_pausa_para_pensar(client):
@@ -143,3 +145,18 @@ def test_pwa_instalable(client):
     assert m["display"] == "standalone" and m["start_url"] == "/demo"
     assert {i["sizes"] for i in m["icons"]} == {"192x192", "512x512"}
     assert 'rel="manifest"' in client.get("/demo").text
+
+
+def test_pagos_del_mes(client):
+    r = client.get("/api/personas/javi/pagos_del_mes").json()
+    conceptos = [p["concepto"] for p in r["pagos"]]
+    assert conceptos == ["Alquiler", "Abono de transporte", "Luz", "Comida del supermercado"]
+    assert all(p["pagado"] for p in r["pagos"])  # hoy es día 8: ya ha pasado todo
+    assert "Ya has pagado el alquiler: 350 €." in r["texto_lectura_facil"]
+    assert comprobar(r["texto_lectura_facil"])["es_facil"]
+
+
+def test_cine_dictado_va_a_sus_cosas(client):
+    # Javi no tiene hucha de ocio: el cine cuenta como "Para tus cosas".
+    r = client.post("/api/personas/javi/gastos", json={"texto": "12 euros de cine", "registrado_por": "ana"}).json()
+    assert r["hucha"] == "mis_cosas"

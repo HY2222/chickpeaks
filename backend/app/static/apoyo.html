@@ -167,13 +167,13 @@ async function pintarAna() {
   // (botón "Avisar a Ana" de la pantalla 8). Las señales salen del aviso del backend.
   const pidio = [...decisiones].reverse().find(d =>
     d.compartir && d.decision === "hablarlo" && /^enviar /i.test(d.concepto));
-  const avisoEstafa = avisos.find(a => a.tipo === "posible_abuso");
+  const avisoEstafa = avisos.find(a => a.tipo === "posible_estafa");
   if (pidio && avisoEstafa) {
     const e = leerAvisoEstafa(avisoEstafa);
     $("p9-estafa").innerHTML = `
       <div class="caja-aviso" role="alert">
         <p class="titulo-aviso"><span data-icono="aviso"></span>Posible estafa</p>
-        <p style="margin-top:12px">Javi quería enviar ${esc(e.importe || euros(pidio.importe))} a ${esc(e.destinatario)} y ha pedido hablar contigo.</p>
+        <p style="margin-top:12px">Javi quería enviar ${esc(e.importe || euros(pidio.importe))} a ${esc(e.destinatario)} y ha pedido hablar contigo</p>
         <p class="negrita" style="margin-top:12px">${e.etiquetas.map(t => `• ${esc(t)}`).join("&nbsp; ")}</p>
         <!-- TODO: el teléfono de Javi no está en seed.json; "tel:" abre el marcador vacío. -->
         <a class="boton aviso" style="margin-top:16px" href="tel:" id="p9-llamar">Llamar a Javi</a>
@@ -211,7 +211,7 @@ const cifra = n => `${n.toLocaleString("de-DE", {maximumFractionDigits: 2})} €
 async function pausasDeEstafa() {
   const avisos = await api("avisos");
   const unicas = new Map();
-  for (const a of avisos.filter(a => a.tipo === "posible_abuso")) unicas.set(a.fecha + a.texto, a);
+  for (const a of avisos.filter(a => a.tipo === "posible_estafa")) unicas.set(a.fecha + a.texto, a);
   return [...unicas.values()].reverse();   // de la más antigua a la más nueva
 }
 
@@ -288,7 +288,7 @@ AL_ENTRAR["11"] = async () => {
         <p class="etiqueta">${esc(fecha)}</p>
         <p class="nombre" style="font-size:24px;margin-top:12px">${esc(medio)} de ${esc(e.importe)} a ${esc(e.destinatario)}</p>
         <p class="etiqueta">Por qué hubo pausa:</p>
-        <ul class="razones">${e.razones.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+        <ul class="razones">${e.razones.map(r => `<li>${esc(r).replace(/\.\s*$/, "")}</li>`).join("")}</ul>
         <p class="etiqueta">Qué decidió Javi:</p>
         <p class="negrita" style="font-size:20px;margin-top:12px">${q ? q.texto : "Todavía no ha decidido."}</p>
         ${resultado}
@@ -296,7 +296,7 @@ AL_ENTRAR["11"] = async () => {
   }).reverse();   // lo más nuevo arriba
 
   $("p11-lista").innerHTML = tarjetas.join("") ||
-    `<p class="tarjeta">No ha habido ninguna pausa para pensar este año.</p>`;
+    `<p class="tarjeta">No ha habido ninguna pausa para pensar este año</p>`;
 };
 
 pintarIconos();

@@ -4,7 +4,7 @@
     {
       "type": "webhook",
       "name": "consultar_huchas",
-      "description": "Devuelve cuánto dinero le queda este mes en cada hucha (casa, comida, mis cosas, salir, ahorro) y un texto en lectura fácil.",
+      "description": "Devuelve cuánto dinero le queda este mes para sus cosas (y en cada hucha) y un texto en lectura fácil.",
       "api_schema": {
         "url": "BASE_URL/api/personas/javi/presupuesto",
         "method": "GET"
@@ -20,11 +20,23 @@
         "request_body_schema": {
           "type": "object",
           "properties": {
-            "importe": {"type": "number", "description": "Precio en euros"},
-            "concepto": {"type": "string", "description": "Qué quiere comprar, con artículo. Ej: 'las zapatillas'"},
-            "hucha": {"type": "string", "description": "Opcional: casa, comida, mis_cosas, ocio o ahorro. Por defecto mis_cosas"}
+            "importe": {
+              "type": "number",
+              "description": "Precio en euros"
+            },
+            "concepto": {
+              "type": "string",
+              "description": "Qué quiere comprar, con artículo. Ej: 'las zapatillas'"
+            },
+            "hucha": {
+              "type": "string",
+              "description": "Opcional: casa, comida, mis_cosas, ocio o ahorro. Por defecto mis_cosas"
+            }
           },
-          "required": ["importe", "concepto"]
+          "required": [
+            "importe",
+            "concepto"
+          ]
         }
       }
     },
@@ -38,14 +50,37 @@
         "request_body_schema": {
           "type": "object",
           "properties": {
-            "concepto": {"type": "string"},
-            "importe": {"type": "number"},
-            "decision": {"type": "string", "enum": ["comprar", "esperar", "hablarlo"]},
-            "palabras_persona": {"type": "string", "description": "Lo que dijo, con sus palabras exactas"},
-            "pidio_apoyo": {"type": "boolean"},
-            "compartir": {"type": "boolean", "description": "true si quiere que su círculo de apoyo lo vea"}
+            "concepto": {
+              "type": "string"
+            },
+            "importe": {
+              "type": "number"
+            },
+            "decision": {
+              "type": "string",
+              "enum": [
+                "comprar",
+                "esperar",
+                "hablarlo"
+              ]
+            },
+            "palabras_persona": {
+              "type": "string",
+              "description": "Lo que dijo, con sus palabras exactas"
+            },
+            "pidio_apoyo": {
+              "type": "boolean"
+            },
+            "compartir": {
+              "type": "boolean",
+              "description": "true si quiere que su círculo de apoyo lo vea"
+            }
           },
-          "required": ["concepto", "importe", "decision"]
+          "required": [
+            "concepto",
+            "importe",
+            "decision"
+          ]
         }
       }
     },
@@ -59,12 +94,32 @@
         "request_body_schema": {
           "type": "object",
           "properties": {
-            "destinatario": {"type": "string", "description": "A quién quiere enviar el dinero"},
-            "importe": {"type": "number"},
-            "contexto": {"type": "string", "description": "Resumen de lo que ha contado: quién se lo pide, cómo, por qué"}
+            "destinatario": {
+              "type": "string",
+              "description": "A quién quiere enviar el dinero"
+            },
+            "importe": {
+              "type": "number"
+            },
+            "contexto": {
+              "type": "string",
+              "description": "Resumen de lo que ha contado: quién se lo pide, cómo, por qué"
+            }
           },
-          "required": ["destinatario", "importe"]
+          "required": [
+            "destinatario",
+            "importe"
+          ]
         }
+      }
+    },
+    {
+      "type": "webhook",
+      "name": "pagos_del_mes",
+      "description": "Lista los pagos fijos del mes (alquiler, bus, luz, comida), si ya se han pagado o qué día se pagan, y un texto en lectura fácil. Willo no paga nada: los paga el banco solo.",
+      "api_schema": {
+        "url": "BASE_URL/api/personas/javi/pagos_del_mes",
+        "method": "GET"
       }
     }
   ]

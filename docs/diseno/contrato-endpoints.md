@@ -1,7 +1,7 @@
-# Willo · Contrato de endpoints (borrador para revisar)
+# Willo · Contrato de endpoints
 
 Qué pide cada pantalla al backend y qué le devuelve. Sirve para que pantallas, backend y Noa (ElevenLabs) hablen el mismo idioma.
-Revisan: Inés y Cristina. Fecha: 8 de noviembre de 2026.
+Revisado por Inés (8 nov). Cristina: echarle un vistazo. Fecha: 8 de noviembre de 2026.
 
 Leyenda: ✅ ya existe · ✏️ existe pero hay que cambiarlo · 🆕 hay que crearlo.
 
@@ -30,7 +30,7 @@ Reglas para todos:
 | 9 Móvil de Ana | `GET /api/personas/javi/avisos?para=ana` | ✏️ (estado del aviso) |
 | 10 Informe | `GET /api/personas/javi/informe_anual/resumen` | ✏️ (añadir avisos de estafa) |
 | 10 PDF | `GET /api/personas/javi/informe_anual?preparado_por=ana` | ✅ |
-| 11 Detalle estafas | `GET /api/personas/javi/avisos?tipo=posible_abuso` | ✏️ (filtro y resultado) |
+| 11 Detalle estafas | `GET /api/personas/javi/avisos?tipo=posible_estafa` | ✏️ (filtro y resultado) |
 | Demo | `POST /api/demo/reset` | ✅ |
 
 ---
@@ -117,7 +117,8 @@ Respuesta:
   "texto_lectura_facil": "He leído: multa de aparcamiento. 90 €. Hay que pagar antes del 20 de diciembre. ¿Es correcto?"
 }
 ```
-Valores de `tipo`: `factura`, `recibo`, `nomina`, `multa`, `carta_banco`, `otro`.
+Valores de `tipo`: `factura`, `recibo`, `ticket`, `nomina`, `multa`, `carta_banco`, `otro`.
+- `ticket`: el ticket de una compra que Javi ya ha hecho (tienda, bar, supermercado). `accion` suele ser `nada`: ya está pagado.
 Valores de `accion`: `pagar`, `nada`, `contestar`, `revisar`.
 Si Claude no puede leerlo → `422` con `"texto_lectura_facil": "No he podido leerlo bien. ¿Haces otra foto con más luz?"`.
 
@@ -140,6 +141,7 @@ Respuesta:
   "texto_lectura_facil": "No estaba en tu plan. Si la pagas, te quedan 75 € para tus cosas. Tienes hasta el 20 de diciembre. ¿Quieres hablarlo con Ana?"
 }
 ```
+- Si `tipo` es `ticket`, no se resta otra vez: el pago con tarjeta ya está en sus movimientos. Solo se explica: "Es el ticket de la tienda de ropa. Pagaste 30 €. Ya está apuntado. Te quedan 210 € para tus cosas." Si el gasto no aparece en sus movimientos (pagó en efectivo), se apunta como gasto de "Para tus cosas".
 - `en_plan` es `true` si el importe y el remitente coinciden con un gasto recurrente (por ejemplo, la luz). Entonces: "Ya estaba en tu plan. No tienes que hacer nada."
 - Si `sospechoso` es `true` (pantalla de reserva R1), no se hacen cuentas: "Cuidado. Este documento te pide tu clave del banco. Los bancos nunca piden eso..."
 - **No paga nada.** "Hablar con Ana" usa `POST /decisiones` con `"decision": "hablarlo"`.
@@ -195,7 +197,7 @@ Lo usa la pantalla 11 ("Dinero no enviado").
 Cada aviso trae ahora `id`, `estado` y `resultado`:
 ```json
 [
-  {"id": "av_7", "tipo": "posible_abuso", "para": "ana", "fecha": "2026-11-08T19:10:00",
+  {"id": "av_7", "tipo": "posible_estafa", "para": "ana", "fecha": "2026-11-08T19:10:00",
    "estado": "javi_pide_hablar", "resultado": {"enviado": false},
    "destinatario": "Carlos", "importe": 300.0,
    "senales": ["Carlos es una persona nueva.", "Te pide prisa.", "300 € es mucho para ti este mes."],
@@ -220,7 +222,7 @@ La pantalla 10 enseña: Dinero que entró = `total_ingresos`, Dinero que gastó 
 ### ✅ `GET /api/personas/javi/informe_anual?preparado_por=ana`
 Devuelve el PDF. Ana está en "Guardar" (nivel 3), así que tiene permiso. Con "Apoyar" devuelve `403`.
 
-### ✏️ `GET /api/personas/javi/avisos?tipo=posible_abuso`
+### ✏️ `GET /api/personas/javi/avisos?tipo=posible_estafa`
 Pantalla 11: añadir el filtro `tipo`. Cada aviso trae `senales` y `resultado`, como arriba.
 
 ---
@@ -241,8 +243,8 @@ En la API van como número; en pantalla siempre el nombre.
 
 ---
 
-## Para decidir (Inés y Cristina)
+## Decidido (Inés, 8 de noviembre de 2026)
 
-1. ¿Leer documento en **dos pasos** (leer + confirmar), como aquí, o en uno?
-2. ¿Qué modelo de Claude con visión usamos? Propuesta: el más barato que lea bien, probado con 5 fotos reales de facturas.
-3. ¿Guardamos el resultado del envío (`/resultado`) o la pantalla 11 lo deduce de las decisiones?
+1. **Leer documento en dos pasos** (`/documentos/leer` y luego `/documentos/confirmar`). Javi comprueba lo leído antes de que se hagan cuentas, porque la IA puede leer mal una cifra. Pantallas 5, 6 y 7.
+2. **Modelo: Claude Haiku** (con visión), con la clave de la fase 1. Antes, probarlo con 5 fotos reales: factura, ticket, multa, carta del banco y una foto mala. Si falla con las buenas, cambiar a Sonnet (una línea de código).
+3. **Guardar el resultado del envío** con `POST /avisos/{aviso_id}/resultado`. Se apunta igual si Javi no lo envía o si lo envía, sin juzgarle. Lo usan la pantalla 11 y el informe para el juzgado.
