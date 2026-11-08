@@ -363,7 +363,13 @@ AL_ENTRAR["2"] = async () => {
         else if (m.source === "ai" && estado.respuesta) location.hash = "#3"; // Noa contesta → pantalla 3
       },
       onModeChange: ({mode}) => $("p2-micro").classList.toggle("activo", mode === "listening"),
-      onDisconnect: () => { conv = null; },
+      // Si Noa cuelga sola (Javi dice que no necesita nada más), volvemos al inicio.
+      // Si la cortó Javi con el botón, pararVoz ya puso conv = null y no se navega.
+      onDisconnect: () => {
+        const colgoNoa = conv !== null;
+        conv = null;
+        if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 1500);
+      },
     });
   } catch {
     console.info("Modo demo: la voz no está conectada. Se usa la frase del guion.");
