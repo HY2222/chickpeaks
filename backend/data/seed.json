@@ -119,7 +119,7 @@
           "id": "ana",
           "nombre": "Ana",
           "relacion": "hermana",
-          "nivel": 2,
+          "nivel": 3,
           "otorgado_por": "persona",
           "consiente_avisos_abuso": true
         },

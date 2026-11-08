@@ -6,86 +6,648 @@
 <title>Willo · Javi</title>
 <link rel="stylesheet" href="/static/willo.css">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
-<meta name="theme-color" content="#1f4fd1">
+<meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
 <script src="/static/pwa.js" defer></script>
 </head>
 <body>
-<main>
-  <h1>Hola, Javi</h1>
-  <p class="sub">Esto es lo que te queda este mes.</p>
-  <section id="huchas" class="huchas" aria-live="polite"></section>
 
-  <button id="hablar" class="grande">🎤 Hablar con Noa</button>
-  <p id="estado-voz" class="sub" aria-live="polite"></p>
-
-  <h2>O escribe</h2>
-  <form id="preguntar" class="fila">
-    <label>¿Qué quieres comprar? <input id="concepto" value="las zapatillas" required></label>
-    <label>¿Cuánto cuesta? <input id="importe" type="number" min="1" value="80" required> €</label>
-    <button class="grande">¿Puedo comprarlo?</button>
-  </form>
-
-  <section id="respuesta" class="respuesta" hidden aria-live="polite">
-    <p id="texto"></p>
-    <div class="fila">
-      <button data-d="comprar" class="grande">Lo compro</button>
-      <button data-d="esperar" class="grande">Espero</button>
-      <button data-d="hablarlo" class="grande">Lo hablo con Ana</button>
+<!-- 1 · Inicio de Javi -->
+<section class="pantalla" data-pantalla="1">
+  <header class="cabecera">
+    <span class="picto" data-icono="persona"></span>
+    <div>
+      <h1 class="titulo">Hola, Javi</h1>
+      <p class="suave" id="p1-fecha"></p>
     </div>
-  </section>
-  <p class="aviso">Demo con datos inventados.</p>
-</main>
+  </header>
+
+  <div class="tarjeta destacada saldo">
+    <p style="font-size:22px">Este mes te quedan</p>
+    <p class="cifra" id="p1-quedan">… €</p>
+    <p class="suave">Hasta el día <span id="p1-dia-fin">30</span></p>
+    <div class="barra"><span id="p1-barra" style="width:0"></span></div>
+  </div>
+
+  <h2 class="titulo-seccion">Tus huchas</h2>
+  <div class="lista" id="p1-huchas" aria-live="polite"></div>
+
+  <div class="botones">
+    <a class="boton" href="#2">Hablar con Noa</a>
+  </div>
+</section>
+
+<!-- 2 · Hablando con Noa -->
+<section class="pantalla" data-pantalla="2" hidden>
+  <h1 class="titulo centrado">Noa te escucha</h1>
+
+  <div class="microfono" id="p2-micro" aria-hidden="true">
+    <div class="microfono-dentro" data-icono="micro"></div>
+  </div>
+
+  <div class="tarjeta" style="padding:24px 20px">
+    <p class="etiqueta">Noa ha oído:</p>
+    <p class="transcripcion" id="p2-oido" aria-live="polite">…</p>
+  </div>
+
+  <div class="botones" style="margin-top:0">
+    <button class="boton secundario" id="p2-parar">Parar</button>
+  </div>
+</section>
+
+<!-- 3 · Respuesta de Noa -->
+<section class="pantalla" data-pantalla="3" hidden>
+  <div class="tarjeta fila">
+    <span class="picto grande" id="p3-picto" data-icono="entrada"></span>
+    <div>
+      <p class="nombre" id="p3-cosa"></p>
+      <p class="suave" style="font-size:20px;margin-top:4px" id="p3-cuesta"></p>
+    </div>
+  </div>
+
+  <div>
+    <p class="etiqueta">Noa dice:</p>
+    <div class="frases noa-dice" id="p3-frases" aria-live="polite"></div>
+  </div>
+
+  <div class="tarjeta destacada comparar">
+    <p class="negrita" id="p3-ahora-texto"></p>
+    <div class="barra"><span id="p3-ahora-barra"></span></div>
+    <p class="negrita" id="p3-despues-texto"></p>
+    <div class="barra"><span id="p3-despues-barra"></span></div>
+  </div>
+
+  <p class="tu-decides">Tú decides.</p>
+
+  <div class="botones">
+    <button class="boton secundario" id="p3-escuchar">Escuchar otra vez</button>
+    <a class="boton" href="#1" id="p3-entendido">Entendido</a>
+  </div>
+</section>
+
+<!-- 4 · Aviso de pago -->
+<section class="pantalla centrado" data-pantalla="4" hidden>
+  <span class="picto pagado" data-icono="hecho"></span>
+  <div>
+    <h1 class="titulo" style="font-size:34px" id="p4-pagado"></h1>
+    <p class="suave" style="font-size:22px;margin-top:24px" id="p4-donde"></p>
+  </div>
+
+  <div class="tarjeta destacada" style="text-align:left;padding:24px 20px">
+    <p style="font-size:20px">Te quedan</p>
+    <p class="cifra" style="font-size:40px;margin:16px 0 4px" id="p4-quedan"></p>
+    <div class="barra"><span id="p4-barra"></span></div>
+  </div>
+
+  <div class="tarjeta" style="text-align:left;padding:24px 20px">
+    <p class="suave" id="p4-nota"></p>
+  </div>
+
+  <div class="botones">
+    <a class="boton" href="#1">Vale</a>
+  </div>
+</section>
+
+<!-- 5 · Hacer foto a un documento -->
+<section class="pantalla" data-pantalla="5" hidden>
+  <h1 class="titulo" style="font-size:30px">Enséñale el documento a Noa</h1>
+
+  <div class="camara" aria-hidden="true"><svg class="marco" viewBox="0 0 170 235"><rect x="2" y="2" width="166" height="231" rx="8" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="16 10"/></svg></div>
+
+  <div class="centrado">
+    <p style="font-size:20px">Pon el documento dentro del recuadro.</p>
+    <p class="suave" style="margin-top:16px">Willo no guarda la foto. Solo guarda lo que pone.</p>
+  </div>
+
+  <div class="botones">
+    <label class="boton">Hacer foto
+      <input type="file" accept="image/*" capture="environment" id="p5-camara" hidden>
+    </label>
+    <label class="boton secundario">Subir desde la galería
+      <input type="file" accept="image/*" id="p5-galeria" hidden>
+    </label>
+  </div>
+</section>
+
+<!-- 6 · ¿Es correcto? -->
+<section class="pantalla" data-pantalla="6" hidden>
+  <p class="etiqueta" style="font-size:20px">Noa ha leído:</p>
+
+  <div class="tarjeta borde-salvia leido" style="margin-top:-8px">
+    <div class="cabecera">
+      <span class="picto" id="p6-picto" data-icono="coche"></span>
+      <p class="nombre" style="font-size:22px" id="p6-tipo"></p>
+    </div>
+    <p class="etiqueta">Cuánto es</p>
+    <p class="dato" id="p6-importe"></p>
+    <p class="etiqueta">Hay que pagar antes del</p>
+    <p class="dato" id="p6-fecha"></p>
+    <p class="etiqueta">La envía</p>
+    <p class="dato" id="p6-envia"></p>
+  </div>
+
+  <div>
+    <p class="titulo verde">¿Es correcto?</p>
+    <p class="suave" style="font-size:20px;margin-top:16px">Mira el número en el documento. A veces Noa lee mal.</p>
+  </div>
+
+  <div class="botones">
+    <button class="boton" id="p6-si">Sí, es correcto</button>
+    <button class="boton secundario" id="p6-no">No, está mal</button>
+  </div>
+</section>
+
+<!-- 7 · Noa explica el documento -->
+<section class="pantalla" data-pantalla="7" hidden>
+  <div class="tarjeta fila">
+    <span class="picto grande" id="p7-picto" data-icono="coche"></span>
+    <div>
+      <p class="nombre" id="p7-tipo"></p>
+      <p class="suave" style="font-size:20px;margin-top:4px" id="p7-importe"></p>
+    </div>
+  </div>
+
+  <div>
+    <p class="etiqueta">Noa dice:</p>
+    <div class="frases noa-dice" id="p7-frases" aria-live="polite"></div>
+  </div>
+
+  <div class="tarjeta destacada comparar">
+    <p class="negrita" id="p7-ahora-texto"></p>
+    <div class="barra"><span id="p7-ahora-barra"></span></div>
+    <p class="negrita" id="p7-despues-texto"></p>
+    <div class="barra"><span id="p7-despues-barra"></span></div>
+  </div>
+
+  <p class="titulo-seccion">¿Quieres hablarlo con Ana?</p>
+
+  <div class="botones">
+    <button class="boton" id="p7-ana">Hablar con Ana</button>
+    <a class="boton secundario" href="#1" id="p7-ahora-no">Ahora no</a>
+  </div>
+</section>
+
+<!-- 8 · Pausa para pensar -->
+<section class="pantalla" data-pantalla="8" hidden style="padding-top:44px;padding-bottom:24px;gap:16px">
+  <div class="tarjeta fila">
+    <span class="picto" data-icono="enviar"></span>
+    <div>
+      <p class="nombre" style="font-size:22px" id="p8-enviar"></p>
+      <p class="suave" style="margin-top:4px" id="p8-a-quien"></p>
+    </div>
+  </div>
+
+  <div class="caja-aviso" role="alert">
+    <p class="titulo-aviso"><span data-icono="aviso"></span>Pausa para pensar</p>
+    <div class="frases aviso-frases">
+      <p class="negrita">Espera un momento.</p>
+      <div id="p8-razones"></div>
+      <p>Esto pasa a veces en las estafas.</p>
+    </div>
+  </div>
+
+  <p class="titulo-seccion">¿Quieres hablar con Ana antes?</p>
+
+  <div class="botones" style="margin-top:0;gap:12px">
+    <button class="boton" id="p8-ana">Avisar a Ana</button>
+    <button class="boton secundario" id="p8-no-enviar">No enviar</button>
+    <button class="boton secundario" id="p8-enviar-igual">Enviar igualmente</button>
+  </div>
+</section>
+
+<!-- Solo para la demo: botón invisible abajo a la derecha (pantallas 1, 3 y 4).
+     Antes de pagar: hace como si Javi pagara en la taquilla con su tarjeta (→ pantalla 4).
+     Después de pagar (pantallas 1 y 4): lleva a la foto del documento (→ pantalla 5).
+     Después del documento (pantalla 1): lleva a la pausa para pensar (→ pantalla 8).
+     Lo pulsa quien presenta, nunca la IA. -->
+<button class="escondido" id="simular-pago" aria-label="Simular pago (demo)" hidden></button>
+<!-- Igual, en la pantalla 5: hace como si Javi hubiera hecho la foto (sin abrir la cámara). -->
+<button class="escondido" id="simular-foto" aria-label="Simular foto (demo)" hidden></button>
+
 <script type="module">
 const P = "javi";
-const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => x.json());
+const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
 const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
+const $ = id => document.getElementById(id);
+const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
+const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
 
-async function pintarHuchas() {
+// ---------- Pictogramas (iconos Lucide; en la versión final, ARASAAC) ----------
+const ICONOS = {
+  persona: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+  hucha: '<path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/>',
+  micro: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/>',
+  entrada: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
+  bolsa: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  hecho: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  coche: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+  documento: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
+  enviar: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
+  aviso: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+};
+
+// Lo que Javi ha preguntado (lo usan las pantallas 2, 3 y 4).
+const estado = {pregunta: null, respuesta: null};
+const icono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[n]}</svg>`;
+const pintarIconos = (raiz = document) => raiz.querySelectorAll("[data-icono]").forEach(e => e.innerHTML = icono(e.dataset.icono));
+
+// ---------- Navegación: una pantalla cada vez, /demo#1 … /demo#8 ----------
+const AL_ENTRAR = {};
+function mostrar() {
+  const n = location.hash.slice(1) || "1";
+  document.querySelectorAll(".pantalla").forEach(s => s.hidden = s.dataset.pantalla !== n);
+  window.scrollTo(0, 0);
+  $("simular-pago").hidden = !["1", "3", "4"].includes(n);
+  $("simular-foto").hidden = n !== "5";
+  AL_ENTRAR[n]?.();
+}
+window.addEventListener("hashchange", mostrar);
+
+// ---------- 1 · Inicio de Javi ----------
+// "Este mes te quedan" = lo que queda en la hucha "Mis cosas" (la misma que usa evaluar_compra).
+AL_ENTRAR["1"] = async () => {
   const d = await api("presupuesto");
-  document.getElementById("huchas").innerHTML = d.huchas.map(h =>
-    `<div class="hucha"><span class="nombre">${h.nombre}</span><span class="cifra">${h.quedan} €</span></div>`).join("");
+  const fecha = new Date(d.fecha + "T12:00");
+  const texto = fecha.toLocaleDateString("es-ES", {weekday: "long", day: "numeric", month: "long"});
+  $("p1-fecha").textContent = texto[0].toUpperCase() + texto.slice(1);
+  $("p1-dia-fin").textContent = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
+
+  const h = d.huchas.find(x => x.id === "mis_cosas") ?? d.huchas[0];
+  $("p1-quedan").textContent = euros(h.quedan);
+  $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
+
+  let metas = await api("metas").catch(() => []);
+  if (!metas.length) {
+    // TODO: Javi todavía no tiene huchas de ahorro en backend/data/seed.json (solo Lucía).
+    // Datos falsos fijos del diseño hasta que se cuadre el seed (fase 0).
+    metas = [{nombre: "Viaje a Valencia", ahorrado: 120, importe: 300},
+             {nombre: "Móvil nuevo", ahorrado: 45, importe: 200}];
+  }
+  $("p1-huchas").innerHTML = metas.map(m => `
+    <div class="tarjeta fila" style="padding-right:40px">
+      <span class="picto" data-icono="hucha"></span>
+      <div>
+        <p class="nombre">${m.nombre}</p>
+        <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
+        <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
+      </div>
+    </div>`).join("");
+  pintarIconos($("p1-huchas"));
+};
+
+// ---------- 2 · Hablando con Noa ----------
+// La voz es el agente Noa de ElevenLabs (su transcripción es Scribe). Noa explica; aquí no se paga nada.
+// Con lo que Javi dice, la pantalla saca el importe y el concepto y pide las cuentas
+// al backend (evaluar_compra). Las cuentas las hace el código, nunca la IA.
+let conv = null;
+
+function entenderPregunta(texto) {
+  const num = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:€|euros?)/i);
+  if (!num) return null;
+  const cosa = texto.match(/comprar\s+(.+?)\s*(?:[?¿.,]|$)/i);
+  return {texto, importe: parseFloat(num[1].replace(",", ".")), concepto: cosa ? cosa[1] : "esto"};
 }
 
-let ultima = null;
-document.getElementById("preguntar").onsubmit = async e => {
-  e.preventDefault();
-  const concepto = document.getElementById("concepto").value;
-  const importe = +document.getElementById("importe").value;
-  const r = await post("evaluar_compra", {concepto, importe});
-  ultima = {concepto, importe};
-  document.getElementById("texto").textContent = r.texto_lectura_facil;
-  document.getElementById("respuesta").hidden = false;
-};
-document.querySelectorAll("[data-d]").forEach(b => b.onclick = async () => {
-  if (!ultima) return;
-  const r = await post("decisiones", {...ultima, decision: b.dataset.d, palabras_persona: b.textContent});
-  document.getElementById("texto").textContent = r.texto_lectura_facil;
-  pintarHuchas();
-});
+async function oido(texto) {
+  $("p2-oido").textContent = `«${texto}»`;
+  const q = entenderPregunta(texto);
+  if (!q) return;
+  estado.pregunta = q;
+  estado.respuesta = await post("evaluar_compra", {importe: q.importe, concepto: q.concepto});
+}
 
-// Voz: Noa (ElevenLabs Agents). Necesita ELEVENLABS_API_KEY y ELEVENLABS_AGENT_ID en el backend.
-// P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
-let conv = null;
-document.getElementById("hablar").onclick = async () => {
-  const estado = document.getElementById("estado-voz");
-  if (conv) { await conv.endSession(); conv = null; estado.textContent = ""; return; }
+// Si la voz no está lista (sin claves de ElevenLabs o sin micrófono), la demo sigue:
+// se escribe la frase del guion poco a poco, como si Noa la oyera.
+async function frasePorDefecto() {
+  const frase = "¿Puedo comprar la entrada del concierto? Cuesta 45 euros.";
+  const palabras = frase.split(" ");
+  for (let i = 1; i <= palabras.length; i++) {
+    if (location.hash !== "#2") return;
+    $("p2-oido").textContent = `«${palabras.slice(0, i).join(" ")}»`;
+    await new Promise(r => setTimeout(r, 220));
+  }
+  await oido(frase);
+}
+
+async function pararVoz() {
+  if (conv) { const c = conv; conv = null; await c.endSession().catch(() => {}); }
+  $("p2-micro").classList.remove("activo");
+}
+
+AL_ENTRAR["2"] = async () => {
+  estado.pregunta = estado.respuesta = null;
+  $("p2-oido").textContent = "…";
+  $("p2-micro").classList.add("activo");
   try {
-    const { signed_url } = await fetch("/api/voz/signed-url").then(r => { if (!r.ok) throw new Error(); return r.json(); });
+    const r = await fetch("/api/voz/signed-url");
+    if (!r.ok) throw new Error("voz no configurada");
+    const { signed_url } = await r.json();
     await navigator.mediaDevices.getUserMedia({audio: true});
+    // P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     conv = await Conversation.startSession({
       signedUrl: signed_url,
-      onMessage: m => { if (m.source === "ai") estado.textContent = m.message; },
-      onDisconnect: () => { conv = null; pintarHuchas(); },
+      onMessage: m => {
+        if (m.source === "user") oido(m.message);
+        else if (m.source === "ai" && estado.respuesta) location.hash = "#3"; // Noa contesta → pantalla 3
+      },
+      onModeChange: ({mode}) => $("p2-micro").classList.toggle("activo", mode === "listening"),
+      onDisconnect: () => { conv = null; },
     });
-    estado.textContent = "Noa te escucha.";
   } catch {
-    estado.textContent = "La voz no está lista. Puedes escribir abajo.";
+    console.info("Modo demo: la voz no está conectada. Se usa la frase del guion.");
+    await frasePorDefecto();
   }
 };
-pintarHuchas();
+
+$("p2-parar").onclick = async () => {
+  await pararVoz();
+  location.hash = estado.respuesta ? "#3" : "#1";
+};
+window.addEventListener("hashchange", () => { if (location.hash === "#1") pararVoz(); });
+
+// ---------- 3 · Respuesta de Noa ----------
+// Todas las cifras vienen de evaluar_compra (backend). Noa explica, no recomienda.
+const sinArticulo = s => s.replace(/^(la|el|los|las|un|una|unos|unas)\s+/i, "");
+const mayuscula = s => s[0].toUpperCase() + s.slice(1);
+
+// Voz del navegador para "Escuchar otra vez" y para el modo demo sin ElevenLabs.
+function decir(texto) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(texto);
+  u.lang = "es-ES"; u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+AL_ENTRAR["3"] = async () => {
+  if (!estado.respuesta) {
+    // Si se abre /demo#3 directamente, se usa la pregunta del guion.
+    estado.pregunta = {concepto: "la entrada del concierto", importe: 45};
+    estado.respuesta = await post("evaluar_compra", estado.pregunta);
+  }
+  const q = estado.pregunta, r = estado.respuesta;
+  const corto = q.concepto.replace(/\s+del?\s.*$/i, "");  // "la entrada del concierto" → "la entrada"
+  $("p3-cosa").textContent = mayuscula(sinArticulo(q.concepto));
+  $("p3-cuesta").textContent = `Cuesta ${euros(r.importe)}`;
+  $("p3-picto").dataset.icono = /entrada/i.test(q.concepto) ? "entrada" : "bolsa";
+  pintarIconos(document.querySelector("[data-pantalla=\"3\"]"));
+
+  const dia = $("p1-dia-fin").textContent || "30";
+  const frases = [`Este mes te quedan ${euros(r.quedan_antes)}.`];
+  if (r.alcanza) {
+    frases.push(`Si compras ${corto}, te quedan ${euros(r.quedan_despues)}.`);
+    // TODO: frase del diseño. El backend aún no dice si llega para comida (está en otra hucha);
+    // se ajustará cuando se cuadre seed.json (fase 0). De momento solo sale si la compra cabe.
+    frases.push(`Con ${euros(r.quedan_despues)} tienes para comida hasta el día ${dia}.`);
+  } else {
+    frases.push(`Cuesta ${euros(r.importe)}.`, `Te faltan ${euros(-r.quedan_despues)}.`);
+  }
+  $("p3-frases").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
+
+  // Escala de las barras: lo que tiene la hucha cada mes.
+  const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
+  const total = h?.limite_mensual || r.quedan_antes;
+  $("p3-ahora-texto").textContent = `Ahora: ${euros(r.quedan_antes)}`;
+  $("p3-despues-texto").textContent = `Después: ${euros(Math.max(r.quedan_despues, 0))}`;
+  $("p3-ahora-barra").style.width = pct(r.quedan_antes, total);
+  $("p3-despues-barra").style.width = pct(r.quedan_despues, total);
+
+  estado.textoNoa = [...frases, "Tú decides."].join(" ");
+  if (!conv) decir(estado.textoNoa);   // sin el agente de voz, habla el navegador
+};
+
+$("p3-escuchar").onclick = async () => { await pararVoz(); decir(estado.textoNoa); };
+$("p3-entendido").onclick = () => { pararVoz(); if ("speechSynthesis" in window) speechSynthesis.cancel(); };
+
+// ---------- 4 · Aviso de pago ----------
+// Javi paga él mismo en la taquilla. En la demo lo simula el botón invisible: apunta la compra
+// con POST /decisiones (decision "comprar"). El backend resta el gasto de la hucha y avisa a
+// quien Javi eligió (Ana). Si la compra ya estaba apuntada (p. ej. por Noa), no se apunta dos veces.
+const COMERCIO = "Entradas Concierto";  // nombre del comercio en el aviso de la tarjeta (dato de la demo)
+
+$("simular-pago").onclick = async () => {
+  // La esquina secreta sigue el guion: pantalla 4 → foto del documento (pantalla 5).
+  if (location.hash === "#4") { location.hash = "#5"; return; }
+  const q = estado.pregunta ?? {concepto: "la entrada del concierto", importe: 45};
+  const yaApuntada = (await api("decisiones")).some(d =>
+    d.decision === "comprar" && d.concepto === q.concepto && d.importe === q.importe);
+  // En la pantalla 1 después de pagar, la esquina lleva a la parte 2 del guion (pantalla 5),
+  // y después del documento, a la parte 3 (pantalla 8).
+  if (yaApuntada && (location.hash === "#1" || location.hash === "")) {
+    location.hash = (await documentoHecho()) ? "#8" : "#5";
+    return;
+  }
+  let avisados = [];
+  if (!yaApuntada) {
+    const r = await post("decisiones", {
+      concepto: q.concepto, importe: q.importe, decision: "comprar",
+      palabras_persona: `Pagado con tarjeta en ${COMERCIO}`, compartir: true,
+    });
+    avisados = r.avisados;
+  } else {
+    avisados = (await api("avisos")).filter(a => a.tipo === "decision").map(a => a.para_nombre);
+  }
+  estado.pago = {...q, avisados};
+  location.hash = "#4";
+};
+
+AL_ENTRAR["4"] = async () => {
+  const pago = estado.pago ?? {concepto: "la entrada del concierto", importe: 45, avisados: ["Ana"]};
+  $("p4-pagado").textContent = `Has pagado ${euros(pago.importe)}`;
+  $("p4-donde").textContent = `en ${COMERCIO}`;
+  $("p4-nota").textContent = pago.avisados.includes("Ana")
+    ? "Ana ve este pago porque tú lo elegiste."
+    : "Nadie más ve este pago.";
+  const h = (await api("presupuesto")).huchas.find(x => x.id === "mis_cosas");
+  $("p4-quedan").textContent = `${euros(h.quedan)} este mes`;
+  $("p4-barra").style.width = pct(h.quedan, h.limite_mensual);
+};
+
+// ---------- 5 · Hacer foto a un documento ----------
+// La foto la leerá Claude con visión y devolverá siempre el mismo formato:
+// tipo, quién lo envía, importe, fecha, qué hay que hacer y si parece sospechoso.
+// No se guarda la imagen, solo esos datos (y solo después de que Javi confirme, pantalla 6).
+//
+// TODO: todavía no existe el endpoint para leer documentos (está pendiente en el contrato de
+// endpoints). Mientras tanto, la foto NO se envía a ningún sitio y se usan estos datos falsos fijos.
+const DOCUMENTO_FALSO = {
+  tipo: "Multa de aparcamiento",
+  envia: "Ayuntamiento",
+  importe: 90,
+  fecha_limite: "20 de diciembre",
+  que_hacer: "Pagar la multa",
+  sospechoso: false,
+};
+
+async function leerDocumento(foto) {
+  // TODO: cuando exista, algo así como:
+  //   const datos = new FormData(); datos.append("foto", foto);
+  //   return fetch(`/api/personas/${P}/leer_documento`, {method: "POST", body: datos}).then(r => r.json());
+  return {...DOCUMENTO_FALSO};
+}
+
+async function fotoElegida(e) {
+  const foto = e.target.files?.[0];
+  e.target.value = "";            // la pantalla tampoco se queda con la foto
+  if (!foto) return;
+  estado.documento = await leerDocumento(foto);
+  location.hash = "#6";
+}
+$("p5-camara").onchange = fotoElegida;
+$("p5-galeria").onchange = fotoElegida;
+$("simular-foto").onclick = async () => { estado.documento = await leerDocumento(null); location.hash = "#6"; };
+
+// ---------- 6 · ¿Es correcto? ----------
+// Regla: los datos leídos NO se usan hasta que Javi confirma. Solo "Sí, es correcto" marca
+// el documento como confirmado; la pantalla 7 no hace cuentas sin esa confirmación.
+const iconoDocumento = d => /multa|aparcamiento|coche/i.test(d.tipo) ? "coche" : "documento";
+
+AL_ENTRAR["6"] = async () => {
+  if (!estado.documento) estado.documento = await leerDocumento(null);  // abierto directo: datos de la demo
+  const d = estado.documento;
+  d.confirmado = false;
+  $("p6-tipo").textContent = d.tipo;
+  $("p6-importe").textContent = euros(d.importe);
+  $("p6-fecha").textContent = d.fecha_limite;
+  $("p6-envia").textContent = d.envia;
+  $("p6-picto").dataset.icono = iconoDocumento(d);
+  pintarIconos(document.querySelector('[data-pantalla="6"]'));
+  if (!conv) decir(`He leído ${euros(d.importe)}, hasta el ${d.fecha_limite}. ¿Es correcto?`);
+};
+
+$("p6-si").onclick = () => { estado.documento.confirmado = true; location.hash = "#7"; };
+// "No, está mal": se descarta lo leído y se vuelve a hacer la foto.
+$("p6-no").onclick = () => { estado.documento = null; location.hash = "#5"; };
+
+// ---------- 7 · Noa explica el documento ----------
+// Las cuentas las hace el backend con evaluar_compra (resta el importe de "Mis cosas").
+// Solo calcula: no paga nada ni apunta ningún gasto. Noa no paga nada.
+const conceptoDocumento = d => `la ${d.tipo.toLowerCase()}`;   // "la multa de aparcamiento"
+
+// ¿Javi ya terminó con el documento? (lo usa la esquina secreta de la pantalla 1)
+async function documentoHecho() {
+  if (estado.documentoHecho) return true;
+  return (await api("decisiones")).some(d => d.decision === "hablarlo" && d.importe === DOCUMENTO_FALSO.importe);
+}
+
+AL_ENTRAR["7"] = async () => {
+  const d = estado.documento;
+  if (!d?.confirmado) { location.hash = "#6"; return; }   // sin confirmar, no se usan los datos
+
+  $("p7-tipo").textContent = d.tipo;
+  $("p7-importe").textContent = euros(d.importe);
+  $("p7-picto").dataset.icono = iconoDocumento(d);
+  pintarIconos(document.querySelector('[data-pantalla="7"]'));
+  $("p7-ana").disabled = false;
+  $("p7-ana").textContent = "Hablar con Ana";
+
+  const r = await post("evaluar_compra", {importe: d.importe, concepto: conceptoDocumento(d)});
+  // "No estaba en tu plan": la multa no es un gasto fijo del mes (alquiler, luz, comida…).
+  const frases = ["No estaba en tu plan."];
+  frases.push(r.alcanza
+    ? `Si la pagas, te quedan ${euros(r.quedan_despues)} para tus cosas.`
+    : `Si la pagas, te faltan ${euros(-r.quedan_despues)} para tus cosas.`);
+  frases.push(`Tienes hasta el ${d.fecha_limite}.`);
+  $("p7-frases").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
+
+  const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
+  const total = h?.limite_mensual || r.quedan_antes;
+  $("p7-ahora-texto").textContent = `Ahora: ${euros(r.quedan_antes)}`;
+  $("p7-despues-texto").textContent = `Si pagas: ${euros(Math.max(r.quedan_despues, 0))}`;
+  $("p7-ahora-barra").style.width = pct(r.quedan_antes, total);
+  $("p7-despues-barra").style.width = pct(r.quedan_despues, total);
+
+  if (!conv) decir([...frases, "¿Quieres hablarlo con Ana?"].join(" "));
+};
+
+// "Hablar con Ana": Javi decide pedir apoyo. Se apunta su decisión (decisión "hablarlo", no se paga)
+// y el backend avisa a Ana: "Javi quiere hablar contigo de la multa de aparcamiento."
+$("p7-ana").onclick = async () => {
+  const d = estado.documento;
+  $("p7-ana").disabled = true;
+  await post("decisiones", {
+    concepto: conceptoDocumento(d), importe: d.importe, decision: "hablarlo",
+    palabras_persona: "Hablar con Ana", pidio_apoyo: true, compartir: true,
+  });
+  estado.documentoHecho = true;
+  $("p7-ana").textContent = "Ana ya lo sabe";
+  setTimeout(() => { location.hash = "#1"; }, 1500);
+};
+$("p7-ahora-no").onclick = () => { estado.documentoHecho = true; };
+
+// ---------- 8 · Pausa para pensar ----------
+// Javi intenta mandar un Bizum. La pausa la activan REGLAS FIJAS del backend (evaluar_riesgo:
+// persona nueva, prisa, cantidad alta…), no la IA. Willo nunca bloquea: Javi siempre puede
+// "Enviar igualmente". Los botones los pulsa Javi; Willo no envía dinero por él.
+//
+// Intento de Bizum de la demo (en la app real llegaría del banco al ir a enviar).
+const BIZUM = {
+  destinatario: "Carlos",
+  importe: 300,
+  contexto: "Carlos, un amigo nuevo de Instagram, me pide 300 euros urgente",
+};
+const conceptoBizum = b => `enviar ${euros(b.importe)} a ${b.destinatario} por Bizum`;
+
+// Frases cortas para cada regla del backend (orden del diseño). Las que no están aquí
+// se enseñan con la explicación que da el backend.
+const RAZONES = {
+  destinatario_nuevo: b => `${b.destinatario} es una persona nueva.`,
+  relacion_nueva: b => `${b.destinatario} es una persona nueva.`,
+  urgencia: () => "Te pide prisa.",
+  importe_alto: b => `${euros(b.importe)} es mucho para ti este mes.`,
+};
+const ORDEN = ["destinatario_nuevo", "relacion_nueva", "urgencia", "importe_alto"];
+
+AL_ENTRAR["8"] = async () => {
+  const b = BIZUM;
+  $("p8-enviar").textContent = `Enviar ${euros(b.importe)}`;
+  $("p8-a-quien").textContent = `a ${b.destinatario}, por Bizum`;
+  ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = false);
+  $("p8-ana").textContent = "Avisar a Ana";
+
+  // Solo se evalúa una vez por intento (cada evaluación con riesgo alto avisa a Ana).
+  estado.riesgo ??= await post("evaluar_riesgo", b);
+  const senales = [...estado.riesgo.senales].sort((x, y) =>
+    (ORDEN.indexOf(x.id) + 1 || 99) - (ORDEN.indexOf(y.id) + 1 || 99));
+  const razones = [...new Set(senales.map(s => RAZONES[s.id]?.(b) ?? s.explicacion))];
+  estado.razones = razones;
+  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${r}</p>`).join("");
+  pintarIconos(document.querySelector('[data-pantalla="8"]'));
+
+  if (!conv) decir(["Pausa para pensar.", "Espera un momento.", ...razones,
+                    "Esto pasa a veces en las estafas.", "¿Quieres hablar con Ana antes?"].join(" "));
+};
+
+async function decidirBizum(decision, extra) {
+  ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = true);
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  await post("decisiones", {
+    concepto: conceptoBizum(BIZUM), importe: BIZUM.importe, decision, ...extra,
+  });
+  estado.riesgo = null;
+}
+
+// Javi pide hablar con Ana y no envía el dinero. El backend avisa a Ana.
+$("p8-ana").onclick = async () => {
+  await decidirBizum("hablarlo", {palabras_persona: "Avisar a Ana", pidio_apoyo: true, compartir: true});
+  $("p8-ana").textContent = "Ana ya lo sabe";
+  setTimeout(() => { location.hash = "#1"; }, 1500);
+};
+// Javi decide no enviarlo.
+$("p8-no-enviar").onclick = async () => {
+  await decidirBizum("esperar", {palabras_persona: "No enviar", compartir: false});
+  location.hash = "#1";
+};
+// Willo nunca bloquea: si Javi quiere, lo envía. Se apunta como gasto suyo.
+$("p8-enviar-igual").onclick = async () => {
+  await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true});
+  location.hash = "#1";
+};
+
+pintarIconos();
+mostrar();
 </script>
 </body>
 </html>

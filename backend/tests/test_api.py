@@ -73,7 +73,9 @@ def test_circulo_documento_no_se_cambia_desde_app(client):
     assert client.put("/api/personas/javi/circulo/fundacion", json={"nivel": 0}).status_code == 403
 
 
-def test_ana_no_puede_registrar_gastos(client):
+def test_apoyar_no_puede_registrar_gastos(client):
+    # Ana es "Guardar" (N3) en la demo. Con "Apoyar" (N2) no puede apuntar gastos.
+    assert client.put("/api/personas/javi/circulo/ana", json={"nivel": 2}).status_code == 200
     r = client.post("/api/personas/javi/gastos", json={"texto": "45 euros de luz", "registrado_por": "ana"})
     assert r.status_code == 403
 
@@ -84,6 +86,9 @@ def test_curadora_registra_gasto_y_genera_informe(client):
     assert r["importe"] == 45 and r["hucha"] == "casa"
     pdf = client.get("/api/personas/javi/informe_anual?preparado_por=fundacion")
     assert pdf.status_code == 200 and pdf.content[:4] == b"%PDF"
+    # Ana es "Guardar" (N3): puede preparar el informe. Con "Apoyar" (N2), no.
+    assert client.get("/api/personas/javi/informe_anual?preparado_por=ana").status_code == 200
+    client.put("/api/personas/javi/circulo/ana", json={"nivel": 2})
     assert client.get("/api/personas/javi/informe_anual?preparado_por=ana").status_code == 403
 
 
