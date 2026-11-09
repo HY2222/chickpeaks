@@ -45,6 +45,24 @@
       }
     },
     {
+      "type": "client",
+      "name": "responder_documento",
+      "description": "Cuando Willo te ha pasado un documento leído y Javi contesta si está bien leído. correcto=true si dice que sí; false si dice que está mal. La ejecuta la pantalla de Javi (persona.html), que pulsa 'Sí, es correcto' o 'No, está mal'.",
+      "expects_response": true,
+      "parameters": {
+        "type": "object",
+        "required": [
+          "correcto"
+        ],
+        "properties": {
+          "correcto": {
+            "type": "boolean",
+            "description": "true si Javi dice que lo leído es correcto; false si dice que está mal"
+          }
+        }
+      }
+    },
+    {
       "type": "webhook",
       "name": "guardar_decision",
       "description": "Guarda lo que la persona ha decidido y avisa a su círculo de apoyo si ella quiere compartirlo.",

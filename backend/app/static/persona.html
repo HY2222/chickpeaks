@@ -699,6 +699,50 @@ $("p5-contactos").onclick = async () => {
   }
 };
 
+// ---------- Noa en los documentos (pantallas 6 y 7) ----------
+// Con un documento leído, la pantalla abre una conversación con Noa (sin saludo) y le pasa
+// lo que ha leído Willo. Noa lo dice con su voz y Javi le puede contestar o preguntar.
+// Los datos y las cuentas siguen viniendo del backend: Noa solo los explica.
+// Si la voz no está disponible, devuelve false y la pantalla usa decir().
+async function noaDice(textoParaNoa) {
+  if (conv) {
+    try { conv.sendUserMessage(textoParaNoa); return true; } catch { return false; }
+  }
+  await pararVoz();
+  const miSesion = sesionVoz;
+  try {
+    const r = await fetch("/api/voz/signed-url");
+    if (!r.ok) return false;
+    const { signed_url } = await r.json();
+    await navigator.mediaDevices.getUserMedia({audio: true});
+    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
+    let nueva = null;
+    nueva = await Conversation.startSession({
+      signedUrl: signed_url,
+      dynamicVariables: {nombre: "Javi"},
+      overrides: {agent: {firstMessage: ""}},   // sin "Hola, soy Noa": va directa al documento
+      clientTools: {
+        // Javi contesta por voz "sí, está bien" o "no, está mal": la pantalla 6 hace lo mismo que los botones.
+        responder_documento: async ({correcto}) => {
+          if (location.hash === "#6") setTimeout(() => $(correcto ? "p6-si" : "p6-no").click(), 1500);
+          return correcto ? "Javi dice que es correcto. Ahora Willo hace las cuentas." : "Javi dice que está mal. Se abre la cámara otra vez.";
+        },
+        abrir_camara: async () => {
+          setTimeout(() => { location.hash = "#5"; }, 2500);
+          return "Se abre la cámara.";
+        },
+      },
+      onDisconnect: () => { if (nueva && conv === nueva) conv = null; },
+    });
+    if (miSesion !== sesionVoz) { nueva.endSession().catch(() => {}); return false; }
+    conv = nueva;
+    conv.sendUserMessage(textoParaNoa);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ---------- 6 · ¿Es correcto? ----------
 // Regla: los datos leídos NO se usan hasta que Javi confirma. Solo "Sí, es correcto" marca
 // el documento como confirmado; la pantalla 7 no hace cuentas sin esa confirmación.
@@ -732,7 +776,9 @@ AL_ENTRAR["6"] = () => {
   $("p6-aviso").hidden = !d.sospechoso;
   $("p6-senales").innerHTML = senales.map(t => `<p>${esc(sinPunto(t))}</p>`).join("");
   pintarIconos(document.querySelector('[data-pantalla="6"]'));
-  if (!conv) decir(d.texto_lectura_facil);
+  const paraNoa = `[Willo] Javi ha hecho una foto. Willo ha leído esto: ${d.texto_lectura_facil} ` +
+    "Díselo a Javi con estas mismas palabras y pregúntale si es correcto. Cuando conteste, usa responder_documento.";
+  noaDice(paraNoa).then(ok => { if (!ok) decir(d.texto_lectura_facil); });
 };
 
 $("p6-si").onclick = () => { estado.documento.confirmado = true; location.hash = "#7"; };
@@ -786,7 +832,9 @@ AL_ENTRAR["7"] = async () => {
     $("p7-despues-barra").style.width = pct(r.quedan_despues, total);
   }
 
-  if (!conv) decir(r.texto_lectura_facil);
+  const paraNoa = `[Willo] Javi ha dicho que es correcto. Willo ha hecho las cuentas: ${r.texto_lectura_facil} ` +
+    "Díselo a Javi con estas mismas palabras. Después contesta a lo que pregunte. Si dice que quiere hablarlo con Ana, dile que pulse el botón \"Hablar con Ana\".";
+  noaDice(paraNoa).then(ok => { if (!ok) decir(r.texto_lectura_facil); });
 };
 
 // "Hablar con Ana": Javi decide pedir apoyo. No se paga nada.
