@@ -35,8 +35,9 @@ const Foot = ({ children, n, dark = false, center = false }: { children?: ReactN
   </p>
 );
 const Panel = () => <div className="absolute left-[1200px] top-0 h-[1080px] w-[720px] bg-salvia" />;
-const T72 = "text-[72px] font-bold leading-[1.1] tracking-[-1.2px]";
-const T80 = "text-[80px] font-bold leading-[1.08] tracking-[-1.5px]";
+/* Titulares en Fraunces (clase .titular, ver index.css). El resto del texto, en Figtree. */
+const T72 = "titular text-[72px] font-semibold leading-[1.1]";
+const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 
 /* ---------- Diapositivas ---------- */
 export const slides: Slide[] = [
@@ -51,7 +52,7 @@ export const slides: Slide[] = [
           <Label>Una app de dinero accesible y por voz</Label>
         </Fade>
         <Rise delay={1.6} className="absolute left-[128px] top-[700px] w-[1664px] text-center">
-          <p className="text-[64px] leading-[1.1] text-suave">Tu voluntad, tu dinero.</p>
+          <p className="titular text-[64px] italic leading-[1.1] text-suave">Tu voluntad, tu dinero.</p>
         </Rise>
         <Fade delay={2} className="absolute left-[128px] top-[860px] w-[1664px] text-center">
           <p className="text-[32px] leading-[1.35] text-suave">Para personas con discapacidad intelectual. Su asistente se llama Noa.</p>
@@ -69,7 +70,7 @@ export const slides: Slide[] = [
         <div className="absolute left-[128px] top-[128px] flex w-[960px] flex-col gap-[40px]">
           <Label>Os presentamos a Javi</Label>
           <h2 className={T80}>
-            <Words text="Javi tiene 34 años, trabaja en una lavandería y cobra 980 € al mes." />
+            <Words text="Javi tiene 34 años, trabaja en una lavandería y cobra 980 € al mes." />
           </h2>
         </div>
         <Rise o={7} className="absolute left-[128px] top-[510px] w-[900px]">
@@ -103,13 +104,13 @@ export const slides: Slide[] = [
         </Fade>
         <BarH o={6} width={491} height={96} color={ACCENT} className="absolute left-[128px] top-[654px]" />
         <Fade o={10} className="absolute left-[651px] top-[668px]">
-          <p className="whitespace-nowrap text-[56px] font-bold text-verde">1 de cada 3</p>
+          <p className="titular whitespace-nowrap text-[56px] font-semibold text-verde">1 de cada 3</p>
         </Fade>
         <Fade o={7} className="absolute left-[128px] top-[790px]">
           <p className="text-[32px] text-suave">Población general</p>
         </Fade>
         <BarH o={7} width={1250} height={96} color={GREY} className="absolute left-[128px] top-[844px]" />
-        <p className="absolute left-[1410px] top-[858px] whitespace-nowrap text-[56px] font-bold tabular-nums text-suave">
+        <p className="absolute left-[1410px] top-[858px] titular whitespace-nowrap text-[56px] font-semibold tabular-nums text-suave">
           <Count to={84} suffix=" %" o={7} />
         </p>
         <Foot n="03">Fuente: INE, datos de 2022, citados por Plena inclusión.</Foot>
@@ -136,7 +137,7 @@ export const slides: Slide[] = [
           <img src={img("03-respuesta.png")} alt="Noa responde: si compras la entrada, te quedan 165 euros. Tú decides." className="h-[840px] w-[388px] rounded-[31px] object-contain" />
         </Rise>
         <Emphasis o={10} className="absolute left-[128px] top-[670px] origin-left">
-          <p className="text-[120px] font-bold leading-[1.05] tracking-[-3px] text-verde">Tú decides.</p>
+          <p className="titular text-[120px] font-semibold leading-[1.05] text-verde">Tú decides.</p>
         </Emphasis>
         <Foot n="04" />
       </div>
@@ -313,8 +314,8 @@ export const slides: Slide[] = [
             ))}
           </div>
           <div className="absolute left-[1008px] top-[470px] flex h-[450px] w-[784px] flex-col justify-center gap-[16px]">
-            <p className="whitespace-nowrap text-[160px] font-bold leading-none tracking-[-4px] tabular-nums text-verde">
-              <Count to={400000} prefix="+" o={6} />
+            <p className="titular whitespace-nowrap text-[160px] font-semibold leading-none tracking-normal tabular-nums text-verde">
+              <Count to={400000} prefix={"+\u200A"} o={6} />
             </p>
             <Fade o={10}>
               <p className="text-[32px] leading-[1.3]">personas con discapacidad intelectual y del desarrollo viven en España.</p>
@@ -335,7 +336,7 @@ export const slides: Slide[] = [
     render: () => (
       <div className="absolute inset-0 bg-verde text-fondo">
         {/* "willo" vuelve a formarse aquí con las partículas de la capa de App. */}
-        <h1 className="absolute left-[128px] top-[640px] w-[1664px] text-center text-[96px] font-bold leading-[1.05] tracking-[-3px]">
+        <h1 className="absolute left-[128px] top-[640px] w-[1664px] titular text-center text-[96px] italic font-semibold leading-[1.05]">
           <Words text="Tu voluntad, tu dinero." delay={1.6} />
         </h1>
         <p className="absolute left-[128px] top-[790px] w-[1664px] text-center text-[40px] leading-[1.3] text-salvia">

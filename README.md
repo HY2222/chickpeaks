@@ -58,7 +58,7 @@ El logo está en `src/logoMascara.ts` (y en `public/logo-willo-mascara.png`): el
 
 Cómo funciona:
 
-1. Dibuja el texto en un `<canvas>` oculto con Arimo en negrita a 200 px, lee los píxeles con `getImageData` y guarda los puntos de la rejilla con alfa > 128. Escala las coordenadas al contenedor y las recalcula con un `ResizeObserver`.
+1. Dibuja el texto en un `<canvas>` oculto con Figtree (peso 800) a 200 px, lee los píxeles con `getImageData` y guarda los puntos de la rejilla con alfa > 128. Escala las coordenadas al contenedor y las recalcula con un `ResizeObserver`.
 2. Hasta 700 puntos: un `<svg>` con un `<motion.circle>` por punto. Más de 700: `<canvas>`, con un único progreso 0→1 animado por Motion y cada punto interpolado en `requestAnimationFrame`.
 3. Secuencia: los puntos flotan dispersos con una deriva lenta; luego cada uno viaja a su letra con un spring (stiffness 60, damping 14, mass aleatoria 0,8-1,2), escalonado desde el centro; ya formada, la palabra "respira" 1-2 px.
 4. Con "reducir movimiento" activado en el sistema, la palabra aparece ya formada y no hay animaciones (`MotionConfig reducedMotion="user"`).
@@ -73,6 +73,13 @@ Cómo funciona:
 - Todo dura menos de 1,5 s, solo anima transform y opacity (los gráficos, `pathLength`) y se repite al volver a la diapositiva.
 - Con "reducir movimiento" en el sistema, nada se desplaza y las partículas aparecen ya formadas.
 
+## Tipografía
+
+Dos familias, autoalojadas con `@fontsource-variable` (la presentación funciona sin internet). Las dos son de [bestfreefonts.com](https://bestfreefonts.com) y tienen licencia SIL Open Font License.
+
+- **Fraunces** (clase `titular`, eje SOFT al máximo): solo titulares, cifras protagonistas y frases clave ("Tú decides.", "Tu voluntad, tu dinero.").
+- **Figtree**: todo lo demás, y la palabra "willo" de las partículas.
+
 ## Estructura
 
 ```
@@ -81,7 +88,7 @@ src/
   slides.tsx                 las 10 diapositivas y sus notas
   components/ParticleText.tsx
   components/Anim.tsx        Rise, Fade, Emphasis, MockupIn, Words, Count, BarH, BarV, DrawArrow
-  index.css                  Tailwind v4 + paleta de Willo
+  index.css                  Tailwind v4 + paleta de Willo + tipografía
 public/screens/              pantallas de la app (Figma)
 ```
 

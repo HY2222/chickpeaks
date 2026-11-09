@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
-/* Paleta y letra de la app Willo (docs/diseno/integrar-pantallas.md). */
+/* Paleta de la app Willo (docs/diseno/integrar-pantallas.md).
+ * Tipografía del pitch: dos familias y nada más.
+ * - Figtree: todo el texto (etiquetas, cuerpo, tarjetas, pies).
+ * - Fraunces: solo titulares, cifras protagonistas y las frases clave (clase .titular).
+ */
 @theme {
   --color-fondo: #F5F7F0;
   --color-salvia: #D3DFC8;
@@ -9,7 +13,8 @@
   --color-texto: #1E2A1B;
   --color-suave: #4A5745;
   --color-aviso: #FBEFD0;
-  --font-sans: "Arimo", Helvetica, Arial, sans-serif;
+  --font-sans: "Figtree Variable", Helvetica, Arial, sans-serif;
+  --font-serif: "Fraunces Variable", Georgia, serif;
 }
 
 html,
@@ -21,4 +26,12 @@ body,
 
 body {
   @apply bg-texto font-sans antialiased;
+}
+
+/* Fraunces con el eje SOFT al máximo: remates redondeados, como el logo. Sin WONK (más sobria). */
+@utility titular {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  letter-spacing: -0.015em;
 }
