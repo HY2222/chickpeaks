@@ -83,6 +83,8 @@ class Pago(BaseModel):
     importe: float = Field(gt=0, examples=[200])
     contexto: str = Field(default="", description="Lo que la persona cuenta sobre el pago",
                           examples=["Un amigo nuevo de Instagram me pide 200 euros urgente para un billete"])
+    telefono: str | None = Field(default=None, description="Número de quien pide el dinero, si se sabe",
+                                 examples=["+34 611 222 333"])
 
 
 class GastoDictado(BaseModel):
@@ -101,16 +103,30 @@ class Pausa(BaseModel):
 
 class DocumentoConfirmado(BaseModel):
     """Lo que leyó Noa, ya revisado por la persona (pantalla 6)."""
-    tipo: Literal["factura", "recibo", "ticket", "nomina", "multa", "carta_banco", "otro"]
+    tipo: Literal["factura", "recibo", "ticket", "nomina", "multa", "carta_banco", "mensaje", "otro"]
     titulo: str = Field(min_length=1, examples=["Multa de aparcamiento"])
     remitente: str | None = Field(default=None, examples=["Ayuntamiento"])
     importe: float | None = Field(default=None, ge=0, examples=[90.0])
     fecha_limite: date | None = Field(default=None, examples=["2026-12-20"])
+    texto_mensaje: str | None = Field(default=None, max_length=documents.MAX_TEXTO_MENSAJE,
+                                      description="Solo si tipo es mensaje: lo que escribe la otra persona",
+                                      examples=["Hola, soy Carlos. Dame 300 euros"])
+    telefono: str | None = Field(default=None, max_length=30, examples=["+34 611 222 333"])
     sospechoso: bool = False
 
 
 class ResultadoEnvio(BaseModel):
     enviado: bool = Field(description="true si Javi envió el dinero, false si no")
+
+
+class Contacto(BaseModel):
+    nombre: str = Field(min_length=1, max_length=80, examples=["Ana"])
+    telefono: str = Field(max_length=30, examples=["+34 600 000 101"])
+
+
+class ListaContactos(BaseModel):
+    """Los contactos que Javi elige en su agenda (Contact Picker del navegador)."""
+    contactos: list[Contacto] = Field(max_length=2000)
 
 
 class Texto(BaseModel):
@@ -194,12 +210,12 @@ async def leer_documento(persona_id: str, foto: UploadFile = File(...)):
 
     La imagen no se guarda. Javi tiene que confirmar lo leído antes de usarlo (/documentos/confirmar).
     """
-    _persona(persona_id)
+    p = _persona(persona_id)
     if not os.getenv("ANTHROPIC_API_KEY"):
         raise HTTPException(503, "Falta ANTHROPIC_API_KEY en .env")
     contenido = await foto.read()
     try:
-        return await run_in_threadpool(documents.leer, contenido, foto.content_type)
+        return await run_in_threadpool(documents.leer, contenido, foto.content_type, p)
     except documents.FormatoNoValido:
         return JSONResponse(status_code=415, content={
             "error": "formato_no_valido",
@@ -229,6 +245,14 @@ def confirmar_documento(persona_id: str, doc: DocumentoConfirmado):
     if not datos["titulo"]:
         raise HTTPException(422, "Falta el título del documento")
     datos["fecha_limite"] = doc.fecha_limite.isoformat() if doc.fecha_limite else None
+    if doc.tipo == "mensaje":
+        # Las reglas antiestafa (código) revisan el mensaje otra vez, con lo que Javi confirmó.
+        # Si el riesgo es alto, se crea el mismo aviso para Ana que en la pantalla 8.
+        datos["riesgo"] = _riesgo_y_aviso(p, Pago(destinatario=doc.remitente or "esa persona",
+                                                  importe=doc.importe or 0.01,
+                                                  contexto=doc.texto_mensaje or "",
+                                                  telefono=doc.telefono))
+        datos["sospechoso"] = doc.sospechoso or datos["riesgo"]["nivel_riesgo"] != "bajo"
     return documents.confirmar(p, datos)
 
 
@@ -240,7 +264,15 @@ def evaluar_riesgo(persona_id: str, pago: Pago):
     Si se evalúa otra vez el mismo envío (Noa y la pantalla, o dos veces seguidas), usa el mismo aviso.
     """
     p = _persona(persona_id)
-    r = risk.evaluar_pago(p, pago.destinatario, pago.importe, pago.contexto)
+    r = _riesgo_y_aviso(p, pago)
+    if r["avisados"]:
+        r["texto_lectura_facil"] += f" Como acordaste, he avisado a {' y '.join(r['avisados'])}."
+    return r
+
+
+def _riesgo_y_aviso(p: dict, pago: Pago) -> dict:
+    """Reglas antiestafa + un solo aviso al círculo si el riesgo es alto. Lo usan la voz y la foto."""
+    r = risk.evaluar_pago(p, pago.destinatario, pago.importe, pago.contexto, pago.telefono)
     r["bloquea"] = False  # la decisión siempre es de la persona
     r["aviso_id"], r["avisados"] = None, []
     miembros = support.con_permiso(p, "recibir_avisos_estafa")
@@ -254,7 +286,6 @@ def evaluar_riesgo(persona_id: str, pago: Pago):
             destinatario=pago.destinatario, importe=float(pago.importe),
             senales=[s["explicacion"] for s in r["senales"]])
         r["aviso_id"], r["avisados"] = aviso["id"], aviso["para_nombres"]
-        r["texto_lectura_facil"] += f" Como acordaste, he avisado a {' y '.join(r['avisados'])}."
     return r
 
 
@@ -267,6 +298,51 @@ def _aviso_abierto(p: dict, pago: Pago) -> dict | None:
                 and a.get("importe") == float(pago.importe)):
             return a
     return None
+
+
+# ---------- Contactos del móvil ----------
+# Solo los que la persona elige en su agenda. Se guarda nombre y número, nada más.
+# Sirven para una cosa: saber si quien pide dinero es alguien que conoce. Nunca se mandan a la IA.
+
+@app.get("/api/personas/{persona_id}/contactos")
+def ver_contactos(persona_id: str):
+    return _persona(persona_id).get("contactos", [])
+
+
+@app.post("/api/personas/{persona_id}/contactos")
+def guardar_contactos(persona_id: str, lista: ListaContactos):
+    """Añade los contactos elegidos. Si un número ya estaba, se queda el nombre nuevo."""
+    p = _persona(persona_id)
+    por_numero = {risk.numero(c["telefono"]): c for c in p.setdefault("contactos", [])}
+    nuevos = 0
+    for c in lista.contactos:
+        n = risk.numero(c.telefono)
+        if len(n) < 9:
+            continue  # no es un número de teléfono
+        nuevos += n not in por_numero
+        por_numero[n] = {"nombre": c.nombre.strip(), "telefono": c.telefono.strip()}
+    p["contactos"] = list(por_numero.values())
+    total = len(p["contactos"])
+    return {"nuevos": nuevos, "total": total,
+            "texto_lectura_facil": (f"Tengo {total} contactos tuyos. "
+                                    "Así sé si te escribe alguien que no conoces.")}
+
+
+@app.delete("/api/personas/{persona_id}/contactos")
+def borrar_contactos(persona_id: str):
+    """La persona puede borrar todos sus contactos de Willo cuando quiera."""
+    _persona(persona_id)["contactos"] = []
+    return {"total": 0, "texto_lectura_facil": "He borrado tus contactos de Willo. Los de tu móvil siguen igual."}
+
+
+@app.delete("/api/personas/{persona_id}/contactos/{telefono}")
+def borrar_contacto(persona_id: str, telefono: str):
+    p = _persona(persona_id)
+    antes = len(p.get("contactos", []))
+    p["contactos"] = [c for c in p.get("contactos", []) if risk.numero(c["telefono"]) != risk.numero(telefono)]
+    if len(p["contactos"]) == antes:
+        raise HTTPException(404, "Ese número no está en tus contactos de Willo")
+    return {"total": len(p["contactos"])}
 
 
 @app.get("/api/personas/{persona_id}/metas")

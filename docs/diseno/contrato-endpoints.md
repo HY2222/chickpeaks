@@ -117,7 +117,8 @@ Respuesta:
   "texto_lectura_facil": "He leído: multa de aparcamiento. 90 €. Hay que pagar antes del 20 de diciembre. ¿Es correcto?"
 }
 ```
-Valores de `tipo`: `factura`, `recibo`, `ticket`, `nomina`, `multa`, `carta_banco`, `otro`.
+Valores de `tipo`: `factura`, `recibo`, `ticket`, `nomina`, `multa`, `carta_banco`, `mensaje`, `otro`.
+- `mensaje`: pantallazo de un WhatsApp, SMS, Instagram o correo. Trae además `texto_mensaje` (lo que escribe la otra persona) y `telefono` (si se ve el número). **Las reglas antiestafa (código) revisan el mensaje** igual que cuando Javi lo cuenta por voz: si ven riesgo medio o alto, `sospechoso` es `true` aunque Claude no lo vea. La respuesta trae `senales` (frases cortas). Ejemplo: "He leído: mensaje de Carlos. Te pide 300 €. ¿Es correcto?"
 - `ticket`: el ticket de una compra que Javi ya ha hecho (tienda, bar, supermercado). `accion` suele ser `nada`: ya está pagado.
 Valores de `accion`: `pagar`, `nada`, `contestar`, `revisar`.
 Si Claude no puede leerlo → `422` con `"texto_lectura_facil": "No he podido leerlo bien. ¿Haces otra foto con más luz?"`.
@@ -143,6 +144,7 @@ Respuesta:
 ```
 - Si `tipo` es `ticket`, no se resta otra vez: el pago con tarjeta ya está en sus movimientos. Solo se explica: "Es el ticket de la tienda de ropa. Pagaste 30 €. Ya está apuntado. Te quedan 210 € para tus cosas." Si el gasto no aparece en sus movimientos (pagó en efectivo), se apunta como gasto de "Para tus cosas".
 - `en_plan` es `true` si el importe y el remitente coinciden con un gasto recurrente (por ejemplo, la luz). Entonces: "Ya estaba en tu plan. No tienes que hacer nada."
+- Si es un `mensaje`, se manda también `texto_mensaje` y `telefono`. Las reglas lo revisan otra vez; si el riesgo es alto y Javi dio permiso, se crea **el mismo aviso para Ana** que en la pantalla 8 y se devuelve `aviso_id`. Noa: "Cuidado. Este mensaje puede ser un engaño. No tienes guardado este número. … Tú decides qué hacer. Como acordaste, he avisado a Ana."
 - Si `sospechoso` es `true` (pantalla de reserva R1), no se hacen cuentas: "Cuidado. Este documento te pide tu clave del banco. Los bancos nunca piden eso..."
 - **No paga nada.** "Hablar con Ana" usa `POST /decisiones` con `"decision": "hablarlo"`.
 
@@ -207,6 +209,14 @@ Cada aviso trae ahora `id`, `estado` y `resultado`:
 ]
 ```
 Valores de `estado`: `nuevo`, `javi_pide_hablar`.
+
+### 🆕 Contactos del móvil
+`evaluar_riesgo` admite también `"telefono"`. Si el número no está en los contactos de Javi → señal `numero_desconocido` ("No tienes guardado este número."). Si dice ser alguien conocido desde otro número → "Dice que es Ana, pero no tienes guardado este número." (la estafa de "este es mi número nuevo").
+
+Los contactos los **elige Javi** en su agenda (Contact Picker del navegador: Chrome en Android; Safari en iPhone todavía no). Se guarda solo nombre y número. Nunca se mandan a la IA.
+- `GET /api/personas/javi/contactos`
+- `POST /api/personas/javi/contactos` con `{"contactos": [{"nombre": "Ana", "telefono": "+34 600 000 101"}]}` → `{"nuevos": 1, "total": 3, "texto_lectura_facil": "..."}`
+- `DELETE /api/personas/javi/contactos` (todos) y `DELETE /api/personas/javi/contactos/{telefono}` (uno)
 
 ## 10-11. Informe
 

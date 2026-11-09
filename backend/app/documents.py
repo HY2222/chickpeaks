@@ -25,7 +25,7 @@ from .easyread import euros
 # Para cambiar a Sonnet si Haiku lee mal: WILLO_MODELO_DOCUMENTOS=claude-sonnet-5-5 en .env
 MODELO_POR_DEFECTO = "claude-haiku-5-5"
 
-TIPOS = ["factura", "recibo", "ticket", "nomina", "multa", "carta_banco", "otro"]
+TIPOS = ["factura", "recibo", "ticket", "nomina", "multa", "carta_banco", "mensaje", "otro"]
 ACCIONES = ["pagar", "nada", "contestar", "revisar"]
 FORMATOS = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 
@@ -34,7 +34,10 @@ LADO_MAXIMO = 1568
 
 TEXTO_NO_LEGIBLE = "No he podido leerlo bien. ¿Haces otra foto con más luz?"
 
-PICTOGRAMAS = {"multa": "coche", "ticket": "bolsa", "nomina": "hucha"}
+PICTOGRAMAS = {"multa": "coche", "ticket": "bolsa", "nomina": "hucha", "mensaje": "enviar"}
+
+# Un mensaje muy largo no aporta nada a las reglas y solo ocupa memoria.
+MAX_TEXTO_MENSAJE = 2000
 
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
@@ -66,24 +69,33 @@ ESQUEMA = {
         "fecha_limite": {**_TEXTO_O_NULO,
                          "description": "Fecha límite para pagar o contestar, AAAA-MM-DD. null si no hay"},
         "accion": {"type": "string", "enum": ACCIONES},
+        "telefono": {**_TEXTO_O_NULO,
+                     "description": "Solo si es un mensaje y se ve el número de quien escribe. Si solo sale un nombre, null"},
+        "texto_mensaje": {**_TEXTO_O_NULO,
+                          "description": "Solo si es un mensaje: el texto que escribe la otra persona, tal cual. Si no, null"},
         "sospechoso": {"type": "boolean"},
         "motivo_sospecha": {**_TEXTO_O_NULO,
                             "description": "Si es sospechoso, por qué, en una frase corta. Si no, null"},
     },
     "required": ["legible", "tipo", "titulo", "remitente", "importe", "fecha_limite",
-                 "accion", "sospechoso", "motivo_sospecha"],
+                 "accion", "telefono", "texto_mensaje", "sospechoso", "motivo_sospecha"],
     "additionalProperties": False,
 }
 
 INSTRUCCIONES = """Eres el lector de documentos de Willo, una app de dinero para personas con \
-discapacidad intelectual. Te llega la foto de un papel: una factura, un recibo, un ticket de \
-compra, una nómina, una multa, una carta del banco u otra cosa.
+discapacidad intelectual. Te llega la foto de un papel (una factura, un recibo, un ticket de \
+compra, una nómina, una multa, una carta del banco) o el pantallazo de un mensaje \
+(WhatsApp, SMS, Instagram, correo).
 
 Tu trabajo es SOLO copiar lo que pone. No hagas cuentas. No recomiendes nada. No inventes datos: \
 si algo no aparece o no se lee, pon null.
 
 - tipo: "ticket" es el ticket de algo que ya se compró (tienda, bar, supermercado). \
-"recibo" es un cobro del banco ya hecho o programado (luz, agua, móvil). "factura" pide un pago.
+"recibo" es un cobro del banco ya hecho o programado (luz, agua, móvil). "factura" pide un pago. \
+"mensaje" es un chat, SMS o correo de una persona o empresa.
+- Si es un mensaje: remitente es el nombre de quien escribe; importe es el dinero que pide; \
+texto_mensaje es lo que escribe, copiado tal cual; telefono es el número de arriba \
+del chat si se ve (si sale un nombre guardado, null); accion es "pagar" si pide dinero.
 - accion: "pagar" si hay que pagar; "nada" si ya está pagado (los tickets casi siempre); \
 "contestar" si pide una respuesta; "revisar" si no está claro.
 - importe: el total final que hay que pagar o que se pagó, en euros.
@@ -160,13 +172,20 @@ def limpiar(datos: dict[str, Any]) -> dict[str, Any]:
         raise NoLegible("Hay que pagar pero no se lee cuánto")
     fecha = _fecha(datos.get("fecha_limite"))
     sospechoso = bool(datos.get("sospechoso"))
+    tipo = tipo if tipo in TIPOS else "otro"
+    texto_mensaje = (str(datos.get("texto_mensaje") or "").strip()[:MAX_TEXTO_MENSAJE] or None
+                     if tipo == "mensaje" else None)
+    telefono = str(datos.get("telefono") or "").strip()
+    telefono = telefono if tipo == "mensaje" and sum(c.isdigit() for c in telefono) >= 9 else None
     return {
-        "tipo": tipo if tipo in TIPOS else "otro",
+        "tipo": tipo,
         "titulo": str(datos["titulo"]).strip(),
         "remitente": (str(datos.get("remitente") or "").strip() or None),
         "importe": importe,
         "fecha_limite": fecha.isoformat() if fecha else None,
         "accion": accion if accion in ACCIONES else "revisar",
+        "telefono": telefono,
+        "texto_mensaje": texto_mensaje,
         "sospechoso": sospechoso,
         "motivo_sospecha": (str(datos.get("motivo_sospecha") or "").strip() or None) if sospechoso else None,
     }
@@ -184,6 +203,11 @@ def texto_leido(d: dict[str, Any]) -> str:
     """Frases cortas para la pantalla 6. Termina siempre preguntando si es correcto."""
     titulo = d["titulo"][0].lower() + d["titulo"][1:]
     frases = [f"He leído: {titulo}."]
+    if d["tipo"] == "mensaje":
+        if d["importe"] is not None:
+            frases.append(f"Te pide {euros(d['importe'])}.")
+        frases.append("¿Es correcto?")
+        return " ".join(frases)
     if d["importe"] is not None:
         frases.append(f"{euros(d['importe'])}.")
     if d["accion"] == "pagar":
@@ -198,12 +222,31 @@ def texto_leido(d: dict[str, Any]) -> str:
     return " ".join(frases)
 
 
-def leer(contenido: bytes, media_type: str | None) -> dict[str, Any]:
-    """Foto -> datos del documento + texto de Noa. La foto no sale de esta función."""
+def revisar_mensaje(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any] | None:
+    """Pasa las reglas antiestafa (las mismas que con la voz) por un mensaje. Es código, no IA."""
+    from . import risk
+    if d["tipo"] != "mensaje":
+        return None
+    return risk.evaluar_pago(persona, d["remitente"] or "esa persona", d["importe"] or 0.0,
+                             d.get("texto_mensaje") or "", d.get("telefono"))
+
+
+def leer(contenido: bytes, media_type: str | None, persona: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Foto -> datos del documento + texto de Noa. La foto no sale de esta función.
+
+    Si es un mensaje, además de lo que diga Claude, lo revisan las reglas antiestafa.
+    Basta con que uno de los dos vea peligro para marcarlo como sospechoso.
+    """
     imagen, tipo_imagen = preparar_imagen(contenido, media_type)
     datos = limpiar(_llamar_claude(imagen, tipo_imagen))
+    riesgo = revisar_mensaje(persona, datos) if persona else None
+    senales = [s["explicacion"] for s in riesgo["senales"]] if riesgo else []
+    if riesgo and riesgo["nivel_riesgo"] != "bajo":
+        datos["sospechoso"] = True
+        datos["motivo_sospecha"] = datos["motivo_sospecha"] or senales[0]
     pictograma = "aviso" if datos["sospechoso"] else PICTOGRAMAS.get(datos["tipo"], "documento")
-    return {**datos, "pictograma": pictograma, "texto_lectura_facil": texto_leido(datos)}
+    return {**datos, "senales": senales, "pictograma": pictograma,
+            "texto_lectura_facil": texto_leido(datos)}
 
 
 # ======================================================================
@@ -299,12 +342,24 @@ def confirmar(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any]:
             "pictograma": PICTOGRAMAS.get(d["tipo"], "documento")}
 
     # 1. Sospechoso: no se hacen cuentas. Se explica el peligro. Javi decide.
+    riesgo = d.get("riesgo")  # solo en mensajes: lo calcula la ruta con las reglas antiestafa
     if d["sospechoso"]:
-        frases = ["Cuidado. Este papel puede ser un engaño.",
-                  "Los bancos nunca te piden tu clave ni tu PIN.",
-                  "Tú decides qué hacer."] + _pregunta_apoyo(persona)
+        if d["tipo"] == "mensaje":
+            senales = [s["explicacion"] for s in riesgo["senales"]] if riesgo else []
+            frases = ["Cuidado. Este mensaje puede ser un engaño.", *senales[:3],
+                      "Esto pasa a veces en las estafas.", "Tú decides qué hacer."]
+        else:
+            senales = []
+            frases = ["Cuidado. Este papel puede ser un engaño.",
+                      "Los bancos nunca te piden tu clave ni tu PIN.",
+                      "Tú decides qué hacer."]
+        avisados = (riesgo or {}).get("avisados") or []
+        frases += ([f"Como acordaste, he avisado a {' y '.join(avisados)}."] if avisados
+                   else _pregunta_apoyo(persona))
         return {**base, "sospechoso": True, "quedan_antes": None, "quedan_despues": None,
-                "alcanza": None, "pictograma": "aviso", "texto_lectura_facil": " ".join(frases)}
+                "alcanza": None, "pictograma": "aviso", "senales": senales,
+                "aviso_id": (riesgo or {}).get("aviso_id"), "avisados": avisados,
+                "texto_lectura_facil": " ".join(frases)}
 
     # 2. Nómina: es dinero que entra, no que sale.
     if d["tipo"] == "nomina":

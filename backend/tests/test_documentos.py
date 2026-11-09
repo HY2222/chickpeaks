@@ -45,7 +45,8 @@ def test_lee_multa_como_el_contrato(client, claude_falso):
     assert r.json() == {
         "tipo": "multa", "titulo": "Multa de aparcamiento", "remitente": "Ayuntamiento",
         "importe": 90.0, "fecha_limite": "2026-12-20", "accion": "pagar",
-        "sospechoso": False, "motivo_sospecha": None, "pictograma": "coche",
+        "telefono": None, "texto_mensaje": None, "sospechoso": False, "motivo_sospecha": None,
+        "senales": [], "pictograma": "coche",
         "texto_lectura_facil": "He leído: multa de aparcamiento. 90 €. "
                                "Hay que pagar antes del 20 de diciembre. ¿Es correcto?",
     }
