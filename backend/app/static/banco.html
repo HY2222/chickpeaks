@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tu banco · demo</title>
+<link rel="stylesheet" href="/static/willo.css">
+<meta name="theme-color" content="#1F3B5C">
+<link rel="icon" type="image/png" href="/static/icons/favicon-32.png">
+<style>
+  /* Pantalla 0: la app de un banco inventado. Willo vive dentro como un botón más.
+     Colores del banco a propósito distintos de los de Willo. */
+  body { background: #EEF2F6; }
+  .banco { max-width: 390px; min-height: 100dvh; margin: 0 auto; padding: 48px 20px 32px;
+           display: flex; flex-direction: column; gap: 20px; color: #13263B; }
+  .banco-cab { display: flex; justify-content: space-between; align-items: center; }
+  .banco-marca { font-weight: 700; font-size: 20px; letter-spacing: .5px; color: #1F3B5C; }
+  .banco-hola { font-size: 16px; color: #4B5D70; }
+  .banco-saldo { background: #1F3B5C; color: #fff; border-radius: 16px; padding: 20px; }
+  .banco-saldo small { display: block; opacity: .8; font-size: 14px; }
+  .banco-saldo strong { display: block; font-size: 34px; margin-top: 4px; }
+  .banco-saldo span { display: block; font-size: 14px; opacity: .8; margin-top: 8px; }
+  .banco-rejilla { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; }
+  .banco-app { display: flex; flex-direction: column; align-items: center; gap: 6px;
+               font-size: 13px; color: #13263B; text-decoration: none; background: none;
+               border: 0; padding: 0; font-family: inherit; cursor: pointer; }
+  .banco-app i { width: 56px; height: 56px; border-radius: 16px; background: #fff;
+                 display: grid; place-items: center; font-style: normal; font-size: 24px;
+                 box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .banco-app img { width: 56px; height: 56px; border-radius: 16px; display: block;
+                   box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+  .banco-app.willo span { font-weight: 700; color: #3E5A34; }
+  .banco-destacado { display: flex; gap: 14px; align-items: center; background: #fff;
+                     border-radius: 16px; padding: 16px; text-decoration: none; color: inherit;
+                     border: 2px solid #A3B18F; }
+  .banco-destacado img { width: 52px; height: 52px; border-radius: 14px; }
+  .banco-destacado b { display: block; font-size: 17px; color: #3E5A34; }
+  .banco-destacado span { font-size: 14px; color: #4B5D70; }
+  .banco-movs h2 { font-size: 16px; margin-bottom: 8px; }
+  .banco-movs li { display: flex; justify-content: space-between; padding: 10px 0;
+                   border-bottom: 1px solid #DCE3EA; font-size: 15px; list-style: none; }
+  .banco-movs ul { padding: 0; margin: 0; }
+  .banco-pie { margin-top: auto; text-align: center; font-size: 12px; color: #7A8796; }
+</style>
+</head>
+<body>
+<main class="banco">
+  <header class="banco-cab">
+    <div>
+      <div class="banco-marca">TU BANCO</div>
+      <div class="banco-hola">Hola, Javi</div>
+    </div>
+    <span aria-hidden="true">🔔</span>
+  </header>
+
+  <section class="banco-saldo" aria-label="Saldo">
+    <small>Cuenta nómina</small>
+    <strong>472,00 €</strong>
+    <span>ES00 0000 0000 0000 0000 1234</span>
+  </section>
+
+  <a class="banco-destacado" href="/demo" aria-label="Abrir Willo">
+    <img src="/static/icons/icon-192.png" alt="">
+    <div>
+      <b>Willo</b>
+      <span>Tu dinero, explicado fácil. Habla con Noa.</span>
+    </div>
+  </a>
+
+  <nav class="banco-rejilla" aria-label="Servicios">
+    <button class="banco-app" type="button"><i>↔</i><span>Transferir</span></button>
+    <button class="banco-app" type="button"><i>📱</i><span>Bizum</span></button>
+    <button class="banco-app" type="button"><i>💳</i><span>Tarjetas</span></button>
+    <a class="banco-app willo" href="/demo"><img src="/static/icons/icon-192.png" alt=""><span>Willo</span></a>
+    <button class="banco-app" type="button"><i>🧾</i><span>Recibos</span></button>
+    <button class="banco-app" type="button"><i>📈</i><span>Ahorro</span></button>
+    <button class="banco-app" type="button"><i>🛡</i><span>Seguros</span></button>
+    <button class="banco-app" type="button"><i>⋯</i><span>Más</span></button>
+  </nav>
+
+  <section class="banco-movs">
+    <h2>Últimos movimientos</h2>
+    <ul>
+      <li><span>Bar La Esquina</span><span>−22,00 €</span></li>
+      <li><span>Cines del centro</span><span>−12,00 €</span></li>
+      <li><span>Peluquería del barrio</span><span>−14,00 €</span></li>
+      <li><span>Nómina</span><span>+980,00 €</span></li>
+    </ul>
+  </section>
+
+  <p class="banco-pie">Banco inventado para la demo de Willo</p>
+</main>
+</body>
+</html>
