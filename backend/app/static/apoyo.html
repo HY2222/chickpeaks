@@ -82,6 +82,14 @@
 
 <script type="module">
 const P = "javi", YO = "ana";
+
+// "Llamar a Javi" usa su número (de .env si está, si no el inventado de seed.json).
+let TEL_JAVI = "";
+fetch("/api/personas").then(r => r.json()).then(ps => {
+  TEL_JAVI = ((ps.find(p => p.id === P) || {}).telefono || "").replace(/\s/g, "");
+  const boton = document.getElementById("p9-llamar");
+  if (boton) boton.href = "tel:" + TEL_JAVI;
+}).catch(() => {});
 const api = r => fetch(`/api/personas/${P}/${r}`).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
 const $ = id => document.getElementById(id);
 const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
@@ -176,8 +184,7 @@ async function pintarAna() {
         <p class="titulo-aviso"><span data-icono="aviso"></span>Posible estafa</p>
         <p style="margin-top:12px">Javi quería enviar ${esc(e.importe || euros(pidio.importe))} a ${esc(e.destinatario)} y ha pedido hablar contigo</p>
         <p class="negrita" style="margin-top:12px">${e.etiquetas.map(t => `• ${esc(t)}`).join("&nbsp; ")}</p>
-        <!-- TODO: el teléfono de Javi no está en seed.json; "tel:" abre el marcador vacío. -->
-        <a class="boton aviso" style="margin-top:16px" href="tel:" id="p9-llamar">Llamar a Javi</a>
+        <a class="boton aviso" style="margin-top:16px" href="tel:${esc(TEL_JAVI)}" id="p9-llamar">Llamar a Javi</a>
       </div>`;
   } else {
     $("p9-estafa").innerHTML = "";

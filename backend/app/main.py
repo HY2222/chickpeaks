@@ -137,7 +137,13 @@ class Texto(BaseModel):
 
 @app.get("/api/personas")
 def personas():
-    return [{"id": p["id"], "nombre": p["nombre"], "tipo": p["tipo"]} for p in store.personas.values()]
+    return [{"id": p["id"], "nombre": p["nombre"], "tipo": p["tipo"], "telefono": telefono(p)}
+            for p in store.personas.values()]
+
+
+def telefono(p: dict) -> str | None:
+    """El número de verdad va en .env (WILLO_TELEFONO_JAVI), no en el repo, que es público."""
+    return os.getenv(f"WILLO_TELEFONO_{p['id'].upper()}") or p.get("telefono")
 
 
 @app.get("/api/personas/{persona_id}/presupuesto", dependencies=[Depends(token_herramientas)])
