@@ -393,6 +393,8 @@ AL_ENTRAR["2"] = async () => {
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     conv = await Conversation.startSession({
       signedUrl: signed_url,
+      // El prompt de Noa usa {{nombre}}: sin este valor, la conversación puede no arrancar.
+      dynamicVariables: {nombre: "Javi"},
       // Herramienta de Noa que corre en esta pantalla: así Noa y la pantalla usan
       // las mismas cifras. Las cuentas las hace el backend, no la IA.
       clientTools: {
