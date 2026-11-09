@@ -2,6 +2,8 @@
 
 Copiad el bloque de abajo en el campo **System prompt** del agente.
 Las herramientas están en `agent/tools.json` (7 herramientas, con la URL de Render).
+- `{{nombre}}` es una variable dinámica: la pantalla de Javi la manda al empezar (`dynamicVariables: {nombre: "Javi"}`). Para probar desde el panel de ElevenLabs, poned "Javi" como valor de prueba.
+- `evaluar_compra` es una **herramienta de cliente** (Client tool, con "Wait for response"): la ejecuta la pantalla de Javi. Las demás son Webhook.
 Primer mensaje sugerido: «Hola, Javi. Soy Noa. ¿Qué quieres saber de tu dinero?»
 
 Configuración recomendada:
