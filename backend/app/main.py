@@ -316,6 +316,12 @@ def service_worker():
                         headers={"Cache-Control": "no-cache"})
 
 
+@app.get("/demo/banco")
+def demo_banco():
+    """Pantalla 0: la app de un banco inventado, con Willo dentro."""
+    return FileResponse(STATIC / "banco.html")
+
+
 @app.get("/demo")
 def demo_persona():
     return FileResponse(STATIC / "persona.html")
@@ -329,4 +335,4 @@ def demo_apoyo():
 @app.get("/")
 def raiz():
     return {"app": "Willo", "lema": "Your will, your money", "docs": "/docs",
-            "demo_persona": "/demo", "demo_apoyo": "/demo/apoyo"}
+            "demo_banco": "/demo/banco", "demo_persona": "/demo", "demo_apoyo": "/demo/apoyo"}
