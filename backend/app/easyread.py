@@ -2,8 +2,12 @@
 
 Índice Fernández-Huerta (adaptación de Flesch al español):
     L = 206,84 - 0,60 * P - 1,02 * F
-P = sílabas por cada 100 palabras, F = frases por cada 100 palabras.
+P = sílabas por cada 100 palabras, F = palabras por frase.
 Más alto = más fácil. Por encima de 80 se considera fácil.
+
+Ojo: la fórmula de 1959 definía F como "frases por cada 100 palabras". Con esa F,
+más frases cortas daban peor nota (al revés de lo que debe). Aquí se usa la versión
+corregida, con palabras por frase, que es la equivalente a la de Flesch.
 """
 
 from __future__ import annotations
@@ -55,8 +59,9 @@ def fernandez_huerta(texto: str) -> float:
         return 0.0
     n = len(palabras)
     p = sum(silabas(w) for w in palabras) * 100 / n
-    f = len(_frases(texto)) * 100 / n
-    return round(206.84 - 0.60 * p - 1.02 * f, 1)
+    f = n / max(len(_frases(texto)), 1)  # palabras por frase
+    # La escala va de 0 a 100. Frases muy cortas y simples pueden pasarse de 100: se deja en 100.
+    return round(min(max(206.84 - 0.60 * p - 1.02 * f, 0.0), 100.0), 1)
 
 
 def comprobar(texto: str) -> dict:

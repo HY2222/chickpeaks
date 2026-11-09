@@ -129,7 +129,7 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str | None, importe: flo
 
 def _texto(nivel: str, senales: list[dict[str, Any]]) -> str:
     if nivel == "bajo":
-        return "Este pago parece normal. Tú decides."
+        return "No he visto nada raro. Tú decides."
     partes = ["Espera un momento.", "He visto algo raro."]
     partes += [s["explicacion"] for s in senales[:3]]
     partes.append("Puedes enviarlo o esperar. Tú decides.")
