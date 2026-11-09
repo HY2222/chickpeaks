@@ -92,7 +92,8 @@ fetch("/api/personas").then(r => r.json()).then(ps => {
 }).catch(() => {});
 const api = r => fetch(`/api/personas/${P}/${r}`).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
 const $ = id => document.getElementById(id);
-const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
+// Como el backend: "4.800 €", "12,50 €", "90 €".
+const euros = n => `${Number(n).toLocaleString("de-DE", {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2})} €`;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 
 // ---------- Pictogramas (iconos Lucide; en la versión final, ARASAAC) ----------
@@ -134,15 +135,23 @@ const SENALES = [
   [/código/i, () => "Pide un código", () => "Le pedía un código."],
   [/has ganado/i, () => "Promete un premio", () => "Le prometía un premio."],
   [/banco, de hacienda/i, () => "Se hace pasar por otro", () => "Decía ser del banco o de la policía."],
+  [/no tienes guardado este número/i, () => "Número desconocido", () => "Le escribían desde un número desconocido."],
+  [/ha cambiado de número/i, () => "Dice que cambió de número", () => "Decía que había cambiado de número."],
+  [/prestado/i, () => "Pide un préstamo", () => "Le pedían dinero prestado."],
+  [/\bte pide dinero\b/i, () => "Pide dinero", () => "Le pedían dinero."],
+  [/no se ve quién/i, () => "No se sabe quién es", () => "No se veía quién lo pedía."],
 ];
 function leerAvisoEstafa(a) {
-  const destinatario = a.texto.match(/para (.+?)\. Señales/)?.[1] ?? "alguien";
-  const importe = a.texto.match(/Le piden (.+?) para/)?.[1] ?? "";
-  const senales = a.texto.match(/Señales: (.+?)\. La decisión/)?.[1] ?? "";
-  const hay = SENALES.filter(([re]) => re.test(senales));
+  const destinatario = a.destinatario ?? a.texto.match(/para (.+?)\. Señales/)?.[1] ?? "alguien";
+  const importe = a.importe != null ? euros(a.importe) : (a.texto.match(/Le piden (.+?) para/)?.[1] ?? "");
+  const senales = a.senales ?? (a.texto.match(/Señales: (.+?)\. La decisión/)?.[1] ?? "").split("; ");
+  const texto = senales.join(" ");
+  const hay = SENALES.filter(([re]) => re.test(texto));
   const etiquetas = [...new Set(hay.map(([, f]) => f(destinatario)))];
   const razones = [...new Set(hay.map(([, , f]) => f(destinatario)))];
-  return {destinatario, importe, etiquetas, razones};
+  // Señales que esta pantalla no conoce: se enseñan tal como las manda el backend.
+  const sinEtiqueta = senales.filter(t => t && !SENALES.some(([re]) => re.test(t)));
+  return {destinatario, importe, etiquetas, razones: [...razones, ...sinEtiqueta]};
 }
 
 // Hora de una decisión: "Hoy, 19:02" o "8 de noviembre, 19:02".
@@ -172,17 +181,18 @@ async function pintarAna() {
   const yo = circulo.find(m => m.id === YO);
   $("p9-como").textContent = `Ayudas a Javi como: ${NIVELES[yo?.nivel] ?? "—"}`;
 
-  // Caja "Posible estafa": solo cuando Javi ha pedido hablar con Ana de un envío de dinero
-  // (botón "Avisar a Ana" de la pantalla 8). Las señales salen del aviso del backend.
-  const pidio = [...decisiones].reverse().find(d =>
+  // Caja "Posible estafa": cuando Javi ha pedido hablar con Ana de un envío de dinero
+  // (botón "Avisar a Ana"). El aviso lo dice con su estado. Las señales salen del aviso.
+  const avisoEstafa = avisos.find(a => a.tipo === "posible_estafa" && a.estado === "javi_pide_hablar");
+  // Su decisión "hablarlo" de ese envío no se repite abajo como tarjeta.
+  const pidio = avisoEstafa && [...decisiones].reverse().find(d =>
     d.compartir && d.decision === "hablarlo" && /^enviar /i.test(d.concepto));
-  const avisoEstafa = avisos.find(a => a.tipo === "posible_estafa");
-  if (pidio && avisoEstafa) {
+  if (avisoEstafa) {
     const e = leerAvisoEstafa(avisoEstafa);
     $("p9-estafa").innerHTML = `
       <div class="caja-aviso" role="alert">
         <p class="titulo-aviso"><span data-icono="aviso"></span>Posible estafa</p>
-        <p style="margin-top:12px">Javi quería enviar ${esc(e.importe || euros(pidio.importe))} a ${esc(e.destinatario)} y ha pedido hablar contigo</p>
+        <p style="margin-top:12px">Javi quería enviar ${esc(e.importe)} a ${esc(e.destinatario)} y ha pedido hablar contigo</p>
         <p class="negrita" style="margin-top:12px">${e.etiquetas.map(t => `• ${esc(t)}`).join("&nbsp; ")}</p>
         <a class="boton aviso" style="margin-top:16px" href="tel:${esc(TEL_JAVI)}" id="p9-llamar">Llamar a Javi</a>
       </div>`;
@@ -213,25 +223,18 @@ AL_ENTRAR["9"] = () => { pintarAna(); repetir = setInterval(pintarAna, 2000); };
 // Cifras con punto de miles, como en el diseño: 11.760 €
 const cifra = n => `${n.toLocaleString("de-DE", {maximumFractionDigits: 2})} €`;
 
-// Avisos de estafa = pausas con riesgo alto que avisaron al círculo de apoyo.
-// TODO: el resumen del backend aún no trae este número; se cuenta desde GET /avisos
-// (un aviso por pausa, aunque llegue a varias personas).
-async function pausasDeEstafa() {
-  const avisos = await api("avisos");
-  const unicas = new Map();
-  for (const a of avisos.filter(a => a.tipo === "posible_estafa")) unicas.set(a.fecha + a.texto, a);
-  return [...unicas.values()].reverse();   // de la más antigua a la más nueva
-}
+// Avisos de estafa: uno por cada envío, aunque llegue a varias personas (GET /avisos?tipo=posible_estafa).
+const avisosDeEstafa = async () => (await api("avisos?tipo=posible_estafa")).reverse();  // de la más antigua a la más nueva
 
 AL_ENTRAR["10"] = async () => {
   $("p10-mensaje").hidden = true;
-  const [r, pausas] = await Promise.all([api("informe_anual/resumen"), pausasDeEstafa()]);
+  const r = await api("informe_anual/resumen");
   $("p10-titulo").textContent = `Informe anual ${r.anio}`;
   $("p10-entro").textContent = cifra(r.total_ingresos);
   $("p10-gasto").textContent = cifra(r.total_gastos);
   $("p10-ahorro").textContent = cifra(r.traspasado_a_ahorro);
   $("p10-decisiones").textContent = r.decisiones.length;
-  $("p10-estafas").textContent = pausas.length;
+  $("p10-estafas").textContent = r.avisos_estafa;
 };
 
 // El PDF lo genera el backend. Solo lo puede preparar quien tenga permiso de rendir cuentas
@@ -268,37 +271,40 @@ $("p10-compartir").onclick = async () => {
 };
 
 // ---------- 11 · Detalle de estafas ----------
-// Una tarjeta por cada pausa para pensar con aviso (GET /avisos). Lo que decidió Javi sale de
-// sus decisiones sobre envíos de dinero (GET /decisiones): cada intento de envío termina en una
-// decisión (Avisar a Ana / No enviar / Enviar igualmente), así que la pausa n.º 1 va con la
-// decisión n.º 1, la 2 con la 2, etc. Si Javi envió el dinero, se dice tal cual: sin esconderlo ni juzgarlo.
-const QUE_DECIDIO = {
-  hablarlo: {texto: "Avisó a Ana y no envió el dinero.", enviado: false},
-  esperar: {texto: "No envió el dinero.", enviado: false},
-  comprar: {texto: "Envió el dinero.", enviado: true},
-};
+// Una tarjeta por cada aviso de estafa (GET /avisos?tipo=posible_estafa). Lo que hizo Javi
+// sale del propio aviso: "resultado" (envió o no) y "estado" (si pidió hablar con Ana).
+// Si Javi envió el dinero, se dice tal cual: sin esconderlo ni juzgarlo.
+function queDecidio(a) {
+  if (!a.resultado) return {texto: "Todavía no ha decidido.", enviado: null};
+  if (a.resultado.enviado) return {texto: "Envió el dinero.", enviado: true};
+  return {texto: a.estado === "javi_pide_hablar" ? "Avisó a Ana y no envió el dinero." : "No envió el dinero.",
+          enviado: false};
+}
 
 AL_ENTRAR["11"] = async () => {
-  const [pausas, decisiones] = await Promise.all([pausasDeEstafa(), api("decisiones")]);
+  const [avisos, decisiones] = await Promise.all([avisosDeEstafa(), api("decisiones")]);
+  // Por dónde lo quería enviar (Bizum, mensaje…): sale de su decisión sobre ese envío.
   const envios = decisiones.filter(d => /^enviar /i.test(d.concepto));
 
-  const tarjetas = pausas.map((a, i) => {
+  const tarjetas = avisos.map(a => {
     const e = leerAvisoEstafa(a);
-    const d = envios[i];
-    const medio = d?.concepto.match(/por (\w+)$/)?.[1] ?? "Envío";
-    const fecha = new Date(d?.fecha ?? a.fecha).toLocaleDateString("es-ES", {day: "numeric", month: "long", year: "numeric"});
-    const q = d ? QUE_DECIDIO[d.decision] : null;
-    const resultado = !q ? "" : q.enviado
-      ? `<p class="resultado enviado">Dinero enviado: ${esc(e.importe || euros(d.importe))}</p>`
+    const d = [...envios].reverse().find(x => x.concepto.includes(` a ${e.destinatario} `));
+    const medio = d?.concepto.match(/por (\w+)$/)?.[1];
+    const titulo = medio ? `${medio.charAt(0).toUpperCase() + medio.slice(1)} de ${e.importe} a ${e.destinatario}`
+                         : `Envío de ${e.importe} a ${e.destinatario}`;
+    const fecha = new Date(a.fecha).toLocaleDateString("es-ES", {day: "numeric", month: "long", year: "numeric"});
+    const q = queDecidio(a);
+    const resultado = q.enviado === null ? "" : q.enviado
+      ? `<p class="resultado enviado">Dinero enviado: ${esc(e.importe)}</p>`
       : `<p class="resultado">✓&nbsp; Dinero no enviado</p>`;
     return `
       <div class="tarjeta borde-salvia leido estafa">
         <p class="etiqueta">${esc(fecha)}</p>
-        <p class="nombre" style="font-size:24px;margin-top:12px">${esc(medio)} de ${esc(e.importe)} a ${esc(e.destinatario)}</p>
+        <p class="nombre" style="font-size:24px;margin-top:12px">${esc(titulo)}</p>
         <p class="etiqueta">Por qué hubo pausa:</p>
         <ul class="razones">${e.razones.map(r => `<li>${esc(r).replace(/\.\s*$/, "")}</li>`).join("")}</ul>
         <p class="etiqueta">Qué decidió Javi:</p>
-        <p class="negrita" style="font-size:20px;margin-top:12px">${q ? q.texto : "Todavía no ha decidido."}</p>
+        <p class="negrita" style="font-size:20px;margin-top:12px">${q.texto}</p>
         ${resultado}
       </div>`;
   }).reverse();   // lo más nuevo arriba
