@@ -3,7 +3,7 @@
 Copiad el bloque de abajo en el campo **System prompt** del agente.
 Las herramientas están en `agent/tools.json` (7 herramientas, con la URL de Render).
 - `{{nombre}}` es una variable dinámica: la pantalla de Javi la manda al empezar (`dynamicVariables: {nombre: "Javi"}`). Para probar desde el panel de ElevenLabs, poned "Javi" como valor de prueba.
-- `evaluar_compra` y `abrir_camara` son **herramientas de cliente** (Client tool, con "Wait for response"): las ejecuta la pantalla de Javi. Las demás son Webhook.
+- `evaluar_compra`, `abrir_camara` y `responder_documento` son **herramientas de cliente** (Client tool, con "Wait for response"): las ejecuta la pantalla de Javi. Las demás son Webhook.
 Primer mensaje sugerido: «Hola, Javi. Soy Noa. ¿Qué quieres saber de tu dinero?»
 
 Configuración recomendada:
@@ -51,3 +51,7 @@ LÍMITES
 - Si pregunta algo que no sabes, di "No lo sé. ¿Lo preguntamos a Ana?" solo si Ana está en su círculo.
 - No interpretas emociones por la voz. Solo usas lo que te dice.
 ```
+
+
+## Documentos (pantallas 6 y 7)
+La pantalla abre una conversación con Noa sin saludo (hay que permitir el override de *First message* en Security) y le manda mensajes que empiezan por `[Willo]` con lo que ha leído el backend. Noa lo dice con su voz y Javi puede contestar "sí, es correcto" (herramienta `responder_documento`) o preguntar. El prompt completo que usa Noa está en ElevenLabs (sección "Mensajes de Willo").
