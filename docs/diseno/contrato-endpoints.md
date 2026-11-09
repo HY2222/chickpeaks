@@ -75,8 +75,8 @@ Respuesta:
 {
   "hucha": "mis_cosas", "quedan_antes": 210.0, "importe": 45.0,
   "quedan_despues": 165.0, "alcanza": true, "pausa_para_pensar": false,
-  "pictograma": "bolsa",
-  "texto_lectura_facil": "En tu hucha de mis cosas te quedan 210 €. Si compras la entrada del concierto, te quedan 165 €. Tú decides."
+  "pictograma": "bolsa", "frase_comida": "El dinero de la comida está aparte.",
+  "texto_lectura_facil": "En la hucha de tus cosas te quedan 210 €. Si compras la entrada del concierto, te quedan 165 €. El dinero de la comida está aparte. Tú decides."
 }
 ```
 

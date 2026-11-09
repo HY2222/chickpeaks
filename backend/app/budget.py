@@ -85,6 +85,12 @@ def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
         frases.append(f"Te faltan {euros(falta)}.")
         dias = _dias_hasta_fin_de_mes()
         frases.append(f"El mes que viene la hucha se llena otra vez. Faltan {dias} días.")
+    # La comida tiene su propia hucha: comprar algo de "tus cosas" no la toca. Se dice para que
+    # no piense que se queda sin comer (y para no decir lo contrario, que sería falso).
+    frase_comida = None
+    if h["id"] != "comida" and any(x["id"] == "comida" for x in persona["huchas"]):
+        frase_comida = "El dinero de la comida está aparte."
+        frases.append(frase_comida)
     frases.append("Tú decides.")
     return {
         "hucha": h["id"],
@@ -93,6 +99,7 @@ def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
         "importe": importe,
         "quedan_despues": quedan_despues,
         "alcanza": alcanza,
+        "frase_comida": frase_comida,
         "texto_lectura_facil": " ".join(frases),
         "pictograma": h["pictograma"],
     }
