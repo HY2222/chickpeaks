@@ -50,3 +50,16 @@ def test_persona_nueva(client, frase):
 @pytest.mark.parametrize("frase", ["Mañana me los devuelve", "Te lo devolveré", "Me lo devolverá el lunes"])
 def test_prestamo(client, frase):
     assert "prestamo" in ids(riesgo(client, frase))
+
+
+def test_hola_mama_he_cambiado_de_numero():
+    from app.risk import evaluar_pago
+    from app.store import store
+    store.reset()
+    r = evaluar_pago(store.persona("javi"), "Carla", 4800,
+                     "Hola mamá, me he cambiado de número. Sí, pero tengo que pagar una deuda de "
+                     "4.800 euros. ¿Me puedes hacer una transferencia?")
+    ids = {s["id"] for s in r["senales"]}
+    assert {"numero_cambiado", "pide_dinero", "importe_alto"} <= ids
+    assert "suplantacion" not in ids  # no dice que sea del banco ni de Hacienda
+    assert r["nivel_riesgo"] == "alto"

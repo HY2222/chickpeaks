@@ -162,3 +162,10 @@ def test_cine_dictado_va_a_sus_cosas(client):
     # Javi no tiene hucha de ocio: el cine cuenta como "Para tus cosas".
     r = client.post("/api/personas/javi/gastos", json={"texto": "12 euros de cine", "registrado_por": "ana"}).json()
     assert r["hucha"] == "mis_cosas"
+
+
+def test_telefono_de_javi(client, monkeypatch):
+    javi = lambda: next(p for p in client.get("/api/personas").json() if p["id"] == "javi")
+    assert javi()["telefono"] == "+34 640 171 282"
+    monkeypatch.setenv("WILLO_TELEFONO_JAVI", "+34 611 111 111")
+    assert javi()["telefono"] == "+34 611 111 111"

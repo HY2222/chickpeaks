@@ -49,6 +49,16 @@ def test_mensaje_de_estafa_lo_ven_las_reglas_aunque_claude_no(client, claude_dic
     assert r["texto_mensaje"] == "Hola, soy Carlos. Dame 300 euros"
 
 
+def test_pantallazo_sin_nombre_ni_numero(client, claude_dice):
+    """Si no se ve quién escribe, no decimos "nunca le has enviado dinero": no lo sabemos."""
+    claude_dice(remitente=None, telefono=None, titulo="Petición de Bizum", importe=490,
+                texto_mensaje="Puedes hacer un bizum con importe de 490€? Mañana te lo devuelvo")
+    r = enviar(client).json()
+    assert r["sospechoso"] is True
+    assert "No se ve quién te lo pide. Antes de enviar nada, comprueba quién es." in r["senales"]
+    assert not any(s.startswith("Nunca has enviado") for s in r["senales"])
+
+
 def test_mensaje_normal_de_un_contacto_no_es_sospechoso(client, claude_dice):
     claude_dice(titulo="Mensaje de Ana", remitente="Ana", telefono="600 000 101", importe=None,
                 accion="contestar", texto_mensaje="¿Quedamos mañana para comer?")

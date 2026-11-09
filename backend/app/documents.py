@@ -218,6 +218,8 @@ def texto_leido(d: dict[str, Any]) -> str:
                       if d["fecha_limite"] else "Hay que contestar.")
     elif d["accion"] == "nada" and d["tipo"] == "ticket":
         frases.append("Ya está pagado.")
+    elif d["accion"] == "nada" and d["tipo"] == "recibo":
+        frases.append("El banco lo cobra solo de tu cuenta. Tiene que haber dinero ese día.")
     frases.append("¿Es correcto?")
     return " ".join(frases)
 
@@ -227,7 +229,7 @@ def revisar_mensaje(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any
     from . import risk
     if d["tipo"] != "mensaje":
         return None
-    return risk.evaluar_pago(persona, d["remitente"] or "esa persona", d["importe"] or 0.0,
+    return risk.evaluar_pago(persona, d["remitente"], d["importe"] or 0.0,
                              d.get("texto_mensaje") or "", d.get("telefono"))
 
 

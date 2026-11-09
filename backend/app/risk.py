@@ -33,12 +33,17 @@ _REGLAS_TEXTO = [
                          "de instagram", "de internet", "de whatsapp", "de tiktok", "de tinder",
                          "de facebook", "por facebook", "por tinder", "no lo conozco", "no la conozco"], 2,
      "Es una persona que conoces desde hace poco."),
-    ("suplantacion", ["soy del banco", "del banco", "hacienda", "la policia", "tu hijo", "tu hija",
-                      "soy yo", "nuevo numero", "numero nuevo", "cambiado de numero", "cambie de numero",
-                      "se me ha roto el movil", "perdi el movil"], 2,
+    ("suplantacion", ["soy del banco", "del banco", "hacienda", "la policia"], 2,
      "Dicen que son del banco, de Hacienda o de la policía."),
+    # "Hola mamá, me he cambiado de número": la estafa más típica por WhatsApp.
+    ("numero_cambiado", ["nuevo numero", "numero nuevo", "cambiado de numero", "cambie de numero",
+                         "cambiado el numero", "se me ha roto el movil", "perdi el movil",
+                         "he perdido el movil", "tu hijo", "tu hija", "soy yo"], 3,
+     "Dice que ha cambiado de número. Es un engaño muy común. Llama a su número de siempre."),
     ("pide_dinero", ["dame", "mandame", "enviame", "pasame", "ingresame", "hazme un bizum",
-                     "mandame un bizum", "necesito dinero", "necesito que me", "transfiereme"], 1,
+                     "mandame un bizum", "necesito dinero", "necesito que me", "transfiereme",
+                     "hacer un bizum", "hacerme un bizum", "hacer una transferencia",
+                     "hacerme una transferencia", "hazme una transferencia"], 1,
      "Te pide dinero."),
     ("prestamo", ["prestame", "prestar", "dejame dinero", "me lo devuelve", "me los devuelve",
                   "me la devuelve", "me las devuelve", "te lo devuelvo", "te los devuelvo",
@@ -60,14 +65,18 @@ def _numero(telefono: str | None) -> str:
 numero = _numero  # para usarlo desde fuera
 
 
-def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
+def evaluar_pago(persona: dict[str, Any], destinatario: str | None, importe: float,
                  contexto: str = "", telefono: str | None = None) -> dict[str, Any]:
-    """`telefono`: el número de quien pide el dinero, si se sabe (por ejemplo, de un pantallazo)."""
+    """`telefono`: el número de quien pide el dinero, si se sabe (por ejemplo, de un pantallazo).
+
+    `destinatario` puede ser None: en un pantallazo a veces no se ve quién escribe.
+    Entonces no decimos "nunca le has enviado dinero", porque no lo sabemos.
+    """
     senales: list[dict[str, Any]] = []
     contactos = persona.get("contactos", [])
     conocidos = {_normalizar(d) for d in persona.get("destinatarios_conocidos", [])}
     conocidos |= {_normalizar(c["nombre"]) for c in contactos}
-    nombre_conocido = _normalizar(destinatario) in conocidos
+    nombre_conocido = bool(destinatario) and _normalizar(destinatario) in conocidos
 
     numero = _numero(telefono)
     contacto = next((c for c in contactos if numero and _numero(c["telefono"]) == numero), None)
@@ -79,7 +88,10 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
         else:
             senales.append({"id": "numero_desconocido", "peso": 2,
                             "explicacion": "No tienes guardado este número."})
-    if not nombre_conocido and contacto is None:
+    if not destinatario and not numero:
+        senales.append({"id": "remitente_desconocido", "peso": 2,
+                        "explicacion": "No se ve quién te lo pide. Antes de enviar nada, comprueba quién es."})
+    elif not nombre_conocido and contacto is None and destinatario:
         senales.append({"id": "destinatario_nuevo", "peso": 2,
                         "explicacion": f"Nunca has enviado dinero a {destinatario}."})
 
@@ -99,7 +111,7 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
     preguntas = []
     if nivel != "bajo":
         preguntas = [
-            f"¿Conoces a {destinatario} en persona?",
+            f"¿Conoces a {destinatario} en persona?" if destinatario else "¿Sabes seguro quién te lo pide?",
             "¿Te han pedido el dinero por teléfono o por mensaje?",
             "¿Quieres pensarlo un rato antes de enviarlo?",
         ]
