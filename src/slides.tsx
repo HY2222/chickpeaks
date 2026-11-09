@@ -57,6 +57,9 @@ export const slides: Slide[] = [
         <Fade delay={2} className="absolute left-[128px] top-[860px] w-[1664px] text-center">
           <p className="text-[32px] leading-[1.35] text-suave">Para personas con discapacidad intelectual. Su asistente se llama Noa.</p>
         </Fade>
+        <Fade delay={2.4} className="absolute bottom-[64px] left-[128px] w-[1664px] text-center">
+          <p className="text-[24px] text-suave">Equipo Willo · Noviembre de 2026 · [correo de contacto]</p>
+        </Fade>
       </div>
     ),
   },
@@ -89,7 +92,7 @@ export const slides: Slide[] = [
   {
     id: "problema",
     notes:
-      "Y Javi no es un caso aislado. Según el INE, solo una de cada tres personas con discapacidad intelectual usa internet de forma habitual. En la población general es el 84 por ciento. La banca digital deja fuera justo a quien más apoyo necesita.",
+      "Y Javi no es un caso aislado. Según el INE, solo una de cada tres personas con discapacidad intelectual usa internet de forma habitual. En la población general es el 84 por ciento. La banca digital deja fuera justo a quien más apoyo necesita. Y aquí está la oportunidad: desde junio de 2025, la ley obliga a los bancos a ser accesibles.",
     render: () => (
       <div className="absolute inset-0 bg-fondo text-texto">
         <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[40px]">
@@ -98,6 +101,11 @@ export const slides: Slide[] = [
             <Words text="Solo 1 de cada 3 personas con discapacidad intelectual usa internet de forma habitual." />
           </h2>
         </div>
+        <Fade o={12} className="absolute left-[128px] top-[470px] w-[1664px]">
+          <p className="text-[30px] leading-[1.3]">
+            <b className="text-verde">La oportunidad:</b> desde junio de 2025, la ley obliga a los bancos a ser accesibles.
+          </p>
+        </Fade>
         {/* El dato importante en acento; la comparación en gris. */}
         <Fade o={6} className="absolute left-[128px] top-[600px]">
           <p className="text-[32px] font-bold">Personas con discapacidad intelectual</p>
@@ -133,9 +141,21 @@ export const slides: Slide[] = [
             <p className="w-[860px] text-[36px] leading-[1.3] text-suave">Su asistente, Noa, hace las cuentas en voz alta. Y siempre termina igual:</p>
           </Fade>
         </div>
-        <Rise o={4} className="absolute left-[1366px] top-[120px]">
-          <img src={img("03-respuesta.png")} alt="Noa responde: si compras la entrada, te quedan 165 euros. Tú decides." className="h-[840px] w-[388px] rounded-[31px] object-contain" />
-        </Rise>
+        <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[40px]">
+          <Fade o={3}>
+            <Label>Lo que gana Javi</Label>
+          </Fade>
+          {[
+            { t: "Más autonomía", d: "Decide sobre su dinero sin pedir permiso." },
+            { t: "Menos estafas", d: "Willo le avisa y le explica por qué." },
+            { t: "Menos dependencia", d: "Su familia apoya, pero no decide por él." },
+          ].map((b, i) => (
+            <Rise key={b.t} o={i + 4} className="border-t-2 border-salvia-media pt-[24px]">
+              <h3 className="text-[40px] font-bold leading-[1.15]">{b.t}</h3>
+              <p className="mt-[8px] text-[28px] leading-[1.3]">{b.d}</p>
+            </Rise>
+          ))}
+        </div>
         <Emphasis o={10} className="absolute left-[128px] top-[670px] origin-left">
           <p className="titular text-[120px] font-semibold leading-[1.05] text-verde">Tú decides.</p>
         </Emphasis>
@@ -146,37 +166,46 @@ export const slides: Slide[] = [
   {
     id: "mercado",
     notes:
-      "¿A quién llegamos? Empezamos por las más de 400.000 personas con discapacidad intelectual y del desarrollo que viven en España. Pero la lectura fácil también ayuda a mucha más gente: se calcula que el 30 % de la población tiene dificultades de comprensión lectora, como muchas personas mayores o personas que aún aprenden el idioma. Y quien paga ya tiene un motivo: desde el 28 de junio de 2025, la Ley 11/2023 obliga a los bancos a que sus servicios para consumidores sean accesibles.",
+      "Nuestro mercado, de grande a pequeño. TAM: en España, cerca de 15 millones de personas tienen dificultades para entender lo que leen; a 2 euros al mes serían unos 360 millones al año. SAM: empezamos por las más de 400.000 personas con discapacidad intelectual y del desarrollo, unos 9,6 millones al año. SOM: nuestro primer mercado son las unas 150.000 personas de la red de Plena inclusión, unos 3,6 millones al año. Y quien paga ya tiene un motivo: la Ley 11/2023 obliga a los bancos a ser accesibles.",
     render: () => {
-      const card = "absolute top-[450px] flex h-[420px] w-[528px] flex-col gap-[16px] rounded-[20px] p-[40px]";
+      const rows = [
+        { k: "TAM", t: "Mercado total", n: "≈ 15 millones", d: "de personas en España (el 30\u00a0%) con dificultades para entender lo que leen.", e: "≈ 360 M€ al año" },
+        { k: "SAM", t: "Lo que podemos atacar", n: "+400.000", d: "personas con discapacidad intelectual y del desarrollo.", e: "≈ 9,6 M€ al año" },
+        { k: "SOM", t: "Primer mercado", n: "≈ 150.000", d: "personas en la red de Plena inclusión.", e: "≈ 3,6 M€ al año", accent: true },
+      ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
-          <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
             <Label>El mercado</Label>
             <h2 className={T72}>
-              <Words text="Empezamos por 400.000 personas. Detrás hay muchas más." />
+              <Words text="Empezamos por 150.000 personas. Detrás hay millones." />
             </h2>
           </div>
-          <Rise o={5} className={`${card} left-[128px] bg-verde text-fondo`}>
-            <p className="text-[24px] font-bold text-salvia">Empezamos</p>
-            <p className="titular whitespace-nowrap text-[96px] font-semibold leading-none tabular-nums">
-              <Count to={400000} prefix={"+ "} o={6} />
-            </p>
-            <p className="text-[28px] leading-[1.3] text-salvia">personas con discapacidad intelectual y del desarrollo en España.</p>
+          {/* Rectángulos uno dentro de otro, como en la plantilla de START. */}
+          <Rise o={3} className="absolute left-[128px] top-[400px] h-[520px] w-[760px] rounded-[32px] bg-salvia">
+            <p className="absolute left-[40px] top-[32px] text-[40px] font-bold text-verde">TAM</p>
           </Rise>
-          <Rise o={7} className={`${card} left-[696px] bg-salvia`}>
-            <p className="text-[24px] font-bold text-verde">Después</p>
-            <p className="titular whitespace-nowrap text-[96px] font-semibold leading-none tabular-nums text-verde">
-              <Count to={30} suffix=" %" o={8} />
-            </p>
-            <p className="text-[28px] leading-[1.3]">de la población tiene dificultades para entender lo que lee: personas mayores, personas que aprenden el idioma…</p>
+          <Rise o={4} className="absolute left-[288px] top-[490px] h-[400px] w-[570px] rounded-[28px] bg-salvia-media">
+            <p className="absolute left-[36px] top-[28px] text-[40px] font-bold text-verde">SAM</p>
           </Rise>
-          <Rise o={9} className={`${card} left-[1264px] bg-white`}>
-            <p className="text-[24px] font-bold text-suave">Quién paga</p>
-            <p className="titular text-[64px] font-semibold leading-[1.05]">Los bancos</p>
-            <p className="text-[28px] leading-[1.3] text-suave">Desde el 28 de junio de 2025, la Ley 11/2023 les obliga a ser accesibles. Da igual su tamaño.</p>
+          <Rise o={5} className="absolute left-[478px] top-[580px] h-[280px] w-[350px] rounded-[24px] bg-verde">
+            <p className="absolute left-[32px] top-[24px] text-[40px] font-bold text-fondo">SOM</p>
           </Rise>
-          <Foot n="05">Fuentes: Plena inclusión España; IFLA; Ley 11/2023.</Foot>
+          <div className="absolute left-[968px] top-[400px] flex w-[824px] flex-col gap-[28px]">
+            {rows.map((r, i) => (
+              <Rise key={r.k} o={i + 6} className={i ? "border-t-2 border-salvia pt-[24px]" : ""}>
+                <p className={`text-[24px] font-bold ${r.accent ? "text-verde" : "text-suave"}`}>
+                  {r.k} · {r.t}
+                </p>
+                <p className="mt-[4px] flex items-baseline justify-between gap-[24px]">
+                  <span className={`titular whitespace-nowrap text-[56px] font-semibold leading-[1.05] ${r.accent ? "text-verde" : ""}`}>{r.n}</span>
+                  <span className="whitespace-nowrap text-[28px] font-bold text-verde">{r.e}</span>
+                </p>
+                <p className="mt-[4px] text-[26px] leading-[1.3] text-suave">{r.d}</p>
+              </Rise>
+            ))}
+          </div>
+          <Foot n="05">Ingresos a 2 € al mes por persona. Fuentes: INE (2026), IFLA, Plena inclusión España.</Foot>
         </div>
       );
     },
@@ -379,7 +408,7 @@ export const slides: Slide[] = [
           </Rise>
           <DrawArrow o={6} className="absolute left-[500px] top-[611px]" />
           <Rise o={7} className={`${card} left-[564px] bg-verde text-fondo`}>
-            <p className="text-[24px] font-bold text-salvia">Backend propio · FastAPI</p>
+            <p className="text-[24px] font-bold text-salvia">Nuestro código</p>
             <h3 className="text-[36px] font-bold leading-[1.15]">El código hace la cuenta</h3>
             <p className="text-[26px] leading-[1.3] text-salvia">
               210 € − 45 € = <Count from={210} to={165} suffix=" €" o={8} />. Sin IA.
@@ -398,7 +427,7 @@ export const slides: Slide[] = [
             <p className="text-[26px] leading-[1.3]">Willo nunca compra, nunca paga y nunca bloquea.</p>
           </Rise>
           <Fade o={12} className="absolute left-[128px] top-[860px] w-[1664px]">
-            <p className="text-[28px] leading-[1.3] text-suave">App web instalable (PWA), sin tienda de apps · Desplegada en Render · Se guardan los datos, nunca las fotos.</p>
+            <p className="text-[28px] leading-[1.3] text-suave">Se instala desde el navegador, sin tienda de apps. Se guardan los datos, nunca las fotos.</p>
           </Fade>
           <Foot n="10" />
         </div>
@@ -408,22 +437,22 @@ export const slides: Slide[] = [
   {
     id: "negocio",
     notes:
-      "¿Quién paga? El banco, por cada usuario activo. La Ley 11/2023 obliga a que los servicios bancarios sean accesibles, y Willo le ayuda a cumplirla. Nuestro precio objetivo: 2 € al mes por usuario activo. Con 10.000 usuarios son 240.000 € al año. Para la persona, Willo es gratis.",
+      "¿Quién paga? El banco, por cada usuario activo. La Ley 11/2023 obliga a que los servicios bancarios sean accesibles, y Willo le ayuda a cumplirla. Es un modelo B2B2C: vendemos al banco, y lo usa su cliente. Cobramos como un SaaS, por usuario activo. Precio objetivo: 2 € al mes. Con 10.000 usuarios son 240.000 € al año. Más adelante, fundaciones, administraciones y bancos de otros países de Europa.",
     render: () => {
       const items = [
-        { t: "Cuota por usuario activo", d: "El banco paga por cada persona que usa Willo.", accent: true },
-        { t: "Ley 11/2023", d: "Los servicios bancarios tienen que ser accesibles." },
-        { t: "Ley 8/2021", d: "Apoyar a la persona, sin decidir por ella." },
+        { t: "Ahora: cuota por usuario activo", d: "El banco paga por cada persona que la usa. Para ella, gratis.", accent: true },
+        { t: "Por qué paga", d: "La Ley 11/2023 obliga a que sus servicios sean accesibles." },
+        { t: "Después", d: "Fundaciones, administraciones (B2G) y bancos de Europa." },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
           <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
-            <Label>Modelo de negocio</Label>
+            <Label>Modelo de negocio · B2B2C · SaaS por usuario activo</Label>
             <h2 className={T72}>
               <Words text="Paga el banco, porque la ley ya le pide ser accesible." />
             </h2>
           </div>
-          <div className="absolute left-[128px] top-[470px] flex w-[784px] flex-col gap-[28px]">
+          <div className="absolute left-[128px] top-[440px] flex w-[784px] flex-col gap-[24px]">
             {items.map((it, i) => (
               <Rise key={it.t} o={i + 6} className={i ? "border-t-2 border-salvia pt-[28px]" : ""}>
                 <h3 className={`text-[40px] font-bold ${it.accent ? "text-verde" : ""}`}>{it.t}</h3>
@@ -451,38 +480,53 @@ export const slides: Slide[] = [
   {
     id: "go-to-market",
     notes:
-      "¿Cómo llegamos? Primero, validamos con Plena inclusión: agrupa unas 950 asociaciones que trabajan con unas 150.000 personas. Ellas prueban Willo y validan la lectura fácil. Segundo, un piloto con un banco: Willo va dentro de su app, y esa pantalla ya la tenemos hecha. Tercero, más bancos y Europa: la ley española viene de una directiva europea, así que los bancos de toda la UE tienen la misma obligación.",
+      "¿Cómo llegamos? Paso 1: validamos con Plena inclusión, que agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. Las métricas aún son objetivos: 2 euros al mes por usuario, coste de captación casi cero porque entramos por las asociaciones, y que menos del 3 % lo deje cada mes.",
     render: () => {
-      const card = "absolute top-[450px] flex h-[350px] w-[480px] flex-col gap-[12px] rounded-[20px] p-[40px]";
+      const card = "absolute top-[400px] flex h-[250px] w-[480px] flex-col gap-[10px] rounded-[20px] p-[36px]";
+      const metrics = [
+        { k: "ARPU", v: "2 €", d: "al mes por usuario" },
+        { k: "CAC", v: "≈ 0 €", d: "entramos por las asociaciones" },
+        { k: "Churn", v: "< 3 %", d: "lo dejan al mes" },
+        { k: "LTV", v: "≈ 67 €", d: "por usuario (2\u00a0€\u00a0÷\u00a03\u00a0%)" },
+      ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
-          <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
             <Label>Go to market</Label>
             <h2 className={T72}>
               <Words text="Entramos por las asociaciones. Vendemos a los bancos." />
             </h2>
           </div>
-          <Rise o={5} className={`${card} left-[128px] bg-white`}>
-            <p className="text-[24px] font-bold text-suave">Paso 1 · Validar</p>
-            <h3 className="text-[40px] font-bold leading-[1.15]">Con Plena inclusión</h3>
-            <p className="text-[26px] leading-[1.3] text-suave">Unas 950 asociaciones y 150.000 personas. Prueban Willo y validan la lectura fácil.</p>
+          <Rise o={4} className={`${card} left-[128px] bg-white`}>
+            <p className="text-[22px] font-bold text-suave">Paso 1 · Validar</p>
+            <h3 className="text-[36px] font-bold leading-[1.15]">Con Plena inclusión</h3>
+            <p className="text-[24px] leading-[1.3] text-suave">Unas 950 asociaciones. Prueban Willo y validan la lectura fácil.</p>
           </Rise>
-          <DrawArrow o={6} className="absolute left-[624px] top-[611px]" />
-          <Rise o={7} className={`${card} left-[720px] bg-verde text-fondo`}>
-            <p className="text-[24px] font-bold text-salvia">Paso 2 · Piloto</p>
-            <h3 className="text-[40px] font-bold leading-[1.15]">Con un banco</h3>
-            <p className="text-[26px] leading-[1.3] text-salvia">Willo va dentro de la app del banco. Esa pantalla ya está hecha.</p>
+          <DrawArrow o={5} className="absolute left-[624px] top-[511px]" />
+          <Rise o={6} className={`${card} left-[720px] bg-verde text-fondo`}>
+            <p className="text-[22px] font-bold text-salvia">Paso 2 · Piloto</p>
+            <h3 className="text-[36px] font-bold leading-[1.15]">Con un banco</h3>
+            <p className="text-[24px] leading-[1.3] text-salvia">Willo va dentro de la app del banco. Esa pantalla ya está hecha.</p>
           </Rise>
-          <DrawArrow o={8} className="absolute left-[1216px] top-[611px]" />
-          <Rise o={9} className={`${card} left-[1312px] bg-salvia`}>
-            <p className="text-[24px] font-bold text-verde">Paso 3 · Crecer</p>
-            <h3 className="text-[40px] font-bold leading-[1.15]">Más bancos y Europa</h3>
-            <p className="text-[26px] leading-[1.3]">La ley viene de una directiva europea (2019/882). Toda la UE tiene la misma obligación.</p>
+          <DrawArrow o={7} className="absolute left-[1216px] top-[511px]" />
+          <Rise o={8} className={`${card} left-[1312px] bg-salvia`}>
+            <p className="text-[22px] font-bold text-verde">Paso 3 · Crecer</p>
+            <h3 className="text-[36px] font-bold leading-[1.15]">Más bancos y Europa</h3>
+            <p className="text-[24px] leading-[1.3]">La ley viene de una directiva europea: toda la UE tiene la misma obligación.</p>
           </Rise>
-          <Fade o={10} className="absolute left-[128px] top-[860px] w-[1664px]">
-            <p className="text-[28px] leading-[1.3] text-suave">Lo que vendemos al banco: cumplir la ley de accesibilidad y llegar a clientes que hoy no usan su app.</p>
-          </Fade>
-          <Foot n="12">Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
+          <Rise o={9} className="absolute left-[128px] top-[690px] flex h-[230px] w-[560px] flex-col justify-center gap-[10px] rounded-[20px] border-2 border-verde p-[36px]">
+            <p className="text-[22px] font-bold text-verde">Los 100 primeros usuarios</p>
+            <p className="titular text-[38px] font-semibold leading-[1.1]">10 asociaciones × 10 personas</p>
+            <p className="text-[24px] leading-[1.3] text-suave">Con Plena inclusión, antes del piloto con el banco.</p>
+          </Rise>
+          {metrics.map((m, i) => (
+            <Rise key={m.k} o={i + 10} className="absolute top-[690px] flex h-[230px] w-[254px] flex-col justify-center gap-[6px] rounded-[20px] bg-white p-[28px]" style={{ left: 720 + i * 270 }}>
+              <p className="text-[22px] font-bold text-suave">{m.k}</p>
+              <p className="titular whitespace-nowrap text-[52px] font-semibold leading-none text-verde">{m.v}</p>
+              <p className="text-[22px] leading-[1.25] text-suave">{m.d}</p>
+            </Rise>
+          ))}
+          <Foot n="12">Métricas: objetivos del equipo, aún sin datos reales. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
         </div>
       );
     },
@@ -490,15 +534,12 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos siete. [Cada uno dice su nombre y qué ha hecho en una frase.] Nuestro objetivo: un piloto con un banco en 2027. Hoy buscamos dos cosas: contactos en bancos y mentoría para preparar ese piloto.",
+      "Somos siete y nos complementamos. Hackers: Inés, Cristina y Nolan hacen que funcione. Hipsters: Leo y Raúl lo hacen fácil de usar. Hustlers: Anqi y [tu nombre] lo llevan a la calle. ¿Por qué nosotros? Porque ya tenemos una demo que funciona y la hemos pensado en lectura fácil desde el primer día. [Cada uno puede decir su nombre y qué ha hecho en una frase.]",
     render: () => {
-      const team = [
-        { n: "Inés", r: "Backend y cuentas" },
-        { n: "Cristina", r: "Lectura fácil y antiestafas" },
-        { n: "Nolan", r: "La voz de Noa" },
-        { n: "Leo y Raúl", r: "Pantallas de la app" },
-        { n: "Anqi", r: "Plena inclusión y datos" },
-        { n: "[Tu nombre]", r: "[Tu papel]" },
+      const groups = [
+        { k: "Hacker", d: "Que funcione", people: [{ n: "Inés", r: "Backend y cuentas" }, { n: "Cristina", r: "Lectura fácil y antiestafas" }, { n: "Nolan", r: "La voz de Noa" }] },
+        { k: "Hipster", d: "Que sea fácil", people: [{ n: "Leo y Raúl", r: "Pantallas de la app" }] },
+        { k: "Hustler", d: "Que llegue a la gente", people: [{ n: "Anqi", r: "Plena inclusión y datos" }, { n: "[Tu nombre]", r: "[Tu papel]" }] },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -506,31 +547,78 @@ export const slides: Slide[] = [
           <div className="absolute left-[128px] top-[128px] flex w-[960px] flex-col gap-[32px]">
             <Label>El equipo</Label>
             <h2 className={T72}>
-              <Words text="Somos siete." />
+              <Words text="Somos siete, y nos complementamos." />
             </h2>
           </div>
-          <div className="absolute left-[128px] top-[400px] grid w-[960px] grid-cols-2 gap-x-[48px] gap-y-[36px]">
-            {team.map((p, i) => (
-              <Rise key={p.n} o={i + 3} className="border-t-2 border-salvia pt-[20px]">
-                <h3 className="text-[36px] font-bold leading-[1.15]">{p.n}</h3>
-                <p className="mt-[6px] text-[26px] leading-[1.3] text-suave">{p.r}</p>
+          {groups.map((g, i) => (
+            <Rise key={g.k} o={i + 4} className="absolute top-[440px] flex w-[296px] flex-col gap-[24px]" style={{ left: 128 + i * 328 }}>
+              <div className="rounded-[16px] bg-verde px-[24px] py-[16px] text-fondo">
+                <p className="text-[32px] font-bold leading-[1.1]">{g.k}</p>
+                <p className="text-[22px] text-salvia">{g.d}</p>
+              </div>
+              {g.people.map((p) => (
+                <div key={p.n} className="border-t-2 border-salvia pt-[14px]">
+                  <h3 className="text-[32px] font-bold leading-[1.15]">{p.n}</h3>
+                  <p className="mt-[4px] text-[24px] leading-[1.3] text-suave">{p.r}</p>
+                </div>
+              ))}
+            </Rise>
+          ))}
+          <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[36px]">
+            <Fade o={4}>
+              <Label>¿Por qué nosotros?</Label>
+            </Fade>
+            {[
+              { t: "Ya funciona", d: "Tenemos una demo real, que vais a ver en directo." },
+              { t: "Técnica, diseño y negocio", d: "Las tres patas, en el mismo equipo." },
+              { t: "Lectura fácil desde el día uno", d: "No es un añadido: es cómo pensamos Willo." },
+            ].map((b, i) => (
+              <Rise key={b.t} o={i + 7} className="border-t-2 border-salvia-media pt-[24px]">
+                <h3 className="text-[36px] font-bold leading-[1.15]">{b.t}</h3>
+                <p className="mt-[8px] text-[26px] leading-[1.3]">{b.d}</p>
               </Rise>
             ))}
           </div>
-          <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[32px]">
-            <Fade o={4}>
-              <Label>Nuestro objetivo</Label>
-            </Fade>
-            <Rise o={5}>
-              <p className="titular text-[64px] font-semibold leading-[1.1] text-verde">Un piloto con un banco en 2027.</p>
-            </Rise>
-            <Fade o={9}>
-              <p className="text-[32px] leading-[1.3]">Hoy buscamos dos cosas:</p>
-              <p className="mt-[16px] text-[32px] leading-[1.3]">· Contactos en bancos.</p>
-              <p className="mt-[8px] text-[32px] leading-[1.3]">· Mentoría para preparar el piloto.</p>
-            </Fade>
-          </div>
           <Foot n="13" />
+        </div>
+      );
+    },
+  },
+  {
+    id: "objetivo",
+    notes:
+      "Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Esto es lo que viene: ya tenemos la demo; en los próximos meses, los 100 primeros usuarios con Plena inclusión; en 2027, el piloto con un banco; y después, más bancos y Europa.",
+    render: () => {
+      const steps = [
+        { w: "Hoy", t: "Demo que funciona" },
+        { w: "Próximos meses", t: "100 primeros usuarios con Plena inclusión" },
+        { w: "2027", t: "Piloto con un banco", accent: true },
+        { w: "Después", t: "Más bancos y Europa" },
+      ];
+      return (
+        <div className="absolute inset-0 bg-fondo text-texto">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
+            <Label>Nuestro objetivo</Label>
+            <h2 className={T80}>
+              <Words text="Un piloto con un banco en 2027." />
+            </h2>
+          </div>
+          <Rise o={4} className="absolute left-[128px] top-[380px] flex w-[1664px] items-center gap-[48px] rounded-[24px] bg-verde px-[48px] py-[36px] text-fondo">
+            <p className="w-[360px] text-[28px] font-bold leading-[1.2] text-salvia">Lo que os pedimos hoy</p>
+            <p className="titular text-[52px] font-semibold leading-[1.1]">Contactos en bancos y mentoría para el piloto.</p>
+          </Rise>
+          <Fade o={6} className="absolute left-[128px] top-[640px]">
+            <p className="text-[28px] font-bold text-verde">Qué pasa después</p>
+          </Fade>
+          <BarH o={7} round width={1664} height={8} color={GREY} className="absolute left-[128px] top-[716px]" />
+          {steps.map((st, i) => (
+            <Rise key={st.w} o={i + 8} className="absolute top-[700px] flex w-[400px] flex-col gap-[16px]" style={{ left: 128 + i * 421 }}>
+              <span className={`block h-[40px] w-[40px] rounded-full border-[6px] border-fondo ${st.accent ? "bg-verde" : "bg-salvia-media"}`} />
+              <p className={`text-[26px] font-bold ${st.accent ? "text-verde" : "text-suave"}`}>{st.w}</p>
+              <p className={`text-[32px] font-bold leading-[1.2] ${st.accent ? "text-verde" : ""}`}>{st.t}</p>
+            </Rise>
+          ))}
+          <Foot n="14" />
         </div>
       );
     },
@@ -549,7 +637,7 @@ export const slides: Slide[] = [
           <Words text="Nunca compra. Nunca paga. Nunca bloquea." delay={2.1} />
         </p>
         <Foot dark center>
-          [Nombres del equipo] · [enlace a la demo]
+          Equipo Willo · [correo de contacto]
         </Foot>
       </div>
     ),
