@@ -478,13 +478,33 @@ function cifrasEnNumeros(texto) {
 const sinArticulo = s => s.replace(/^(la|el|los|las|un|una|unos|unas)\s+/i, "");
 const mayuscula = s => s[0].toUpperCase() + s.slice(1);
 
-// Voz del navegador para "Escuchar otra vez" y para el modo demo sin ElevenLabs.
-function decir(texto) {
+// Cuando no hay conversación de voz abierta, las pantallas hablan con la voz de Noa (ElevenLabs).
+// Si falla (sin clave o sin internet), habla la voz del navegador.
+let audioNoa = null;
+function callar() {
+  if (audioNoa) { audioNoa.pause(); audioNoa = null; }
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
+function decirConNavegador(texto) {
   if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(texto);
   u.lang = "es-ES"; u.rate = 0.9;
   speechSynthesis.speak(u);
+}
+async function decir(texto) {
+  callar();
+  if (!texto) return;
+  try {
+    const r = await fetch("/api/voz/decir", {method: "POST", headers: {"Content-Type": "application/json"},
+                                             body: JSON.stringify({texto})});
+    if (!r.ok) throw new Error(r.status);
+    const audio = new Audio(URL.createObjectURL(await r.blob()));
+    audioNoa = audio;
+    audio.onended = () => { if (audioNoa === audio) audioNoa = null; };
+    await audio.play();
+  } catch (e) {
+    decirConNavegador(texto);
+  }
 }
 
 AL_ENTRAR["3"] = async () => {
@@ -533,7 +553,7 @@ AL_ENTRAR["3"] = async () => {
 };
 
 $("p3-escuchar").onclick = async () => { await pararVoz(); decir(estado.textoNoa); };
-$("p3-entendido").onclick = () => { pararVoz(); if ("speechSynthesis" in window) speechSynthesis.cancel(); };
+$("p3-entendido").onclick = () => { pararVoz(); callar(); };
 
 // ---------- 4 · Aviso de pago ----------
 // Javi paga él mismo en la taquilla. En la demo lo simula el botón invisible: apunta la compra
@@ -813,7 +833,7 @@ AL_ENTRAR["8"] = async () => {
 // Lo que decide Javi se apunta en el aviso (resultado) y en sus decisiones. Sin juzgar.
 async function decidirBizum(decision, extra, enviado) {
   ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = true);
-  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  callar();
   const avisoId = estado.riesgo?.aviso_id ?? estado.avisoBizum;
   if (avisoId) await post(`avisos/${avisoId}/resultado`, {enviado});
   await post("decisiones", {

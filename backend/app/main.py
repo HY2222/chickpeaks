@@ -531,6 +531,30 @@ async def signed_url():
     return r.json()
 
 
+@app.post("/api/voz/decir")
+async def decir_con_voz_de_noa(t: Texto):
+    """Lee un texto con la voz de Noa (ElevenLabs). Lo usan las pantallas cuando no hay conversación de voz abierta.
+
+    Si falta la clave o ElevenLabs falla, devuelve un error y la pantalla usa la voz del navegador.
+    """
+    key = os.getenv("ELEVENLABS_API_KEY")
+    if not key:
+        raise HTTPException(503, "Falta ELEVENLABS_API_KEY en .env")
+    texto = t.texto.strip()[:800]
+    if not texto:
+        raise HTTPException(422, "No hay texto")
+    voz = os.getenv("ELEVENLABS_VOICE_ID", "dNjJKg63Fr5AXwIdkATa")  # la voz de Noa
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voz}",
+                         params={"output_format": "mp3_44100_128"},
+                         headers={"xi-api-key": key},
+                         json={"text": texto, "model_id": os.getenv("ELEVENLABS_TTS_MODEL", "eleven_flash_v2_5"),
+                               "language_code": "es"})
+    if r.status_code >= 400:
+        raise HTTPException(502, f"ElevenLabs respondió {r.status_code}")
+    return Response(r.content, media_type="audio/mpeg")
+
+
 @app.post("/api/demo/reset")
 def reset():
     store.reset()
