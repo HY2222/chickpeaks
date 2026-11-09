@@ -285,7 +285,7 @@ export const slides: Slide[] = [
               ))}
             </Rise>
           ))}
-          <Foot n="06">Medio círculo: en parte. Cruz: no, o no consta en su web. Fuentes: webs de cada empresa.</Foot>
+          <Foot n="06" />
         </div>
       );
     },
