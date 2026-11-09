@@ -534,12 +534,12 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos siete y nos complementamos. Hackers: Inés, Cristina y Nolan hacen que funcione. Hipsters: Leo y Raúl lo hacen fácil de usar. Hustlers: Anqi y [tu nombre] lo llevan a la calle. ¿Por qué nosotros? Porque ya tenemos una demo que funciona y la hemos pensado en lectura fácil desde el primer día. [Cada uno puede decir su nombre y qué ha hecho en una frase.]",
+      "Somos seis y nos complementamos. Hackers: Inés, Cristina y Nolan hacen que funcione. Hipsters: Leo y Raúl lo hacen fácil de usar. Hustler: Anqi lo lleva a la calle. ¿Por qué nosotros? Porque ya tenemos una demo que funciona y la hemos pensado en lectura fácil desde el primer día. [Cada uno puede decir su nombre y qué ha hecho en una frase.]",
     render: () => {
       const groups = [
         { k: "Hacker", d: "Que funcione", people: [{ n: "Inés", r: "Backend y cuentas" }, { n: "Cristina", r: "Lectura fácil y antiestafas" }, { n: "Nolan", r: "La voz de Noa" }] },
         { k: "Hipster", d: "Que sea fácil", people: [{ n: "Leo y Raúl", r: "Pantallas de la app" }] },
-        { k: "Hustler", d: "Que llegue a la gente", people: [{ n: "Anqi", r: "Plena inclusión y datos" }, { n: "[Tu nombre]", r: "[Tu papel]" }] },
+        { k: "Hustler", d: "Que llegue a la gente", people: [{ n: "Anqi", r: "Plena inclusión y datos" }] },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -547,7 +547,7 @@ export const slides: Slide[] = [
           <div className="absolute left-[128px] top-[128px] flex w-[960px] flex-col gap-[32px]">
             <Label>El equipo</Label>
             <h2 className={T72}>
-              <Words text="Somos siete, y nos complementamos." />
+              <Words text="Somos seis, y nos complementamos." />
             </h2>
           </div>
           {groups.map((g, i) => (
