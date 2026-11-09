@@ -184,58 +184,79 @@ export const slides: Slide[] = [
   {
     id: "competencia",
     notes:
-      "¿Qué hay hoy? Los bancos ya tienen asistentes con IA, como Blue de BBVA o el agente de CaixaBank, pero están pensados para el cliente medio, no en lectura fácil. Hay guías muy buenas en lectura fácil, como las de Santander con Plena inclusión, pero son guías: no te ayudan en el momento de pagar. Y lo más común es que la familia lo lleve todo, pero entonces la persona no decide. Willo junta las tres cosas.",
+      "Ya hay empresas trabajando en esto. CaixaBank tiene una cuenta con persona de apoyo y una guía en lectura fácil, pero la app no te habla ni te explica cada pago. SpendAble, en Australia, es una tarjeta con app para personas con discapacidad intelectual, pero los presupuestos los pone la persona de apoyo. True Link, en Estados Unidos, protege de estafas bloqueando: decide el cuidador. Y Blue, de BBVA, habla con IA, pero no en lectura fácil ni con apoyos. Willo es el único que junta todo y deja decidir a la persona.",
     render: () => {
-      const cols = ["Habla en lectura fácil", "Ayuda en el momento de pagar", "Decide la persona"];
-      const rows = [
-        { t: "Asistentes con IA de los bancos", s: "BBVA Blue, agente IA de CaixaBank", v: [false, true, true] },
-        { t: "Guías en lectura fácil", s: "Santander y Plena inclusión", v: [true, false, true] },
-        { t: "La familia lo lleva todo", s: "Como Javi, hasta ahora", v: [true, true, false] },
-        { t: "Willo", s: "Voz, lectura fácil y círculo de apoyo", v: [true, true, true], willo: true },
+      type V = 1 | 0.5 | 0;
+      const cols = [
+        { n: "Willo", c: "España", willo: true },
+        { n: "CaixaBank", c: "Cuenta con apoyo" },
+        { n: "SpendAble", c: "Australia" },
+        { n: "True Link", c: "EE. UU." },
+        { n: "BBVA Blue", c: "Asistente con IA" },
       ];
-      const colX = [1020, 1290, 1560];
+      const rows: { t: string; v: V[]; nota?: (string | undefined)[] }[] = [
+        { t: "Se usa hablando", v: [1, 0, 0, 0, 1] },
+        { t: "Explica en lectura fácil", v: [1, 0.5, 0.5, 0, 0], nota: [undefined, "Solo una guía", "Con dibujos"] },
+        { t: "Hace la cuenta antes de pagar", v: [1, 0, 0.5, 0, 0], nota: [undefined, undefined, "Presupuestos"] },
+        { t: "Avisa de estafas sin bloquear", v: [1, 0, 0, 0.5, 0], nota: [undefined, undefined, undefined, "Bloquea"] },
+        { t: "Persona de apoyo con permisos", v: [1, 1, 1, 1, 0] },
+        { t: "Decide la persona, no el apoyo", v: [1, 1, 0.5, 0, 1], nota: [undefined, undefined, "Pone límites", "Decide el cuidador"] },
+      ];
+      const X0 = 720, CW = 214, TOP = 436, RH = 84;
+      const Icon = ({ v, on }: { v: V; on: boolean }) => {
+        const fill = on ? "#F5F7F0" : ACCENT;
+        const ink = on ? ACCENT : "#F5F7F0";
+        if (v === 1)
+          return (
+            <svg width="40" height="40" viewBox="0 0 48 48" aria-label="Sí">
+              <circle cx="24" cy="24" r="24" fill={fill} />
+              <path d="M14 24.5l7 7 13-14" stroke={ink} strokeWidth="4.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          );
+        if (v === 0.5)
+          return (
+            <svg width="40" height="40" viewBox="0 0 48 48" aria-label="En parte">
+              <circle cx="24" cy="24" r="22.5" fill="none" stroke={ACCENT} strokeWidth="3" />
+              <path d="M24 1.5a22.5 22.5 0 0 1 0 45z" fill={ACCENT} />
+            </svg>
+          );
+        return (
+          <svg width="40" height="40" viewBox="0 0 48 48" aria-label="No">
+            <circle cx="24" cy="24" r="22.5" fill="none" stroke={GREY} strokeWidth="3" />
+            <path d="M16 24h16" stroke="#A3B18F" strokeWidth="4.5" strokeLinecap="round" />
+          </svg>
+        );
+      };
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
-          <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
             <Label>La competencia</Label>
             <h2 className={T72}>
-              <Words text="Hay ayudas sueltas. Ninguna hace las tres cosas." />
+              <Words text="Ya hay empresas aquí. Ninguna lo junta todo." />
             </h2>
           </div>
+          {/* Columna de Willo resaltada, como "Mi empresa" en la plantilla. */}
+          <Rise o={3} className="absolute rounded-[20px] bg-verde" style={{ left: X0, top: 336, width: CW, height: TOP - 336 + rows.length * RH + 12 }} />
           {cols.map((c, i) => (
-            <Fade key={c} o={4} className="absolute top-[372px] w-[232px] text-center" style={{ left: colX[i] }}>
-              <p className="text-[24px] font-bold leading-[1.2] text-suave">{c}</p>
+            <Fade key={c.n} o={3} className="absolute flex h-[88px] flex-col items-center justify-center text-center" style={{ left: X0 + i * CW, top: 340, width: CW }}>
+              <p className={`text-[28px] font-bold leading-[1.15] ${c.willo ? "text-fondo" : ""}`}>{c.n}</p>
+              <p className={`text-[20px] leading-[1.3] ${c.willo ? "text-salvia" : "text-suave"}`}>{c.c}</p>
             </Fade>
           ))}
           {rows.map((r, i) => (
-            <Rise
-              key={r.t}
-              o={i * 2 + 5}
-              className={`absolute left-[128px] flex h-[104px] w-[1664px] items-center rounded-[20px] px-[32px] ${r.willo ? "bg-verde text-fondo" : i % 2 ? "" : "bg-white"}`}
-              style={{ top: 460 + i * 116 }}
-            >
-              <div className="w-[860px]">
-                <h3 className="text-[32px] font-bold leading-[1.15]">{r.t}</h3>
-                <p className={`text-[24px] leading-[1.3] ${r.willo ? "text-salvia" : "text-suave"}`}>{r.s}</p>
-              </div>
-              {r.v.map((ok, j) => (
-                <div key={j} className="absolute flex w-[232px] justify-center" style={{ left: colX[j] - 128 }}>
-                  {ok ? (
-                    <svg width="48" height="48" viewBox="0 0 48 48" aria-label="Sí">
-                      <circle cx="24" cy="24" r="24" fill={r.willo ? "#F5F7F0" : ACCENT} />
-                      <path d="M14 24.5l7 7 13-14" stroke={r.willo ? ACCENT : "#F5F7F0"} strokeWidth="4.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  ) : (
-                    <svg width="48" height="48" viewBox="0 0 48 48" aria-label="No">
-                      <circle cx="24" cy="24" r="22.5" fill="none" stroke={GREY} strokeWidth="3" />
-                      <path d="M16 24h16" stroke="#A3B18F" strokeWidth="4.5" strokeLinecap="round" />
-                    </svg>
-                  )}
+            <Rise key={r.t} o={i + 4} className="absolute left-[128px] w-[1664px]" style={{ top: TOP + i * RH, height: RH }}>
+              <div className={`absolute inset-y-[6px] left-0 w-[592px] rounded-l-[16px] ${i % 2 ? "" : "bg-white"}`} />
+              <div className={`absolute inset-y-[6px] right-0 w-[856px] rounded-r-[16px] ${i % 2 ? "" : "bg-white"}`} />
+              <p className="absolute left-[28px] top-1/2 -translate-y-1/2 text-[28px] font-bold leading-[1.15]">{r.t}</p>
+              {r.v.map((v, j) => (
+                <div key={j} className="absolute top-0 flex h-full flex-col items-center justify-center gap-[2px]" style={{ left: X0 - 128 + j * CW, width: CW }}>
+                  <Icon v={v} on={j === 0} />
+                  {r.nota?.[j] && <p className="text-[17px] leading-none text-suave">{r.nota[j]}</p>}
                 </div>
               ))}
             </Rise>
           ))}
-          <Foot n="06" />
+          <Foot n="06">Medio círculo: en parte. Raya: no, o no consta en su web. Fuentes: webs de cada empresa.</Foot>
         </div>
       );
     },
