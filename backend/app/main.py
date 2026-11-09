@@ -283,16 +283,18 @@ def _riesgo_y_aviso(p: dict, pago: Pago) -> dict:
     r["aviso_id"], r["avisados"] = None, []
     miembros = support.con_permiso(p, "recibir_avisos_estafa")
     if r["sugerir_aviso_apoyo"] and miembros:
-        aviso = _aviso_abierto(p, pago) or avisar(
-            p, miembros, "posible_estafa",
-            (f"Aviso de Willo: puede que alguien esté intentando engañar a {p['nombre']}. "
-             f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
-             f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
-             f"La decisión es suya. Llámale con calma."),
-            destinatario=pago.destinatario, importe=float(pago.importe),
-            senales=[s["explicacion"] for s in r["senales"]])
+        aviso = _aviso_abierto(p, pago) or _crear_aviso_estafa(p, pago, r, miembros)
         r["aviso_id"], r["avisados"] = aviso["id"], aviso["para_nombres"]
     return r
+
+
+def _crear_aviso_estafa(p: dict, pago: Pago, r: dict, miembros: list[dict], antes: str = "") -> dict:
+    texto = (f"{antes}Aviso de Willo: puede que alguien esté intentando engañar a {p['nombre']}. "
+             f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
+             f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
+             f"La decisión es suya. Llámale con calma.")
+    return avisar(p, miembros, "posible_estafa", texto, destinatario=pago.destinatario,
+                  importe=float(pago.importe), senales=[s["explicacion"] for s in r["senales"]])
 
 
 def _aviso_abierto(p: dict, pago: Pago) -> dict | None:
@@ -399,16 +401,41 @@ def _aviso(p: dict, aviso_id: str) -> dict:
     return a
 
 
+@app.post("/api/personas/{persona_id}/avisos/pedir_hablar")
+def pedir_hablar_de_un_envio(persona_id: str, pago: Pago):
+    """Pantalla 8, botón "Avisar a Ana", cuando todavía no hay aviso (riesgo medio).
+
+    Con riesgo medio no se avisa a nadie solo: el aviso se crea cuando Javi pulsa el botón.
+    Si ya había un aviso de este mismo envío (riesgo alto), se usa ese. Nunca hay dos.
+    """
+    p = _persona(persona_id)
+    a = _aviso_abierto(p, pago)
+    if a:
+        return {**_pide_hablar(p, a), "creado": False}
+    # Javi lo pide él: basta con que la persona pueda ver sus decisiones (nivel Ver o más).
+    miembros = (support.con_permiso(p, "recibir_avisos_estafa")
+                or support.con_permiso(p, "ver_decisiones"))
+    if not miembros:
+        raise HTTPException(409, "No hay nadie en el círculo de apoyo para avisar")
+    r = risk.evaluar_pago(p, pago.destinatario, pago.importe, pago.contexto, pago.telefono)
+    a = _crear_aviso_estafa(p, pago, r, miembros, antes=f"{p['nombre']} ha pedido hablar contigo. ")
+    return {**_pide_hablar(p, a, mandar=False), "creado": True}  # el mensaje ya ha salido al crearlo
+
+
 @app.post("/api/personas/{persona_id}/avisos/{aviso_id}/pedir_hablar")
 def pedir_hablar(persona_id: str, aviso_id: str):
     """Pantalla 8, botón "Avisar a Ana". No crea otro aviso: cambia el que ya hay."""
     p = _persona(persona_id)
-    a = _aviso(p, aviso_id)
+    return _pide_hablar(p, _aviso(p, aviso_id))
+
+
+def _pide_hablar(p: dict, a: dict, mandar: bool = True) -> dict:
     texto = f"{p['nombre']} ha pedido hablar contigo."
     if a["estado"] != "javi_pide_hablar":  # pulsar dos veces no manda dos mensajes
         a["estado"] = "javi_pide_hablar"
         a["fecha_pide_hablar"] = notify.ahora()
-        notify.mandar_otra_vez(p, a, texto)
+        if mandar:
+            notify.mandar_otra_vez(p, a, texto)
     nombres = " y ".join(a["para_nombres"])
     llamara = "Te llamará." if len(a["para_nombres"]) == 1 else "Te llamarán."
     return {"id": a["id"], "estado": a["estado"], "texto": texto,

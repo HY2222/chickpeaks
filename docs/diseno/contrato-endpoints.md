@@ -191,6 +191,15 @@ Respuesta:
  "texto_lectura_facil": "Se lo he dicho a Ana. Te llamará."}
 ```
 
+### 🆕 `POST /api/personas/javi/avisos/pedir_hablar` (sin id: riesgo medio)
+Con riesgo **medio** no se avisa a nadie solo, así que `evaluar_riesgo` no devuelve `aviso_id`. Si Javi pulsa "Avisar a Ana", la pantalla llama a esta ruta con los datos del envío (los mismos que `evaluar_riesgo`):
+```json
+{"destinatario": "Carlos", "importe": 300, "contexto": ""}
+```
+Si ya había un aviso de ese envío, lo usa (`"creado": false`). Si no, lo crea en ese momento, ya con `estado: "javi_pide_hablar"` (`"creado": true`). Respuesta igual que la de arriba, más `creado`. `409` si no hay nadie en el círculo que pueda ver sus decisiones.
+
+Regla para la pantalla 8: si `aviso_id` existe → `/avisos/{aviso_id}/pedir_hablar`; si no → `/avisos/pedir_hablar` con el envío.
+
 ### 🆕 Resultado del envío
 Cuando Javi pulsa "No enviar" o "Enviar igualmente", se guarda en el mismo aviso:
 `POST /api/personas/javi/avisos/{aviso_id}/resultado` con `{"enviado": false}`.
