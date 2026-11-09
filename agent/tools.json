@@ -107,36 +107,33 @@
       }
     },
     {
-      "type": "webhook",
+      "type": "client",
       "name": "evaluar_pago",
-      "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea. Si el riesgo es alto y la persona dio permiso, avisa a su círculo de apoyo y devuelve aviso_id.",
-      "api_schema": {
-        "url": "https://willo-sfh4.onrender.com/api/personas/javi/evaluar_riesgo",
-        "method": "POST",
-        "request_body_schema": {
-          "type": "object",
-          "properties": {
-            "destinatario": {
-              "type": "string",
-              "description": "A quién quiere enviar el dinero"
-            },
-            "importe": {
-              "type": "number"
-            },
-            "contexto": {
-              "type": "string",
-              "description": "Resumen de lo que ha contado: quién se lo pide, cómo, por qué"
-            },
-            "telefono": {
-              "type": "string",
-              "description": "Opcional. El número de teléfono de quien le pide el dinero, si lo dice. Ej: '611 222 333'"
-            }
+      "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea. Si el riesgo es alto y la persona dio permiso, avisa a su círculo de apoyo y devuelve aviso_id. Es una herramienta de CLIENTE: la ejecuta la pantalla de Javi (persona.html), que llama al backend (evaluar_riesgo) y, si el riesgo no es bajo, abre la pantalla 8 con las señales.",
+      "expects_response": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "destinatario": {
+            "type": "string",
+            "description": "A quién quiere enviar el dinero"
           },
-          "required": [
-            "destinatario",
-            "importe"
-          ]
-        }
+          "importe": {
+            "type": "number"
+          },
+          "contexto": {
+            "type": "string",
+            "description": "Resumen de lo que ha contado: quién se lo pide, cómo, por qué"
+          },
+          "telefono": {
+            "type": "string",
+            "description": "Opcional. El número de teléfono de quien le pide el dinero, si lo dice. Ej: '611 222 333'"
+          }
+        },
+        "required": [
+          "destinatario",
+          "importe"
+        ]
       }
     },
     {
