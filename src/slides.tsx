@@ -9,11 +9,11 @@ export type Slide = { id: string; notes: string; dark?: boolean; render: () => R
 
 /* Color de acento: solo para el dato o la idea importante. El resto, en gris salvia. */
 const ACCENT = "#3E5A34";
-const GREY = "#C4CEBB";
+const GREY = "#CDD5C6";
 
 /* ---------- Piezas comunes ---------- */
 const Label = ({ children, dark = false }: { children: ReactNode; dark?: boolean }) => (
-  <p className={`text-[28px] font-bold ${dark ? "text-salvia" : "text-verde"}`}>{children}</p>
+  <p className={`text-[28px] font-bold ${dark ? "text-crema/62" : "text-verde"}`}>{children}</p>
 );
 
 /**
@@ -21,7 +21,7 @@ const Label = ({ children, dark = false }: { children: ReactNode; dark?: boolean
  * así que no se desvanece con la transición, sino que pasa de una a otra.
  */
 const Foot = ({ children, n, dark = false, center = false }: { children?: ReactNode; n?: string; dark?: boolean; center?: boolean }) => (
-  <p className={`absolute bottom-[64px] left-[128px] w-[1664px] text-[24px] ${dark ? "text-salvia" : "text-suave"} ${center ? "text-center" : ""}`}>
+  <p className={`absolute bottom-[64px] left-[128px] w-[1664px] text-[24px] ${dark ? "text-crema/60" : "text-suave"} ${center ? "text-center" : ""}`}>
     {n && (
       <>
         <motion.b layoutId="marca" className="inline-block">
@@ -102,14 +102,14 @@ export const slides: Slide[] = [
         <Fade o={6} className="absolute left-[128px] top-[600px]">
           <p className="text-[32px] font-bold">Personas con discapacidad intelectual</p>
         </Fade>
-        <BarH o={6} width={491} height={96} color={ACCENT} className="absolute left-[128px] top-[654px]" />
+        <BarH o={6} round width={491} height={96} color={ACCENT} className="absolute left-[128px] top-[654px]" />
         <Fade o={10} className="absolute left-[651px] top-[668px]">
           <p className="titular whitespace-nowrap text-[56px] font-semibold text-verde">1 de cada 3</p>
         </Fade>
         <Fade o={7} className="absolute left-[128px] top-[790px]">
           <p className="text-[32px] text-suave">Población general</p>
         </Fade>
-        <BarH o={7} width={1250} height={96} color={GREY} className="absolute left-[128px] top-[844px]" />
+        <BarH o={7} round width={1250} height={96} color={GREY} className="absolute left-[128px] top-[844px]" />
         <p className="absolute left-[1410px] top-[858px] titular whitespace-nowrap text-[56px] font-semibold tabular-nums text-suave">
           <Count to={84} suffix=" %" o={7} />
         </p>
@@ -149,7 +149,7 @@ export const slides: Slide[] = [
     notes:
       "Vamos a verlo en directo con los móviles de Javi y de su hermana Ana. Seguid el guion de la demo: entrada del concierto, multa de aparcamiento, Bizum de Carlos e informe anual. Si falla la conexión, pasad al vídeo de respaldo: [enlace al vídeo].",
     render: () => (
-      <div className="absolute inset-0 bg-verde text-fondo">
+      <div className="absolute inset-0 bg-noche text-crema">
         <div className="absolute left-[128px] top-[128px] flex w-[1040px] flex-col gap-[40px]">
           <Label dark>Demo en directo · 3 minutos</Label>
           <h2 className={T80}>
@@ -160,7 +160,7 @@ export const slides: Slide[] = [
           <img src={img("02-escucha.png")} alt="Pantalla Noa te escucha, con el botón del micrófono" className="h-[880px] w-[407px] rounded-[32px] object-contain" />
         </MockupIn>
         <Fade o={9} className="absolute left-[128px] top-[800px] w-[960px]">
-          <p className="text-[40px] leading-[1.3] text-salvia">Fijaos en una cosa: Noa explica, pero los botones los pulsa Javi.</p>
+          <p className="text-[40px] leading-[1.3] text-crema/70">Fijaos en una cosa: Noa explica, pero <span className="text-crema">los botones los pulsa Javi.</span></p>
         </Fade>
         <Foot n="05" dark />
       </div>
@@ -334,12 +334,12 @@ export const slides: Slide[] = [
     dark: true,
     notes: "Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.",
     render: () => (
-      <div className="absolute inset-0 bg-verde text-fondo">
+      <div className="absolute inset-0 bg-noche text-crema">
         {/* "willo" vuelve a formarse aquí con las partículas de la capa de App. */}
         <h1 className="absolute left-[128px] top-[640px] w-[1664px] titular text-center text-[96px] italic font-semibold leading-[1.05]">
           <Words text="Tu voluntad, tu dinero." delay={1.6} />
         </h1>
-        <p className="absolute left-[128px] top-[790px] w-[1664px] text-center text-[40px] leading-[1.3] text-salvia">
+        <p className="absolute left-[128px] top-[790px] w-[1664px] text-center text-[40px] leading-[1.3] text-crema/75">
           <Words text="Nunca compra. Nunca paga. Nunca bloquea." delay={2.1} />
         </p>
         <Foot dark center>

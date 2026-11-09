@@ -124,14 +124,16 @@ export function Count({ to, from = 0, prefix = "", suffix = "", o, delay }: { to
 }
 
 /** Barra horizontal que se dibuja de izquierda a derecha (pathLength 0 → 1). */
-export function BarH({ width, height, color, o, delay, className, style }: Base & { width: number; height: number; color: string }) {
+export function BarH({ width, height, color, o, delay, className, style, round = false }: Base & { width: number; height: number; color: string; round?: boolean }) {
   const reduced = useReducedMotion();
+  const r = round ? height / 2 : 0;
   return (
     <svg className={className} style={style} width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
       <motion.path
-        d={`M0 ${height / 2} H${width}`}
+        d={`M${r} ${height / 2} H${width - r}`}
         stroke={color}
         strokeWidth={height}
+        strokeLinecap={round ? "round" : "butt"}
         fill="none"
         initial={reduced ? false : { pathLength: 0 }}
         animate={{ pathLength: 1 }}
