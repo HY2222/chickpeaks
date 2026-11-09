@@ -166,6 +166,6 @@ def test_cine_dictado_va_a_sus_cosas(client):
 
 def test_telefono_de_javi(client, monkeypatch):
     javi = lambda: next(p for p in client.get("/api/personas").json() if p["id"] == "javi")
-    assert javi()["telefono"] == "+34 600 000 001"
+    assert javi()["telefono"] == "+34 640 171 282"
     monkeypatch.setenv("WILLO_TELEFONO_JAVI", "+34 611 111 111")
     assert javi()["telefono"] == "+34 611 111 111"
