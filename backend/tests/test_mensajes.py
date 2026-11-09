@@ -45,7 +45,9 @@ def test_mensaje_de_estafa_lo_ven_las_reglas_aunque_claude_no(client, claude_dic
     assert r["tipo"] == "mensaje" and r["sospechoso"] is True
     assert r["pictograma"] == "aviso"
     assert "No tienes guardado este número." in r["senales"]
-    assert r["texto_lectura_facil"] == "He leído: mensaje de Carlos. Te pide 300 €. ¿Es correcto?"
+    assert r["texto_lectura_facil"] == ("He leído: mensaje de Carlos. Te pide 300 €. "
+                                        "Cuidado: puede ser un engaño. No tienes guardado este número. "
+                                        "¿Es correcto?")
     assert r["texto_mensaje"] == "Hola, soy Carlos. Dame 300 euros"
 
 
