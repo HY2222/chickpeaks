@@ -216,7 +216,7 @@
   </div>
 
   <div class="caja-aviso" role="alert">
-    <p class="titulo-aviso"><span data-icono="aviso"></span>Pausa para pensar</p>
+    <p class="titulo-aviso"><span data-icono="aviso"></span><span id="p8-titulo">Pausa para pensar</span></p>
     <div class="frases aviso-frases">
       <p class="negrita">Espera un momento</p>
       <div id="p8-razones"></div>
@@ -423,6 +423,20 @@ AL_ENTRAR["2"] = async () => {
           estado.irAFoto = true;
           return "La pantalla para hacer la foto se abre cuando termines de hablar.";
         },
+        // Javi cuenta que alguien le pide dinero (Bizum…). Las REGLAS FIJAS del backend
+        // miden el riesgo. Si no es bajo, se abre la pantalla 8 mientras Noa lo explica.
+        evaluar_pago: async ({destinatario, importe, contexto, telefono}) => {
+          const b = {destinatario: destinatario || "esa persona", importe: Number(importe) || 0.01,
+                     contexto: contexto || ""};
+          if (telefono) b.telefono = telefono;
+          const r = await post("evaluar_riesgo", b);
+          if (r.nivel_riesgo !== "bajo") {
+            estado.bizum = b;
+            estado.riesgo = r;
+            location.hash = "#8";
+          }
+          return JSON.stringify(r);
+        },
       },
       onMessage: m => {
         if (m.source === "user") oido(m.message);
@@ -472,7 +486,12 @@ $("p2-parar").onclick = async () => {
   await pararVoz();
   location.hash = estado.respuesta ? "#3" : "#1";
 };
-window.addEventListener("hashchange", () => { if (location.hash === "#1") pararVoz(); });
+window.addEventListener("hashchange", () => {
+  if (location.hash !== "#1") return;
+  pararVoz();
+  estado.bizum = null;   // un Bizum contado a Noa no se queda para la próxima vez
+  if (!estado.avisoBizum) estado.riesgo = null;
+});
 
 // ---------- Cifras dichas por Noa → números ("ciento veinte euros" → "120 €") ----------
 // Noa escribe los números en palabras para que la voz los lea bien. En pantalla, mejor cifras.
@@ -889,8 +908,11 @@ const RAZONES = {
 };
 const ORDEN = ["destinatario_nuevo", "relacion_nueva", "urgencia", "importe_alto"];
 
+// Si Javi se lo ha contado a Noa, el Bizum es el suyo (estado.bizum); si no, el de la demo.
+const bizumActual = () => estado.bizum ?? BIZUM;
+
 AL_ENTRAR["8"] = async () => {
-  const b = BIZUM;
+  const b = bizumActual();
   $("p8-enviar").textContent = `Enviar ${euros(b.importe)}`;
   $("p8-a-quien").textContent = `a ${b.destinatario}, por Bizum`;
   ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = false);
@@ -898,6 +920,7 @@ AL_ENTRAR["8"] = async () => {
 
   // Solo se evalúa una vez por intento. Con riesgo alto, el backend crea UN aviso (aviso_id).
   estado.riesgo ??= await post("evaluar_riesgo", b);
+  $("p8-titulo").textContent = estado.riesgo.nivel_riesgo === "alto" ? "Posible estafa" : "Pausa para pensar";
   const senales = [...estado.riesgo.senales].sort((x, y) =>
     (ORDEN.indexOf(x.id) + 1 || 99) - (ORDEN.indexOf(y.id) + 1 || 99));
   const razones = [...new Set(senales.map(s => RAZONES[s.id]?.(b) ?? s.explicacion))];
@@ -905,7 +928,7 @@ AL_ENTRAR["8"] = async () => {
   $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${esc(sinPunto(r))}</p>`).join("");
   pintarIconos(document.querySelector('[data-pantalla="8"]'));
 
-  if (!conv) decir(["Pausa para pensar.", "Espera un momento.", ...razones,
+  if (!conv) decir([$("p8-titulo").textContent + ".", "Espera un momento.", ...razones,
                     "Esto pasa a veces en las estafas.", "¿Quieres hablar con Ana antes?"].join(" "));
 };
 
@@ -915,10 +938,12 @@ async function decidirBizum(decision, extra, enviado) {
   callar();
   const avisoId = estado.riesgo?.aviso_id ?? estado.avisoBizum;
   if (avisoId) await post(`avisos/${avisoId}/resultado`, {enviado});
+  const b = bizumActual();
   await post("decisiones", {
-    concepto: conceptoBizum(BIZUM), importe: BIZUM.importe, decision, ...extra,
+    concepto: conceptoBizum(b), importe: b.importe, decision, ...extra,
   });
   estado.riesgo = null;
+  estado.bizum = null;
   estado.avisoBizum = null;
 }
 
@@ -929,7 +954,7 @@ $("p8-ana").onclick = async () => {
   $("p8-ana").disabled = true;
   try {
     const id = estado.riesgo?.aviso_id;
-    const r = await (id ? post(`avisos/${id}/pedir_hablar`) : post("avisos/pedir_hablar", BIZUM));
+    const r = await (id ? post(`avisos/${id}/pedir_hablar`) : post("avisos/pedir_hablar", bizumActual()));
     estado.avisoBizum = r.id;
     await decidirBizum("hablarlo", {palabras_persona: "Avisar a Ana", pidio_apoyo: true, compartir: true}, false);
     $("p8-ana").textContent = "Ana ya lo sabe";
