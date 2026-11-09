@@ -57,6 +57,7 @@
   <div class="tarjeta" style="padding:24px 20px">
     <p class="etiqueta">Noa ha oído:</p>
     <p class="transcripcion" id="p2-oido" aria-live="polite">…</p>
+    <p class="suave" id="p2-error" hidden></p>
   </div>
 
   <div class="botones" style="margin-top:0">
@@ -392,6 +393,7 @@ AL_ENTRAR["2"] = async () => {
   await pararVoz();   // nunca dos conversaciones a la vez
   const miSesion = sesionVoz;
   estado.callado = false;
+  $("p2-error").hidden = true;
   estado.pregunta = estado.respuesta = null;
   $("p2-oido").textContent = "…";
   $("p2-micro").classList.add("activo");
@@ -399,7 +401,9 @@ AL_ENTRAR["2"] = async () => {
     const r = await fetch("/api/voz/signed-url");
     if (!r.ok) throw new Error("voz no configurada");
     const { signed_url } = await r.json();
-    await navigator.mediaDevices.getUserMedia({audio: true});
+    // Pide permiso del micro y lo suelta enseguida: dejarlo abierto puede dar problemas
+    // en Android (el SDK de ElevenLabs abre el suyo).
+    (await navigator.mediaDevices.getUserMedia({audio: true})).getTracks().forEach(t => t.stop());
     // P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     let nueva = null;
@@ -474,8 +478,11 @@ AL_ENTRAR["2"] = async () => {
     conv?.sendContextualUpdate(apoyos.length
       ? `Círculo de apoyo de Javi: ${apoyos.join(", ")}.`
       : "Javi no tiene ninguna persona de apoyo en Willo.");
-  } catch {
-    console.info("Modo demo: la voz no está conectada. Se usa la frase del guion.");
+  } catch (e) {
+    console.info("Modo demo: la voz no está conectada. Se usa la frase del guion.", e);
+    // Para saber por qué falla en un móvil (sin consola): se enseña el motivo en pequeño.
+    $("p2-error").textContent = `Sin voz: ${e?.name || ""} ${e?.message || e}`.trim();
+    $("p2-error").hidden = false;
     await frasePorDefecto();
   }
 };
@@ -733,7 +740,9 @@ async function noaDice(textoParaNoa) {
     const r = await fetch("/api/voz/signed-url");
     if (!r.ok) return false;
     const { signed_url } = await r.json();
-    await navigator.mediaDevices.getUserMedia({audio: true});
+    // Pide permiso del micro y lo suelta enseguida: dejarlo abierto puede dar problemas
+    // en Android (el SDK de ElevenLabs abre el suyo).
+    (await navigator.mediaDevices.getUserMedia({audio: true})).getTracks().forEach(t => t.stop());
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     let nueva = null;
     nueva = await Conversation.startSession({
