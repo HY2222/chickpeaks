@@ -75,8 +75,8 @@ def test_recibo_domiciliado_no_hay_que_pagar(client, claude_falso):
                                           "remitente": "Compañía luz", "importe": 32.74,
                                           "fecha_limite": None, "accion": "nada"}
     r = enviar(client).json()
-    assert r["texto_lectura_facil"] == ("He leído: factura de luz. 32,74 €. Se paga solo desde tu cuenta. "
-                                        "No tienes que hacer nada. ¿Es correcto?")
+    assert r["texto_lectura_facil"] == ("He leído: factura de luz. 32,74 €. El banco lo cobra solo de tu cuenta. "
+                                        "Tiene que haber dinero ese día. ¿Es correcto?")
 
 
 def test_sospechoso_lleva_motivo(client, claude_falso):

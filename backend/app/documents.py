@@ -219,7 +219,7 @@ def texto_leido(d: dict[str, Any]) -> str:
     elif d["accion"] == "nada" and d["tipo"] == "ticket":
         frases.append("Ya está pagado.")
     elif d["accion"] == "nada" and d["tipo"] == "recibo":
-        frases.append("Se paga solo desde tu cuenta. No tienes que hacer nada.")
+        frases.append("El banco lo cobra solo de tu cuenta. Tiene que haber dinero ese día.")
     frases.append("¿Es correcto?")
     return " ".join(frases)
 
