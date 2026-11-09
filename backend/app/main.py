@@ -7,7 +7,7 @@ el agente de voz de ElevenLabs (ver agent/tools.json), y las pantallas del front
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -97,6 +97,16 @@ class CambioNivel(BaseModel):
 class Pausa(BaseModel):
     activa: bool
     desde_importe: float = 50.0
+
+
+class DocumentoConfirmado(BaseModel):
+    """Lo que leyó Noa, ya revisado por la persona (pantalla 6)."""
+    tipo: Literal["factura", "recibo", "ticket", "nomina", "multa", "carta_banco", "otro"]
+    titulo: str = Field(min_length=1, examples=["Multa de aparcamiento"])
+    remitente: str | None = Field(default=None, examples=["Ayuntamiento"])
+    importe: float | None = Field(default=None, ge=0, examples=[90.0])
+    fecha_limite: date | None = Field(default=None, examples=["2026-12-20"])
+    sospechoso: bool = False
 
 
 class Texto(BaseModel):
@@ -200,6 +210,22 @@ async def leer_documento(persona_id: str, foto: UploadFile = File(...)):
         raise
     finally:
         del contenido  # la foto no se queda en el servidor
+
+
+@app.post("/api/personas/{persona_id}/documentos/confirmar")
+def confirmar_documento(persona_id: str, doc: DocumentoConfirmado):
+    """Pantalla 7: Javi confirmó lo leído. El código hace las cuentas con su hucha de "mis cosas".
+
+    No paga nada, no recomienda y no bloquea. Solo apunta un gasto si es un ticket
+    pagado en efectivo (el banco no lo sabe). "Hablar con Ana" usa POST /decisiones.
+    """
+    p = _persona(persona_id)
+    datos = doc.model_dump()
+    datos["titulo"] = datos["titulo"].strip()
+    if not datos["titulo"]:
+        raise HTTPException(422, "Falta el título del documento")
+    datos["fecha_limite"] = doc.fecha_limite.isoformat() if doc.fecha_limite else None
+    return documents.confirmar(p, datos)
 
 
 @app.post("/api/personas/{persona_id}/evaluar_riesgo", dependencies=[Depends(token_herramientas)])

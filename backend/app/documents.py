@@ -16,6 +16,7 @@ import base64
 import io
 import json
 import os
+import re
 from datetime import date
 from typing import Any
 
@@ -203,3 +204,165 @@ def leer(contenido: bytes, media_type: str | None) -> dict[str, Any]:
     datos = limpiar(_llamar_claude(imagen, tipo_imagen))
     pictograma = "aviso" if datos["sospechoso"] else PICTOGRAMAS.get(datos["tipo"], "documento")
     return {**datos, "pictograma": pictograma, "texto_lectura_facil": texto_leido(datos)}
+
+
+# ======================================================================
+# Paso 2: /documentos/confirmar (pantalla 7)
+# Javi ya ha dicho "Sí, es correcto". Aquí el CÓDIGO hace las cuentas.
+# No paga nada, no recomienda y no bloquea: solo explica.
+# ======================================================================
+
+def _normal(texto: str | None) -> str:
+    """'Compañía de la Luz' -> 'compania de la luz'. Para comparar nombres sin tildes ni mayúsculas."""
+    import unicodedata
+    t = unicodedata.normalize("NFKD", (texto or "").lower())
+    return "".join(c for c in t if not unicodedata.combining(c)).strip()
+
+
+_PALABRAS_VACIAS = {"de", "del", "la", "el", "los", "las", "y", "a", "en", "por", "para", "factura", "recibo"}
+
+
+def _palabras(texto: str | None) -> set[str]:
+    return {w for w in re.findall(r"[a-z0-9]+", _normal(texto)) if w not in _PALABRAS_VACIAS and len(w) > 2}
+
+
+def _se_parecen(a: str | None, b: str | None) -> bool:
+    """Comparten alguna palabra importante. 'Factura de la luz' y 'Luz' -> sí."""
+    return bool(_palabras(a) & _palabras(b))
+
+
+def _mismo_importe(a: float, b: float, margen: float = 0.0) -> bool:
+    return abs(a - b) <= max(0.01, margen)
+
+
+def buscar_en_plan(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any] | None:
+    """¿Es un gasto fijo que ya está en su plan (luz, alquiler...)?
+
+    Coincide si el nombre se parece al del gasto fijo y el importe es casi igual.
+    Margen del 10 %: las facturas de la luz cambian un poco cada mes.
+    """
+    if d["importe"] is None:
+        return None
+    for g in persona.get("gastos_recurrentes", []):
+        nombre_ok = (_se_parecen(d["remitente"], g.get("destinatario"))
+                     or _se_parecen(d["titulo"], g["concepto"])
+                     or _se_parecen(d["remitente"], g["concepto"]))
+        if nombre_ok and _mismo_importe(d["importe"], g["importe"], g["importe"] * 0.10):
+            return g
+    return None
+
+
+def buscar_ticket(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any] | None:
+    """¿El ticket ya está en sus movimientos de este mes (pagó con tarjeta)?
+
+    Basta con el mismo importe: el nombre de la tienda en el ticket y en el banco
+    a veces no se parecen nada. Mejor no restarlo dos veces.
+    """
+    from .store import hoy
+    mes = hoy().isoformat()[:7]
+    for m in persona["movimientos"]:
+        if m["tipo"] == "gasto" and m["fecha"][:7] == mes and _mismo_importe(m["importe"], d["importe"]):
+            return m
+    return None
+
+
+def _quien_apoya(persona: dict[str, Any]) -> str | None:
+    """El nombre de quien puede ver sus decisiones (Ana). Si Javi no ha dado permiso a nadie, nadie."""
+    from . import support
+    gente = support.con_permiso(persona, "ver_decisiones")
+    return gente[0]["nombre"] if gente else None
+
+
+def _pregunta_apoyo(persona: dict[str, Any]) -> list[str]:
+    nombre = _quien_apoya(persona)
+    return [f"¿Quieres hablarlo con {nombre}?"] if nombre else []
+
+
+_FEMENINOS = {"multa", "factura", "nomina", "carta_banco"}
+
+
+def confirmar(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any]:
+    """Datos ya confirmados por Javi -> cuentas y texto de Noa.
+
+    Solo cambia algo en un caso: un ticket pagado en efectivo se apunta como gasto,
+    porque el banco no lo sabe. Todo lo demás solo se explica.
+    """
+    from . import budget
+    from .store import hoy
+
+    mis_cosas = budget.buscar_hucha(persona, "mis_cosas")
+    quedan = mis_cosas["quedan"]
+    en_tus_cosas = f"para {budget.nombre_en_frase(mis_cosas)}"  # "para tus cosas"
+    titulo = d["titulo"][0].lower() + d["titulo"][1:]
+    base = {"en_plan": False, "quedan_antes": quedan, "quedan_despues": quedan, "alcanza": True,
+            "apuntado": False, "sospechoso": False,
+            "pictograma": PICTOGRAMAS.get(d["tipo"], "documento")}
+
+    # 1. Sospechoso: no se hacen cuentas. Se explica el peligro. Javi decide.
+    if d["sospechoso"]:
+        frases = ["Cuidado. Este papel puede ser un engaño.",
+                  "Los bancos nunca te piden tu clave ni tu PIN.",
+                  "Tú decides qué hacer."] + _pregunta_apoyo(persona)
+        return {**base, "sospechoso": True, "quedan_antes": None, "quedan_despues": None,
+                "alcanza": None, "pictograma": "aviso", "texto_lectura_facil": " ".join(frases)}
+
+    # 2. Nómina: es dinero que entra, no que sale.
+    if d["tipo"] == "nomina":
+        frases = ["Es tu nómina."]
+        if d["importe"] is not None:
+            frases.append(f"Te pagan {euros(d['importe'])}.")
+        frases.append("No tienes que pagar nada.")
+        return {**base, "texto_lectura_facil": " ".join(frases)}
+
+    # 3. Papel sin dinero (por ejemplo, una carta del banco que solo informa).
+    if d["importe"] is None:
+        frases = ["En este papel no hay que pagar nada."]
+        if d["fecha_limite"]:
+            frases.append(f"La fecha que pone es el {fecha_en_palabras(d['fecha_limite'])}.")
+        frases += _pregunta_apoyo(persona)
+        return {**base, "texto_lectura_facil": " ".join(frases)}
+
+    importe = d["importe"]
+
+    # 4. Ticket: ya está pagado. Solo se apunta si pagó en efectivo.
+    if d["tipo"] == "ticket":
+        empieza = "Es el " if _normal(titulo).startswith("ticket") else "Es un ticket: "
+        frases = [f"{empieza}{titulo}.", f"Pagaste {euros(importe)}."]
+        if buscar_ticket(persona, d):
+            frases.append("Ya está apuntado.")
+            frases.append(f"Te quedan {euros(quedan)} {en_tus_cosas}.")
+            return {**base, "pictograma": "bolsa", "texto_lectura_facil": " ".join(frases)}
+        persona["movimientos"].append({
+            "fecha": hoy().isoformat(), "concepto": d["titulo"], "importe": importe,
+            "tipo": "gasto", "hucha": "mis_cosas", "destinatario": d["remitente"],
+            "registrado_por": "persona"})
+        despues = round(quedan - importe, 2)
+        frases.append(f"Lo he apuntado {en_tus_cosas}.")
+        frases.append(f"Te quedan {euros(despues)}.")
+        return {**base, "quedan_despues": despues, "alcanza": despues >= 0, "apuntado": True,
+                "pictograma": "bolsa", "texto_lectura_facil": " ".join(frases)}
+
+    # 5. Gasto fijo que ya estaba en su plan (la luz, el alquiler...).
+    fijo = buscar_en_plan(persona, d)
+    if fijo:
+        frases = ["Ya estaba en tu plan.",
+                  f"Se paga solo el día {fijo['dia']}.",
+                  "No tienes que hacer nada."]
+        return {**base, "en_plan": True, "pictograma": fijo.get("pictograma", base["pictograma"]),
+                "texto_lectura_facil": " ".join(frases)}
+
+    # 6. Algo nuevo que pagar: se dice cuánto le queda si lo paga. No se paga nada.
+    despues = round(quedan - importe, 2)
+    lo = "la" if d["tipo"] in _FEMENINOS else "lo"
+    frases = ["No estaba en tu plan."]
+    if despues >= 0:
+        frases.append(f"Si {lo} pagas, te quedan {euros(despues)} {en_tus_cosas}.")
+    else:
+        frases.append(f"Son {euros(importe)}.")
+        frases.append(f"{en_tus_cosas.capitalize()} te quedan {euros(quedan)}.")
+        frases.append(f"Te faltan {euros(-despues)}.")
+    if d["fecha_limite"]:
+        frases.append(f"Tienes hasta el {fecha_en_palabras(d['fecha_limite'])}.")
+    frases += _pregunta_apoyo(persona)
+    return {**base, "quedan_despues": despues, "alcanza": despues >= 0,
+            "texto_lectura_facil": " ".join(frases)}
