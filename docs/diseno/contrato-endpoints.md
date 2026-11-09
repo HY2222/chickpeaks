@@ -9,7 +9,7 @@ Reglas para todos:
 - Base: `http://localhost:8000`. Persona de la demo: `javi`.
 - Las cuentas las hace el backend. La IA solo pone texto en lectura fácil.
 - Cada respuesta para Javi trae `texto_lectura_facil` (lo que dice Noa) y, si toca, `pictograma`.
-- Las rutas que usa Noa llevan la cabecera `X-Willo-Token` si `WILLO_TOOL_TOKEN` está definido.
+- No usamos `WILLO_TOOL_TOKEN` en la demo: si se define, las pantallas dejan de funcionar porque no mandan la cabecera `X-Willo-Token`.
 - Ejemplos con los datos de `datos-ejemplo.md` (980 €/mes, 210 € para sus cosas).
 
 ---

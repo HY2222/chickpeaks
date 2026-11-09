@@ -1,5 +1,5 @@
 {
-  "_nota": "Herramientas webhook (server tools) de Noa. Crear cada una en el panel de ElevenLabs Agents > Tools. Las de type 'webhook' van como Webhook. evaluar_compra es type 'client': se crea como Client tool, con 'Wait for response' activado, porque la ejecuta la pantalla de Javi (si se crea como webhook, la pantalla 3 no se entera). La URL es la de Render. Si en Render está definido WILLO_TOOL_TOKEN, la cabecera X-Willo-Token de cada herramienta tiene que llevar ese valor: guardadlo como secreto en ElevenLabs y no lo pongáis en este archivo. Si no está definido, quitad la cabecera. El persona_id está fijo en 'javi' para la demo.",
+  "_nota": "Herramientas de Noa. Crear cada una en el panel de ElevenLabs Agents > Tools. Las de type 'webhook' van como Webhook. evaluar_compra es type 'client': se crea como Client tool, con 'Wait for response' activado, porque la ejecuta la pantalla de Javi (si se crea como webhook, la pantalla 3 no se entera). La URL es la de Render. No se usa WILLO_TOOL_TOKEN: las herramientas van sin cabecera, porque las pantallas tampoco la mandan. El persona_id está fijo en 'javi' para la demo.",
   "tools": [
     {
       "type": "webhook",
@@ -7,10 +7,7 @@
       "description": "Devuelve cuánto dinero le queda este mes para sus cosas (y en cada hucha) y un texto en lectura fácil.",
       "api_schema": {
         "url": "https://willo-sfh4.onrender.com/api/personas/javi/presupuesto",
-        "method": "GET",
-        "request_headers": {
-          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
-        }
+        "method": "GET"
       }
     },
     {
@@ -77,9 +74,6 @@
             "importe",
             "decision"
           ]
-        },
-        "request_headers": {
-          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
         }
       }
     },
@@ -113,9 +107,6 @@
             "destinatario",
             "importe"
           ]
-        },
-        "request_headers": {
-          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
         }
       }
     },
@@ -126,9 +117,6 @@
       "api_schema": {
         "url": "https://willo-sfh4.onrender.com/api/personas/javi/avisos/pedir_hablar",
         "method": "POST",
-        "request_headers": {
-          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
-        },
         "request_body_schema": {
           "type": "object",
           "properties": {
@@ -163,9 +151,6 @@
       "api_schema": {
         "url": "https://willo-sfh4.onrender.com/api/personas/javi/avisos/{aviso_id}/resultado",
         "method": "POST",
-        "request_headers": {
-          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
-        },
         "path_params_schema": {
           "aviso_id": {
             "type": "string",
@@ -192,10 +177,7 @@
       "description": "Lista los pagos fijos del mes (alquiler, bus, luz, comida), si ya se han pagado o qué día se pagan, y un texto en lectura fácil. Willo no paga nada: los paga el banco solo.",
       "api_schema": {
         "url": "https://willo-sfh4.onrender.com/api/personas/javi/pagos_del_mes",
-        "method": "GET",
-        "request_headers": {
-          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
-        }
+        "method": "GET"
       }
     }
   ]
