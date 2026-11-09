@@ -1,13 +1,16 @@
 {
-  "_nota": "Herramientas webhook (server tools) de Noa. Crear cada una en el panel de ElevenLabs Agents > Tools > Webhook con estos datos. Sustituid BASE_URL por la URL pública del backend (Vercel/Render o un túnel tipo ngrok en local). Si definís WILLO_TOOL_TOKEN, añadid la cabecera X-Willo-Token en cada herramienta. El persona_id está fijo en 'javi' para la demo.",
+  "_nota": "Herramientas webhook (server tools) de Noa. Crear cada una en el panel de ElevenLabs Agents > Tools > Webhook con estos datos. La URL es la de Render. Si en Render está definido WILLO_TOOL_TOKEN, la cabecera X-Willo-Token de cada herramienta tiene que llevar ese valor: guardadlo como secreto en ElevenLabs y no lo pongáis en este archivo. Si no está definido, quitad la cabecera. El persona_id está fijo en 'javi' para la demo.",
   "tools": [
     {
       "type": "webhook",
       "name": "consultar_huchas",
       "description": "Devuelve cuánto dinero le queda este mes para sus cosas (y en cada hucha) y un texto en lectura fácil.",
       "api_schema": {
-        "url": "BASE_URL/api/personas/javi/presupuesto",
-        "method": "GET"
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/presupuesto",
+        "method": "GET",
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
+        }
       }
     },
     {
@@ -15,7 +18,7 @@
       "name": "evaluar_compra",
       "description": "Calcula cuánto le quedaría si compra algo. No recomienda. Devuelve texto_lectura_facil para leerlo.",
       "api_schema": {
-        "url": "BASE_URL/api/personas/javi/evaluar_compra",
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/evaluar_compra",
         "method": "POST",
         "request_body_schema": {
           "type": "object",
@@ -37,6 +40,9 @@
             "importe",
             "concepto"
           ]
+        },
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
         }
       }
     },
@@ -45,7 +51,7 @@
       "name": "guardar_decision",
       "description": "Guarda lo que la persona ha decidido y avisa a su círculo de apoyo si ella quiere compartirlo.",
       "api_schema": {
-        "url": "BASE_URL/api/personas/javi/decisiones",
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/decisiones",
         "method": "POST",
         "request_body_schema": {
           "type": "object",
@@ -81,15 +87,18 @@
             "importe",
             "decision"
           ]
+        },
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
         }
       }
     },
     {
       "type": "webhook",
       "name": "evaluar_pago",
-      "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea.",
+      "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea. Si el riesgo es alto y la persona dio permiso, avisa a su círculo de apoyo y devuelve aviso_id.",
       "api_schema": {
-        "url": "BASE_URL/api/personas/javi/evaluar_riesgo",
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/evaluar_riesgo",
         "method": "POST",
         "request_body_schema": {
           "type": "object",
@@ -104,6 +113,50 @@
             "contexto": {
               "type": "string",
               "description": "Resumen de lo que ha contado: quién se lo pide, cómo, por qué"
+            },
+            "telefono": {
+              "type": "string",
+              "description": "Opcional. El número de teléfono de quien le pide el dinero, si lo dice. Ej: '611 222 333'"
+            }
+          },
+          "required": [
+            "destinatario",
+            "importe"
+          ]
+        },
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
+        }
+      }
+    },
+    {
+      "type": "webhook",
+      "name": "avisar_a_ana",
+      "description": "Cuando la persona dice que SÍ quiere hablar con Ana de un envío de dinero. Avisa a Ana de que quiere hablar con ella. Usa los mismos datos que evaluar_pago. Si ya había aviso, no crea otro.",
+      "api_schema": {
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/avisos/pedir_hablar",
+        "method": "POST",
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
+        },
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "destinatario": {
+              "type": "string",
+              "description": "A quién quería enviar el dinero (el mismo que en evaluar_pago)"
+            },
+            "importe": {
+              "type": "number",
+              "description": "Cuánto dinero (el mismo que en evaluar_pago)"
+            },
+            "contexto": {
+              "type": "string",
+              "description": "Lo mismo que pusiste en evaluar_pago"
+            },
+            "telefono": {
+              "type": "string",
+              "description": "Opcional, como en evaluar_pago"
             }
           },
           "required": [
@@ -115,11 +168,44 @@
     },
     {
       "type": "webhook",
+      "name": "apuntar_resultado_envio",
+      "description": "Cuando evaluar_pago devolvió aviso_id y la persona dice si al final envía el dinero o no. Lo apunta sin juzgar. No envía nada: Willo nunca mueve dinero.",
+      "api_schema": {
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/avisos/{aviso_id}/resultado",
+        "method": "POST",
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
+        },
+        "path_params_schema": {
+          "aviso_id": {
+            "type": "string",
+            "description": "El aviso_id que devolvió evaluar_pago. Ej: 'av_1'"
+          }
+        },
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "enviado": {
+              "type": "boolean",
+              "description": "true si dice que lo envía, false si dice que no"
+            }
+          },
+          "required": [
+            "enviado"
+          ]
+        }
+      }
+    },
+    {
+      "type": "webhook",
       "name": "pagos_del_mes",
       "description": "Lista los pagos fijos del mes (alquiler, bus, luz, comida), si ya se han pagado o qué día se pagan, y un texto en lectura fácil. Willo no paga nada: los paga el banco solo.",
       "api_schema": {
-        "url": "BASE_URL/api/personas/javi/pagos_del_mes",
-        "method": "GET"
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/pagos_del_mes",
+        "method": "GET",
+        "request_headers": {
+          "X-Willo-Token": "WILLO_TOOL_TOKEN (valor secreto, ver _nota)"
+        }
       }
     }
   ]
