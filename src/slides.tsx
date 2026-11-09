@@ -188,19 +188,19 @@ export const slides: Slide[] = [
     render: () => {
       type V = 1 | 0.5 | 0;
       const cols = [
-        { n: "Willo", c: "España", willo: true },
         { n: "CaixaBank", c: "Cuenta con apoyo" },
         { n: "SpendAble", c: "Australia" },
         { n: "True Link", c: "EE. UU." },
         { n: "BBVA Blue", c: "Asistente con IA" },
+        { n: "Willo", c: "España", willo: true },
       ];
       const rows: { t: string; v: V[]; nota?: (string | undefined)[] }[] = [
-        { t: "Se usa hablando", v: [1, 0, 0, 0, 1] },
-        { t: "Explica en lectura fácil", v: [1, 0.5, 0.5, 0, 0], nota: [undefined, "Solo una guía", "Con dibujos"] },
-        { t: "Hace la cuenta antes de pagar", v: [1, 0, 0.5, 0, 0], nota: [undefined, undefined, "Presupuestos"] },
-        { t: "Avisa de estafas sin bloquear", v: [1, 0, 0, 0.5, 0], nota: [undefined, undefined, undefined, "Bloquea"] },
-        { t: "Persona de apoyo con permisos", v: [1, 1, 1, 1, 0] },
-        { t: "Decide la persona, no el apoyo", v: [1, 1, 0.5, 0, 1], nota: [undefined, undefined, "Pone límites", "Decide el cuidador"] },
+        { t: "Se usa hablando", v: [0, 0, 0, 1, 1] },
+        { t: "Explica en lectura fácil", v: [0.5, 0.5, 0, 0, 1], nota: ["Solo una guía", "Con dibujos"] },
+        { t: "Hace la cuenta antes de pagar", v: [0, 0.5, 0, 0, 1], nota: [undefined, "Presupuestos"] },
+        { t: "Avisa de estafas sin bloquear", v: [0, 0, 0.5, 0, 1], nota: [undefined, undefined, "Bloquea"] },
+        { t: "Persona de apoyo con permisos", v: [1, 1, 1, 0, 1] },
+        { t: "Decide la persona, no el apoyo", v: [1, 0.5, 0, 1, 1], nota: [undefined, "Pone límites", "Decide el cuidador"] },
       ];
       const X0 = 720, CW = 214, TOP = 436, RH = 84;
       const Icon = ({ v, on }: { v: V; on: boolean }) => {
@@ -223,7 +223,7 @@ export const slides: Slide[] = [
         return (
           <svg width="40" height="40" viewBox="0 0 48 48" aria-label="No">
             <circle cx="24" cy="24" r="22.5" fill="none" stroke={GREY} strokeWidth="3" />
-            <path d="M16 24h16" stroke="#A3B18F" strokeWidth="4.5" strokeLinecap="round" />
+            <path d="M16.5 16.5l15 15M31.5 16.5l-15 15" stroke="#8C9A7C" strokeWidth="4.5" strokeLinecap="round" />
           </svg>
         );
       };
@@ -235,8 +235,8 @@ export const slides: Slide[] = [
               <Words text="Ya hay empresas aquí. Ninguna lo junta todo." />
             </h2>
           </div>
-          {/* Columna de Willo resaltada, como "Mi empresa" en la plantilla. */}
-          <Rise o={3} className="absolute rounded-[20px] bg-verde" style={{ left: X0, top: 336, width: CW, height: TOP - 336 + rows.length * RH + 12 }} />
+          {/* Columna de Willo resaltada, la última: primero se ven los competidores. */}
+          <Rise o={3} className="absolute rounded-[20px] bg-verde" style={{ left: X0 + 4 * CW, top: 336, width: CW, height: TOP - 336 + rows.length * RH + 12 }} />
           {cols.map((c, i) => (
             <Fade key={c.n} o={3} className="absolute flex h-[88px] flex-col items-center justify-center text-center" style={{ left: X0 + i * CW, top: 340, width: CW }}>
               <p className={`text-[28px] font-bold leading-[1.15] ${c.willo ? "text-fondo" : ""}`}>{c.n}</p>
@@ -245,18 +245,18 @@ export const slides: Slide[] = [
           ))}
           {rows.map((r, i) => (
             <Rise key={r.t} o={i + 4} className="absolute left-[128px] w-[1664px]" style={{ top: TOP + i * RH, height: RH }}>
-              <div className={`absolute inset-y-[6px] left-0 w-[592px] rounded-l-[16px] ${i % 2 ? "" : "bg-white"}`} />
-              <div className={`absolute inset-y-[6px] right-0 w-[856px] rounded-r-[16px] ${i % 2 ? "" : "bg-white"}`} />
+              {/* Franja de la fila hasta la columna de Willo, que va encima en verde. */}
+              <div className={`absolute inset-y-[6px] left-0 w-[1448px] rounded-l-[16px] ${i % 2 ? "" : "bg-white"}`} />
               <p className="absolute left-[28px] top-1/2 -translate-y-1/2 text-[28px] font-bold leading-[1.15]">{r.t}</p>
               {r.v.map((v, j) => (
                 <div key={j} className="absolute top-0 flex h-full flex-col items-center justify-center gap-[2px]" style={{ left: X0 - 128 + j * CW, width: CW }}>
-                  <Icon v={v} on={j === 0} />
+                  <Icon v={v} on={j === 4} />
                   {r.nota?.[j] && <p className="text-[17px] leading-none text-suave">{r.nota[j]}</p>}
                 </div>
               ))}
             </Rise>
           ))}
-          <Foot n="06">Medio círculo: en parte. Raya: no, o no consta en su web. Fuentes: webs de cada empresa.</Foot>
+          <Foot n="06">Medio círculo: en parte. Cruz: no, o no consta en su web. Fuentes: webs de cada empresa.</Foot>
         </div>
       );
     },
