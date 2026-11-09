@@ -126,6 +126,7 @@
   <div class="centrado">
     <p style="font-size:20px">Pon el documento dentro del recuadro</p>
     <p class="suave" style="margin-top:16px">Willo no guarda la foto. Solo guarda lo que pone.</p>
+    <p class="negrita" style="font-size:20px;margin-top:16px" id="p5-mensaje" aria-live="polite" hidden></p>
   </div>
 
   <div class="botones">
@@ -135,6 +136,8 @@
     <label class="boton secundario">Subir desde la galería
       <input type="file" accept="image/*" id="p5-galeria" hidden>
     </label>
+    <!-- Solo sale si el navegador deja elegir contactos (Chrome en Android). -->
+    <button class="boton secundario" id="p5-contactos" hidden>Elegir mis contactos</button>
   </div>
 </section>
 
@@ -147,12 +150,18 @@
       <span class="picto" id="p6-picto" data-icono="coche"></span>
       <p class="nombre" style="font-size:22px" id="p6-tipo"></p>
     </div>
-    <p class="etiqueta">Cuánto es</p>
+    <p class="etiqueta" id="p6-et-importe">Cuánto es</p>
     <p class="dato" id="p6-importe"></p>
-    <p class="etiqueta">Hay que pagar antes del</p>
+    <p class="etiqueta" id="p6-et-fecha">Hay que pagar antes del</p>
     <p class="dato" id="p6-fecha"></p>
-    <p class="etiqueta">La envía</p>
+    <p class="etiqueta" id="p6-et-envia">La envía</p>
     <p class="dato" id="p6-envia"></p>
+  </div>
+
+  <!-- Si las reglas o Noa ven un posible engaño. Solo avisa: Javi decide. -->
+  <div class="caja-aviso" id="p6-aviso" role="alert" hidden>
+    <p class="titulo-aviso"><span data-icono="aviso"></span>Cuidado</p>
+    <div class="aviso-frases" id="p6-senales"></div>
   </div>
 
   <div>
@@ -181,14 +190,14 @@
     <div class="frases noa-dice" id="p7-frases" aria-live="polite"></div>
   </div>
 
-  <div class="tarjeta destacada comparar">
+  <div class="tarjeta destacada comparar" id="p7-comparar">
     <p class="negrita" id="p7-ahora-texto"></p>
     <div class="barra"><span id="p7-ahora-barra"></span></div>
     <p class="negrita" id="p7-despues-texto"></p>
     <div class="barra"><span id="p7-despues-barra"></span></div>
   </div>
 
-  <p class="titulo-seccion">¿Quieres hablarlo con Ana?</p>
+  <p class="titulo-seccion" id="p7-pregunta">¿Quieres hablarlo con Ana?</p>
 
   <div class="botones">
     <button class="boton" id="p7-ana">Hablar con Ana</button>
@@ -240,7 +249,10 @@ const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "applic
 const $ = id => document.getElementById(id);
 // En pantalla, cada frase va en su línea: sin punto final (inés, 8 nov). Noa sí los usa al hablar.
 const sinPunto = s => s.replace(/\.\s*$/, "");
-const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
+// Como el backend: "4.800 €", "12,50 €", "90 €".
+const euros = n => `${Number(n).toLocaleString("de-DE", {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2})} €`;
+// El texto que viene del backend (o de una foto) nunca se mete en la página como HTML.
+const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[c]);
 const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
 
 // ---------- Pictogramas (iconos Lucide; en la versión final, ARASAAC) ----------
@@ -568,55 +580,108 @@ AL_ENTRAR["4"] = async () => {
 };
 
 // ---------- 5 · Hacer foto a un documento ----------
-// La foto la leerá Claude con visión y devolverá siempre el mismo formato:
-// tipo, quién lo envía, importe, fecha, qué hay que hacer y si parece sospechoso.
-// No se guarda la imagen, solo esos datos (y solo después de que Javi confirme, pantalla 6).
-//
-// TODO: todavía no existe el endpoint para leer documentos (está pendiente en el contrato de
-// endpoints). Mientras tanto, la foto NO se envía a ningún sitio y se usan estos datos falsos fijos.
-const DOCUMENTO_FALSO = {
-  tipo: "Multa de aparcamiento",
-  envia: "Ayuntamiento",
-  importe: 90,
-  fecha_limite: "20 de diciembre",
-  que_hacer: "Pagar la multa",
-  sospechoso: false,
+// La foto va al backend (POST /documentos/leer), que la lee con Claude y devuelve siempre el mismo
+// formato (ver contrato-endpoints.md). Ni el backend ni la pantalla guardan la foto.
+// Las frases de Noa las escribe el backend: aquí solo se enseñan.
+
+// Solo para el botón escondido "simular foto" (demo sin cámara). Mismo formato que el backend.
+const DOCUMENTO_DEMO = {
+  tipo: "multa", titulo: "Multa de aparcamiento", remitente: "Ayuntamiento", importe: 90,
+  fecha_limite: "2026-12-20", accion: "pagar", telefono: null, texto_mensaje: null,
+  sospechoso: false, motivo_sospecha: null, senales: [], pictograma: "coche",
+  texto_lectura_facil: "He leído: multa de aparcamiento. 90 €. Hay que pagar antes del 20 de diciembre. ¿Es correcto?",
 };
 
-async function leerDocumento(foto) {
-  // TODO: cuando exista, algo así como:
-  //   const datos = new FormData(); datos.append("foto", foto);
-  //   return fetch(`/api/personas/${P}/leer_documento`, {method: "POST", body: datos}).then(r => r.json());
-  return {...DOCUMENTO_FALSO};
+function mensajeP5(texto) {
+  $("p5-mensaje").textContent = texto || "";
+  $("p5-mensaje").hidden = !texto;
 }
 
+async function leerDocumento(foto) {
+  const datos = new FormData();
+  datos.append("foto", foto);
+  const r = await fetch(`/api/personas/${P}/documentos/leer`, {method: "POST", body: datos});
+  const cuerpo = await r.json().catch(() => ({}));
+  if (r.ok) return cuerpo;
+  // 422 (foto mala) y 415 (no es una foto) traen la frase de Noa. Para lo demás, una frase nuestra.
+  throw new Error(cuerpo.texto_lectura_facil || "Ahora no puedo leer documentos. Prueba otra vez en un rato.");
+}
+
+let leyendo = false;
 async function fotoElegida(e) {
   const foto = e.target.files?.[0];
   e.target.value = "";            // la pantalla tampoco se queda con la foto
-  if (!foto) return;
-  estado.documento = await leerDocumento(foto);
-  location.hash = "#6";
+  if (!foto || leyendo) return;
+  leyendo = true;
+  mensajeP5("Noa está leyendo…");
+  try {
+    estado.documento = await leerDocumento(foto);
+    mensajeP5("");
+    location.hash = "#6";
+  } catch (err) {
+    mensajeP5(err.message);
+    if (!conv) decir(err.message);
+  } finally {
+    leyendo = false;
+  }
 }
 $("p5-camara").onchange = fotoElegida;
 $("p5-galeria").onchange = fotoElegida;
-$("simular-foto").onclick = async () => { estado.documento = await leerDocumento(null); location.hash = "#6"; };
+$("simular-foto").onclick = () => { estado.documento = {...DOCUMENTO_DEMO}; location.hash = "#6"; };
+
+AL_ENTRAR["5"] = () => {
+  mensajeP5("");
+  $("p5-contactos").hidden = !("contacts" in navigator && "select" in navigator.contacts);
+};
+
+// Javi elige en su agenda qué contactos compartir (Chrome en Android). Solo nombre y número.
+// Sirven para saber si quien pide dinero es alguien que conoce. Nunca van a la IA.
+$("p5-contactos").onclick = async () => {
+  try {
+    const elegidos = await navigator.contacts.select(["name", "tel"], {multiple: true});
+    const contactos = elegidos.flatMap(c => (c.tel || []).map(tel =>
+      ({nombre: c.name?.[0] || "Sin nombre", telefono: tel})));
+    if (!contactos.length) return;
+    mensajeP5((await post("contactos", {contactos})).texto_lectura_facil);
+  } catch {
+    mensajeP5("No he podido guardar los contactos.");
+  }
+};
 
 // ---------- 6 · ¿Es correcto? ----------
 // Regla: los datos leídos NO se usan hasta que Javi confirma. Solo "Sí, es correcto" marca
 // el documento como confirmado; la pantalla 7 no hace cuentas sin esa confirmación.
-const iconoDocumento = d => /multa|aparcamiento|coche/i.test(d.tipo) ? "coche" : "documento";
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+               "septiembre", "octubre", "noviembre", "diciembre"];
+const fechaLarga = iso => { const [, m, d] = iso.split("-").map(Number); return `${d} de ${MESES[m - 1]}`; };
 
-AL_ENTRAR["6"] = async () => {
-  if (!estado.documento) estado.documento = await leerDocumento(null);  // abierto directo: datos de la demo
+// Enseña una fila (etiqueta + dato) solo si hay dato.
+function fila(id, etiqueta, valor) {
+  $(`p6-et-${id}`).textContent = etiqueta;
+  $(`p6-${id}`).textContent = valor ?? "";
+  $(`p6-et-${id}`).hidden = $(`p6-${id}`).hidden = valor == null || valor === "";
+}
+
+AL_ENTRAR["6"] = () => {
+  if (!estado.documento) estado.documento = {...DOCUMENTO_DEMO};  // abierto directo: datos de la demo
   const d = estado.documento;
   d.confirmado = false;
-  $("p6-tipo").textContent = d.tipo;
-  $("p6-importe").textContent = euros(d.importe);
-  $("p6-fecha").textContent = d.fecha_limite;
-  $("p6-envia").textContent = d.envia;
-  $("p6-picto").dataset.icono = iconoDocumento(d);
+  d.explicacion = null;
+  const mensaje = d.tipo === "mensaje";
+  $("p6-tipo").textContent = d.titulo;
+  fila("importe", mensaje ? "Te pide" : "Cuánto es", d.importe == null ? null : euros(d.importe));
+  fila("fecha", d.accion === "contestar" ? "Hay que contestar antes del" : "Hay que pagar antes del",
+       d.fecha_limite ? fechaLarga(d.fecha_limite) : null);
+  fila("envia", mensaje ? "Te escribe" : "La envía",
+       [d.remitente, mensaje ? d.telefono : null].filter(Boolean).join(" · ") || null);
+  $("p6-picto").dataset.icono = d.pictograma || "documento";
+
+  // Posible engaño: se avisa ya aquí, con las señales del backend. No se bloquea nada.
+  const senales = d.senales?.length ? d.senales : [d.motivo_sospecha].filter(Boolean);
+  $("p6-aviso").hidden = !d.sospechoso;
+  $("p6-senales").innerHTML = senales.map(t => `<p>${esc(sinPunto(t))}</p>`).join("");
   pintarIconos(document.querySelector('[data-pantalla="6"]'));
-  if (!conv) decir(`He leído ${euros(d.importe)}, hasta el ${d.fecha_limite}. ¿Es correcto?`);
+  if (!conv) decir(d.texto_lectura_facil);
 };
 
 $("p6-si").onclick = () => { estado.documento.confirmado = true; location.hash = "#7"; };
@@ -624,58 +689,81 @@ $("p6-si").onclick = () => { estado.documento.confirmado = true; location.hash =
 $("p6-no").onclick = () => { estado.documento = null; location.hash = "#5"; };
 
 // ---------- 7 · Noa explica el documento ----------
-// Las cuentas las hace el backend con evaluar_compra (resta el importe de "Para tus cosas").
-// Solo calcula: no paga nada ni apunta ningún gasto. Noa no paga nada.
-const conceptoDocumento = d => `la ${d.tipo.toLowerCase()}`;   // "la multa de aparcamiento"
+// Las cuentas las hace el backend (POST /documentos/confirmar). No paga nada.
+// Solo apunta un gasto si es un ticket pagado en efectivo (el banco no lo sabe).
+const conceptoDocumento = d => d.titulo.charAt(0).toLowerCase() + d.titulo.slice(1);
+const frasesDe = t => t.split(/(?<=[.?!])\s+/).filter(Boolean);
 
 // ¿Javi ya terminó con el documento? (lo usa la esquina secreta de la pantalla 1)
 async function documentoHecho() {
   if (estado.documentoHecho) return true;
-  return (await api("decisiones")).some(d => d.decision === "hablarlo" && d.importe === DOCUMENTO_FALSO.importe);
+  return (await api("decisiones")).some(d => d.decision === "hablarlo" && d.palabras_persona === "Hablar con Ana");
 }
 
 AL_ENTRAR["7"] = async () => {
   const d = estado.documento;
   if (!d?.confirmado) { location.hash = "#6"; return; }   // sin confirmar, no se usan los datos
 
-  $("p7-tipo").textContent = d.tipo;
-  $("p7-importe").textContent = euros(d.importe);
-  $("p7-picto").dataset.icono = iconoDocumento(d);
+  $("p7-tipo").textContent = d.titulo;
+  $("p7-importe").textContent = d.importe == null ? "" : euros(d.importe);
+  $("p7-picto").dataset.icono = d.sospechoso ? "aviso" : (d.pictograma || "documento");
   pintarIconos(document.querySelector('[data-pantalla="7"]'));
   $("p7-ana").disabled = false;
   $("p7-ana").textContent = "Hablar con Ana";
 
-  const r = await post("evaluar_compra", {importe: d.importe, concepto: conceptoDocumento(d)});
-  // "No estaba en tu plan": la multa no es un gasto fijo del mes (alquiler, luz, comida…).
-  const frases = ["No estaba en tu plan."];
-  frases.push(r.alcanza
-    ? `Si la pagas, te quedan ${euros(r.quedan_despues)} para tus cosas.`
-    : `Si la pagas, te faltan ${euros(-r.quedan_despues)} para tus cosas.`);
-  frases.push(`Tienes hasta el ${d.fecha_limite}.`);
-  $("p7-frases").innerHTML = frases.map(f => `<p>${sinPunto(f)}</p>`).join("");
+  // Una sola llamada por documento, aunque Javi vuelva a esta pantalla.
+  d.explicacion ??= await post("documentos/confirmar", {
+    tipo: d.tipo, titulo: d.titulo, remitente: d.remitente, importe: d.importe,
+    fecha_limite: d.fecha_limite, sospechoso: d.sospechoso,
+    texto_mensaje: d.texto_mensaje, telefono: d.telefono,
+  });
+  const r = d.explicacion;
 
-  const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
-  const total = h?.limite_mensual || r.quedan_antes;
-  $("p7-ahora-texto").textContent = `Ahora: ${euros(r.quedan_antes)}`;
-  $("p7-despues-texto").textContent = `Si pagas: ${euros(Math.max(r.quedan_despues, 0))}`;
-  $("p7-ahora-barra").style.width = pct(r.quedan_antes, total);
-  $("p7-despues-barra").style.width = pct(r.quedan_despues, total);
+  // La pregunta "¿Quieres hablarlo con Ana?" ya es el título de abajo: no se repite.
+  const frases = frasesDe(r.texto_lectura_facil).filter(f => !/^¿Quieres hablarlo con/.test(f));
+  $("p7-frases").innerHTML = frases.map(f => `<p>${esc(sinPunto(f))}</p>`).join("");
 
-  if (!conv) decir([...frases, "¿Quieres hablarlo con Ana?"].join(" "));
+  // Barras "antes / después" solo si las cuentas cambian algo.
+  const hayCuentas = r.quedan_antes != null && r.quedan_despues != null && r.quedan_antes !== r.quedan_despues;
+  $("p7-comparar").hidden = !hayCuentas;
+  if (hayCuentas) {
+    const h = (await api("presupuesto")).huchas.find(x => x.id === "mis_cosas");
+    const total = h?.limite_mensual || r.quedan_antes;
+    $("p7-ahora-texto").textContent = `${r.apuntado ? "Antes" : "Ahora"}: ${euros(r.quedan_antes)}`;
+    $("p7-despues-texto").textContent = `${r.apuntado ? "Ahora" : "Si pagas"}: ${euros(Math.max(r.quedan_despues, 0))}`;
+    $("p7-ahora-barra").style.width = pct(r.quedan_antes, total);
+    $("p7-despues-barra").style.width = pct(r.quedan_despues, total);
+  }
+
+  if (!conv) decir(r.texto_lectura_facil);
 };
 
-// "Hablar con Ana": Javi decide pedir apoyo. Se apunta su decisión (decisión "hablarlo", no se paga)
-// y el backend avisa a Ana: "Javi quiere hablar contigo de la multa de aparcamiento."
+// "Hablar con Ana": Javi decide pedir apoyo. No se paga nada.
+// Si es un mensaje sospechoso, se usa el aviso de estafa (el mismo de la pantalla 8):
+// a Ana le sale la caja de "Posible estafa". Si no, se apunta su decisión "hablarlo".
 $("p7-ana").onclick = async () => {
   const d = estado.documento;
+  const r = d.explicacion || {};
   $("p7-ana").disabled = true;
-  await post("decisiones", {
-    concepto: conceptoDocumento(d), importe: d.importe, decision: "hablarlo",
-    palabras_persona: "Hablar con Ana", pidio_apoyo: true, compartir: true,
-  });
-  estado.documentoHecho = true;
-  $("p7-ana").textContent = "Ana ya lo sabe";
-  setTimeout(() => { location.hash = "#1"; }, 1500);
+  try {
+    if (d.tipo === "mensaje" && d.sospechoso) {
+      const envio = {destinatario: d.remitente || "esa persona", importe: d.importe || 0.01,
+                     contexto: d.texto_mensaje || "", telefono: d.telefono};
+      await (r.aviso_id ? post(`avisos/${r.aviso_id}/pedir_hablar`) : post("avisos/pedir_hablar", envio));
+    }
+    await post("decisiones", {
+      concepto: d.tipo === "mensaje" && d.sospechoso
+        ? `enviar ${euros(d.importe || 0)} a ${d.remitente || "esa persona"} por mensaje`
+        : conceptoDocumento(d),
+      importe: d.importe || 0, decision: "hablarlo",
+      palabras_persona: "Hablar con Ana", pidio_apoyo: true, compartir: true,
+    });
+    estado.documentoHecho = true;
+    $("p7-ana").textContent = "Ana ya lo sabe";
+    setTimeout(() => { location.hash = "#1"; }, 1500);
+  } catch {
+    $("p7-ana").textContent = "No he podido avisar a Ana";
+  }
 };
 $("p7-ahora-no").onclick = () => { estado.documentoHecho = true; };
 
@@ -709,42 +797,57 @@ AL_ENTRAR["8"] = async () => {
   ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = false);
   $("p8-ana").textContent = "Avisar a Ana";
 
-  // Solo se evalúa una vez por intento (cada evaluación con riesgo alto avisa a Ana).
+  // Solo se evalúa una vez por intento. Con riesgo alto, el backend crea UN aviso (aviso_id).
   estado.riesgo ??= await post("evaluar_riesgo", b);
   const senales = [...estado.riesgo.senales].sort((x, y) =>
     (ORDEN.indexOf(x.id) + 1 || 99) - (ORDEN.indexOf(y.id) + 1 || 99));
   const razones = [...new Set(senales.map(s => RAZONES[s.id]?.(b) ?? s.explicacion))];
   estado.razones = razones;
-  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${sinPunto(r)}</p>`).join("");
+  $("p8-razones").innerHTML = razones.map((r, i) => `<p>${i + 1}. ${esc(sinPunto(r))}</p>`).join("");
   pintarIconos(document.querySelector('[data-pantalla="8"]'));
 
   if (!conv) decir(["Pausa para pensar.", "Espera un momento.", ...razones,
                     "Esto pasa a veces en las estafas.", "¿Quieres hablar con Ana antes?"].join(" "));
 };
 
-async function decidirBizum(decision, extra) {
+// Lo que decide Javi se apunta en el aviso (resultado) y en sus decisiones. Sin juzgar.
+async function decidirBizum(decision, extra, enviado) {
   ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = true);
   if ("speechSynthesis" in window) speechSynthesis.cancel();
+  const avisoId = estado.riesgo?.aviso_id ?? estado.avisoBizum;
+  if (avisoId) await post(`avisos/${avisoId}/resultado`, {enviado});
   await post("decisiones", {
     concepto: conceptoBizum(BIZUM), importe: BIZUM.importe, decision, ...extra,
   });
   estado.riesgo = null;
+  estado.avisoBizum = null;
 }
 
-// Javi pide hablar con Ana y no envía el dinero. El backend avisa a Ana.
+// Javi pide hablar con Ana y no envía el dinero.
+// Con riesgo alto ya hay aviso: se cambia a "javi_pide_hablar". Con riesgo medio no lo hay:
+// se crea ahora (a Ana no le llega nada hasta que Javi lo pide).
 $("p8-ana").onclick = async () => {
-  await decidirBizum("hablarlo", {palabras_persona: "Avisar a Ana", pidio_apoyo: true, compartir: true});
-  $("p8-ana").textContent = "Ana ya lo sabe";
-  setTimeout(() => { location.hash = "#1"; }, 1500);
+  $("p8-ana").disabled = true;
+  try {
+    const id = estado.riesgo?.aviso_id;
+    const r = await (id ? post(`avisos/${id}/pedir_hablar`) : post("avisos/pedir_hablar", BIZUM));
+    estado.avisoBizum = r.id;
+    await decidirBizum("hablarlo", {palabras_persona: "Avisar a Ana", pidio_apoyo: true, compartir: true}, false);
+    $("p8-ana").textContent = "Ana ya lo sabe";
+    setTimeout(() => { location.hash = "#1"; }, 1500);
+  } catch {
+    $("p8-ana").disabled = false;
+    $("p8-ana").textContent = "No he podido avisar a Ana";
+  }
 };
 // Javi decide no enviarlo.
 $("p8-no-enviar").onclick = async () => {
-  await decidirBizum("esperar", {palabras_persona: "No enviar", compartir: false});
+  await decidirBizum("esperar", {palabras_persona: "No enviar", compartir: false}, false);
   location.hash = "#1";
 };
 // Willo nunca bloquea: si Javi quiere, lo envía. Se apunta como gasto suyo.
 $("p8-enviar-igual").onclick = async () => {
-  await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true});
+  await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true}, true);
   location.hash = "#1";
 };
 
