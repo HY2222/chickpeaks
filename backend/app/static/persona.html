@@ -345,6 +345,7 @@ AL_ENTRAR["1"] = async () => {
 // Con lo que Javi dice, la pantalla saca el importe y el concepto y pide las cuentas
 // al backend (evaluar_compra). Las cuentas las hace el código, nunca la IA.
 let conv = null;
+let sesionVoz = 0;   // sube cada vez que se abre o se para la voz: así no quedan conversaciones sueltas
 
 function entenderPregunta(texto) {
   const num = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:€|euros?)/i);
@@ -378,6 +379,7 @@ async function frasePorDefecto() {
 // Corta la conversación con Noa. No espera más de 1 segundo: si ElevenLabs tarda en
 // cerrar, la pantalla sigue igual (si no, el botón "Parar" parecía no hacer nada).
 async function pararVoz() {
+  sesionVoz++;
   estado.irAFoto = false;
   if (conv) {
     const c = conv; conv = null;
@@ -387,6 +389,9 @@ async function pararVoz() {
 }
 
 AL_ENTRAR["2"] = async () => {
+  await pararVoz();   // nunca dos conversaciones a la vez
+  const miSesion = sesionVoz;
+  estado.callado = false;
   estado.pregunta = estado.respuesta = null;
   $("p2-oido").textContent = "…";
   $("p2-micro").classList.add("activo");
@@ -397,7 +402,8 @@ AL_ENTRAR["2"] = async () => {
     await navigator.mediaDevices.getUserMedia({audio: true});
     // P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
-    conv = await Conversation.startSession({
+    let nueva = null;
+    nueva = await Conversation.startSession({
       signedUrl: signed_url,
       // El prompt de Noa usa {{nombre}}: sin este valor, la conversación puede no arrancar.
       dynamicVariables: {nombre: "Javi"},
@@ -438,11 +444,15 @@ AL_ENTRAR["2"] = async () => {
       // Si Noa cuelga sola (Javi dice que no necesita nada más), volvemos al inicio.
       // Si la cortó Javi con el botón, pararVoz ya puso conv = null y no se navega.
       onDisconnect: () => {
-        const colgoNoa = conv !== null;
+        if (!nueva || conv !== nueva) return;   // una conversación ya cerrada
         conv = null;
+        const colgoNoa = true;
         if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 1500);
       },
     });
+    // Si Javi pulsó Parar (o salió de la pantalla) mientras Noa se conectaba, se cierra ya.
+    if (miSesion !== sesionVoz) { nueva.endSession().catch(() => {}); return; }
+    conv = nueva;
     // Noa no sabe quién hay en el círculo de apoyo: se lo contamos al empezar.
     // Si no hay nadie, no debe ofrecer "hablar con tu persona de apoyo".
     const circulo = await api("circulo").catch(() => []);
@@ -457,6 +467,8 @@ AL_ENTRAR["2"] = async () => {
 };
 
 $("p2-parar").onclick = async () => {
+  estado.callado = true;   // Javi ha pedido silencio: la pantalla 3 no habla sola
+  callar();
   await pararVoz();
   location.hash = estado.respuesta ? "#3" : "#1";
 };
@@ -568,7 +580,7 @@ AL_ENTRAR["3"] = async () => {
   $("p3-despues-barra").style.width = pct(r.quedan_despues, total);
 
   estado.textoNoa = [...frases, "Tú decides."].join(" ");
-  if (!conv) decir(estado.textoNoa);   // sin el agente de voz, habla el navegador
+  if (!conv && !estado.callado) decir(estado.textoNoa);   // sin el agente de voz, habla el navegador
 };
 
 $("p3-escuchar").onclick = async () => { await pararVoz(); decir(estado.textoNoa); };
