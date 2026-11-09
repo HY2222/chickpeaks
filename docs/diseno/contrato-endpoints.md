@@ -122,6 +122,7 @@ Valores de `tipo`: `factura`, `recibo`, `ticket`, `nomina`, `multa`, `carta_banc
 - `ticket`: el ticket de una compra que Javi ya ha hecho (tienda, bar, supermercado). `accion` suele ser `nada`: ya está pagado.
 Valores de `accion`: `pagar`, `nada`, `contestar`, `revisar`.
 Si Claude no puede leerlo → `422` con `"texto_lectura_facil": "No he podido leerlo bien. ¿Haces otra foto con más luz?"`.
+Si `sospechoso` es `true`, Noa ya avisa al leerlo, antes de "¿Es correcto?": "He leído: carta de la Seguridad Social. Cuidado: puede ser un engaño. Te pide tu DNI y datos del banco. ¿Es correcto?". El motivo solo se lee si es corto (15 palabras o menos); entero sigue en `motivo_sospecha`.
 
 ### 🆕 `POST /api/personas/javi/documentos/confirmar`
 Javi pulsó "Sí, es correcto" (o corrigió un dato). Se manda lo leído, ya confirmado. Aquí el **código** hace las cuentas.

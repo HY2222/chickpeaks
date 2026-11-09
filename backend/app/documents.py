@@ -62,7 +62,8 @@ ESQUEMA = {
                     "description": "false si la foto está borrosa, cortada, oscura o no es un documento"},
         "tipo": {"type": "string", "enum": TIPOS},
         "titulo": {"type": "string",
-                   "description": "Qué es, en 2 a 5 palabras sencillas. Ej: 'Multa de aparcamiento'"},
+                   "description": "Qué dice ser, en 2 a 5 palabras sencillas, sin juzgar si es falso. "
+                                  "Ej: 'Multa de aparcamiento', 'Carta de la Seguridad Social'"},
         "remitente": {**_TEXTO_O_NULO, "description": "Quién lo envía, nombre corto. Ej: 'Ayuntamiento'"},
         "importe": {"type": ["number", "null"],
                     "description": "Total en euros que pone el documento, sin signo. null si no hay"},
@@ -75,7 +76,9 @@ ESQUEMA = {
                           "description": "Solo si es un mensaje: el texto que escribe la otra persona, tal cual. Si no, null"},
         "sospechoso": {"type": "boolean"},
         "motivo_sospecha": {**_TEXTO_O_NULO,
-                            "description": "Si es sospechoso, por qué, en una frase corta. Si no, null"},
+                            "description": "Si es sospechoso, qué te pide o qué tiene de raro, en lectura fácil: "
+                                           "una frase de 12 palabras como máximo, hablando de tú. "
+                                           "Ej: 'Te pide tu DNI y datos del banco.' Si no, null"},
     },
     "required": ["legible", "tipo", "titulo", "remitente", "importe", "fecha_limite",
                  "accion", "telefono", "texto_mensaje", "sospechoso", "motivo_sospecha"],
@@ -206,6 +209,7 @@ def texto_leido(d: dict[str, Any]) -> str:
     if d["tipo"] == "mensaje":
         if d["importe"] is not None:
             frases.append(f"Te pide {euros(d['importe'])}.")
+        frases += _aviso(d)
         frases.append("¿Es correcto?")
         return " ".join(frases)
     if d["importe"] is not None:
@@ -220,8 +224,20 @@ def texto_leido(d: dict[str, Any]) -> str:
         frases.append("Ya está pagado.")
     elif d["accion"] == "nada" and d["tipo"] == "recibo":
         frases.append("El banco lo cobra solo de tu cuenta. Tiene que haber dinero ese día.")
+    frases += _aviso(d)
     frases.append("¿Es correcto?")
     return " ".join(frases)
+
+
+def _aviso(d: dict[str, Any]) -> list[str]:
+    """Si parece un engaño, Noa lo dice ya al leerlo, con el motivo si es corto."""
+    if not d.get("sospechoso"):
+        return []
+    frases = ["Cuidado: puede ser un engaño."]
+    motivo = (d.get("motivo_sospecha") or "").strip()
+    if motivo and len(motivo.split()) <= 15:
+        frases.append(motivo if motivo.endswith((".", "!", "?")) else motivo + ".")
+    return frases
 
 
 def revisar_mensaje(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any] | None:

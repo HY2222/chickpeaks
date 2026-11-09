@@ -131,6 +131,7 @@ def test_interpretar_gastos():
 def test_lectura_facil():
     assert silabas("casa") == 2 and silabas("día") == 2 and silabas("bueno") == 2 and silabas("zapatillas") == 4
     assert euros(80.0) == "80 €" and euros(12.5) == "12,50 €"
+    assert euros(4800) == "4.800 €" and euros(1234.5) == "1.234,50 €"
     facil = "Te quedan 40 €. Tú decides."
     dificil = ("La operación solicitada excede el límite disponible en la subcuenta asignada a gastos "
                "discrecionales, por lo que recomendamos reconsiderar la adquisición propuesta.")

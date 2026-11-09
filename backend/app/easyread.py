@@ -18,10 +18,13 @@ _FUERTES = set("aeoáéó") | set("íú")  # í y ú acentuadas rompen el dipton
 
 
 def euros(importe: float) -> str:
-    """80.0 -> '80 €'; 12.5 -> '12,50 €'. Sin decimales cuando no hacen falta."""
+    """80.0 -> '80 €'; 12.5 -> '12,50 €'; 4800 -> '4.800 €'. Sin decimales cuando no hacen falta."""
     if float(importe).is_integer():
-        return f"{int(importe)} €"
-    return f"{importe:.2f}".replace(".", ",") + " €"
+        texto = f"{int(importe):,}"
+    else:
+        texto = f"{importe:,.2f}"
+    # Formato español: punto para los miles y coma para los decimales.
+    return texto.replace(",", "X").replace(".", ",").replace("X", ".") + " €"
 
 
 def silabas(palabra: str) -> int:
