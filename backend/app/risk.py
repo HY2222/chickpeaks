@@ -60,14 +60,18 @@ def _numero(telefono: str | None) -> str:
 numero = _numero  # para usarlo desde fuera
 
 
-def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
+def evaluar_pago(persona: dict[str, Any], destinatario: str | None, importe: float,
                  contexto: str = "", telefono: str | None = None) -> dict[str, Any]:
-    """`telefono`: el número de quien pide el dinero, si se sabe (por ejemplo, de un pantallazo)."""
+    """`telefono`: el número de quien pide el dinero, si se sabe (por ejemplo, de un pantallazo).
+
+    `destinatario` puede ser None: en un pantallazo a veces no se ve quién escribe.
+    Entonces no decimos "nunca le has enviado dinero", porque no lo sabemos.
+    """
     senales: list[dict[str, Any]] = []
     contactos = persona.get("contactos", [])
     conocidos = {_normalizar(d) for d in persona.get("destinatarios_conocidos", [])}
     conocidos |= {_normalizar(c["nombre"]) for c in contactos}
-    nombre_conocido = _normalizar(destinatario) in conocidos
+    nombre_conocido = bool(destinatario) and _normalizar(destinatario) in conocidos
 
     numero = _numero(telefono)
     contacto = next((c for c in contactos if numero and _numero(c["telefono"]) == numero), None)
@@ -79,7 +83,10 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
         else:
             senales.append({"id": "numero_desconocido", "peso": 2,
                             "explicacion": "No tienes guardado este número."})
-    if not nombre_conocido and contacto is None:
+    if not destinatario and not numero:
+        senales.append({"id": "remitente_desconocido", "peso": 2,
+                        "explicacion": "No se ve quién te lo pide. Antes de enviar nada, comprueba quién es."})
+    elif not nombre_conocido and contacto is None and destinatario:
         senales.append({"id": "destinatario_nuevo", "peso": 2,
                         "explicacion": f"Nunca has enviado dinero a {destinatario}."})
 
@@ -99,7 +106,7 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
     preguntas = []
     if nivel != "bajo":
         preguntas = [
-            f"¿Conoces a {destinatario} en persona?",
+            f"¿Conoces a {destinatario} en persona?" if destinatario else "¿Sabes seguro quién te lo pide?",
             "¿Te han pedido el dinero por teléfono o por mensaje?",
             "¿Quieres pensarlo un rato antes de enviarlo?",
         ]
