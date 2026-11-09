@@ -16,7 +16,11 @@ from .easyread import euros
 
 # (id, palabras clave, peso, explicación en lectura fácil)
 _REGLAS_TEXTO = [
-    ("urgencia", ["urgente", "ahora mismo", "rapido", "hoy mismo", "ya mismo", "corre prisa"], 2,
+    # Meter prisa es una señal de estafa, aunque sea con una palabra corta como "ya" o "ahora".
+    ("urgencia", ["urgente", "urgencia", "ya", "ahora", "rapido", "rapidamente", "hoy", "esta noche",
+                  "enseguida", "en seguida", "cuanto antes", "lo antes posible", "inmediatamente",
+                  "corre prisa", "corre", "date prisa", "deprisa", "no hay tiempo", "no tengo tiempo",
+                  "en cinco minutos", "en 5 minutos", "antes de que", "se acaba", "ultimo dia"], 2,
      "Te meten prisa. Quien te quiere no te mete prisa con el dinero."),
     ("secreto", ["no se lo digas", "no digas nada", "es un secreto", "solo entre nosotros"], 3,
      "Te piden que no se lo cuentes a nadie."),
@@ -25,11 +29,15 @@ _REGLAS_TEXTO = [
     ("premio", ["premio", "has ganado", "sorteo", "loteria", "herencia"], 2,
      "Te dicen que has ganado algo, pero tienes que pagar."),
     ("relacion_nueva", ["amigo nuevo", "amiga nueva", "novio", "novia", "por internet",
-                         "por instagram", "por whatsapp", "por tiktok", "lo conoci", "la conoci"], 2,
+                         "por instagram", "por whatsapp", "por tiktok", "lo conoci", "la conoci",
+                         "de instagram", "de internet", "de whatsapp", "de tiktok", "de tinder",
+                         "de facebook", "por facebook", "por tinder", "no lo conozco", "no la conozco"], 2,
      "Es una persona que conoces desde hace poco."),
     ("suplantacion", ["soy del banco", "del banco", "hacienda", "la policia", "tu hijo", "tu hija"], 2,
      "Dicen que son del banco, de Hacienda o de la policía."),
-    ("prestamo", ["prestame", "me lo devuelve", "te lo devuelvo", "dejame dinero"], 1,
+    ("prestamo", ["prestame", "prestar", "dejame dinero", "me lo devuelve", "me los devuelve",
+                  "me la devuelve", "me las devuelve", "te lo devuelvo", "te los devuelvo",
+                  "te lo devolvere", "te los devolvere", "me lo devolvera", "me los devolvera"], 1,
      "Te piden dinero prestado."),
 ]
 
