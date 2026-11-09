@@ -46,6 +46,8 @@ def resumen(persona: dict[str, Any], anio: int) -> dict[str, Any]:
         "traspasado_a_ahorro": round(ahorro, 2),
         "saldo_final": round(inicial + total_ing - total_gas, 2),
         "decisiones": [d for d in persona["decisiones"] if d["fecha"].startswith(str(anio))],
+        "avisos_estafa": sum(1 for a in persona.get("avisos", [])
+                             if a["tipo"] == "posible_estafa" and a["fecha"].startswith(str(anio))),
         "registrados_por_apoyo": [m for m in movs if m["registrado_por"] not in ("banco", "persona")],
         "hasta": hoy().isoformat(),
     }

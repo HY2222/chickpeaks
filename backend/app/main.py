@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import budget, documents, easyread, expenses, report, risk, support
+from . import budget, documents, easyread, expenses, notify, report, risk, support
 from .notify import avisar
 from .store import hoy, store
 
@@ -107,6 +107,10 @@ class DocumentoConfirmado(BaseModel):
     importe: float | None = Field(default=None, ge=0, examples=[90.0])
     fecha_limite: date | None = Field(default=None, examples=["2026-12-20"])
     sospechoso: bool = False
+
+
+class ResultadoEnvio(BaseModel):
+    enviado: bool = Field(description="true si Javi envió el dinero, false si no")
 
 
 class Texto(BaseModel):
@@ -230,21 +234,39 @@ def confirmar_documento(persona_id: str, doc: DocumentoConfirmado):
 
 @app.post("/api/personas/{persona_id}/evaluar_riesgo", dependencies=[Depends(token_herramientas)])
 def evaluar_riesgo(persona_id: str, pago: Pago):
-    """Herramienta de Noa: escudo antiestafas. Nunca bloquea."""
+    """Herramienta de Noa: escudo antiestafas. Nunca bloquea.
+
+    Si el riesgo es alto y Javi dio permiso, crea UN solo aviso para su círculo y devuelve su id.
+    Si se evalúa otra vez el mismo envío (Noa y la pantalla, o dos veces seguidas), usa el mismo aviso.
+    """
     p = _persona(persona_id)
     r = risk.evaluar_pago(p, pago.destinatario, pago.importe, pago.contexto)
-    r["avisados"] = []
-    if r["sugerir_aviso_apoyo"]:
-        texto = (f"Aviso de Willo: puede que alguien esté intentando engañar a {p['nombre']}. "
-                 f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
-                 f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
-                 f"La decisión es suya. Llámale con calma.")
-        for m in support.con_permiso(p, "recibir_avisos_estafa"):
-            avisar(p, m, "posible_estafa", texto)
-            r["avisados"].append(m["nombre"])
-        if r["avisados"]:
-            r["texto_lectura_facil"] += f" Como acordaste, he avisado a {' y '.join(r['avisados'])}."
+    r["bloquea"] = False  # la decisión siempre es de la persona
+    r["aviso_id"], r["avisados"] = None, []
+    miembros = support.con_permiso(p, "recibir_avisos_estafa")
+    if r["sugerir_aviso_apoyo"] and miembros:
+        aviso = _aviso_abierto(p, pago) or avisar(
+            p, miembros, "posible_estafa",
+            (f"Aviso de Willo: puede que alguien esté intentando engañar a {p['nombre']}. "
+             f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
+             f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
+             f"La decisión es suya. Llámale con calma."),
+            destinatario=pago.destinatario, importe=float(pago.importe),
+            senales=[s["explicacion"] for s in r["senales"]])
+        r["aviso_id"], r["avisados"] = aviso["id"], aviso["para_nombres"]
+        r["texto_lectura_facil"] += f" Como acordaste, he avisado a {' y '.join(r['avisados'])}."
     return r
+
+
+def _aviso_abierto(p: dict, pago: Pago) -> dict | None:
+    """Un aviso de estafa de hoy, al mismo destinatario y por el mismo importe, que aún no tiene resultado."""
+    hoy_iso = hoy().isoformat()
+    for a in reversed(p["avisos"]):
+        if (a["tipo"] == "posible_estafa" and a["fecha"].startswith(hoy_iso) and a["resultado"] is None
+                and a.get("destinatario", "").strip().lower() == pago.destinatario.strip().lower()
+                and a.get("importe") == float(pago.importe)):
+            return a
+    return None
 
 
 @app.get("/api/personas/{persona_id}/metas")
@@ -281,9 +303,44 @@ def cambiar_nivel(persona_id: str, miembro_id: str, cambio: CambioNivel):
 
 
 @app.get("/api/personas/{persona_id}/avisos")
-def avisos(persona_id: str, para: str | None = None):
+def avisos(persona_id: str, para: str | None = None, tipo: str | None = None):
+    """Avisos al círculo, lo más nuevo primero. Filtros: ?para=ana y ?tipo=posible_estafa."""
     av = _persona(persona_id)["avisos"]
-    return [a for a in av if para is None or a["para"] == para][::-1]
+    return [a for a in av
+            if (para is None or notify.es_para(a, para)) and (tipo is None or a["tipo"] == tipo)][::-1]
+
+
+def _aviso(p: dict, aviso_id: str) -> dict:
+    a = notify.buscar(p, aviso_id)
+    if a is None:
+        raise HTTPException(404, f"No existe el aviso {aviso_id}")
+    return a
+
+
+@app.post("/api/personas/{persona_id}/avisos/{aviso_id}/pedir_hablar")
+def pedir_hablar(persona_id: str, aviso_id: str):
+    """Pantalla 8, botón "Avisar a Ana". No crea otro aviso: cambia el que ya hay."""
+    p = _persona(persona_id)
+    a = _aviso(p, aviso_id)
+    texto = f"{p['nombre']} ha pedido hablar contigo."
+    if a["estado"] != "javi_pide_hablar":  # pulsar dos veces no manda dos mensajes
+        a["estado"] = "javi_pide_hablar"
+        a["fecha_pide_hablar"] = notify.ahora()
+        notify.mandar_otra_vez(p, a, texto)
+    nombres = " y ".join(a["para_nombres"])
+    llamara = "Te llamará." if len(a["para_nombres"]) == 1 else "Te llamarán."
+    return {"id": a["id"], "estado": a["estado"], "texto": texto,
+            "texto_lectura_facil": f"Se lo he dicho a {nombres}. {llamara}"}
+
+
+@app.post("/api/personas/{persona_id}/avisos/{aviso_id}/resultado")
+def resultado_aviso(persona_id: str, aviso_id: str, r: ResultadoEnvio):
+    """Pantalla 8: Javi pulsó "No enviar" o "Enviar igualmente". Se apunta igual, sin juzgar."""
+    a = _aviso(_persona(persona_id), aviso_id)
+    a["resultado"] = {"enviado": r.enviado}
+    a["fecha_resultado"] = notify.ahora()
+    return {"id": a["id"], "estado": a["estado"], "resultado": a["resultado"],
+            "texto_lectura_facil": "Lo he apuntado. Es tu decisión."}
 
 
 @app.post("/api/personas/{persona_id}/gastos")
