@@ -405,6 +405,12 @@ AL_ENTRAR["2"] = async () => {
           estado.esperandoNoa = true;   // la próxima frase de Noa es la explicación de esta compra
           return JSON.stringify(estado.respuesta);
         },
+        // Javi quiere que Noa lea un papel o un mensaje: cuando Noa termine de hablar,
+        // se cierra la conversación y se abre la pantalla de la foto (5).
+        abrir_camara: async () => {
+          estado.irAFoto = true;
+          return "La pantalla para hacer la foto se abre cuando termines de hablar.";
+        },
       },
       onMessage: m => {
         if (m.source === "user") oido(m.message);
@@ -415,7 +421,14 @@ AL_ENTRAR["2"] = async () => {
           if (location.hash === "#3") AL_ENTRAR["3"](); else location.hash = "#3";
         }
       },
-      onModeChange: ({mode}) => $("p2-micro").classList.toggle("activo", mode === "listening"),
+      onModeChange: async ({mode}) => {
+        $("p2-micro").classList.toggle("activo", mode === "listening");
+        if (mode === "listening" && estado.irAFoto) {
+          estado.irAFoto = false;
+          await pararVoz();
+          location.hash = "#5";
+        }
+      },
       // Si Noa cuelga sola (Javi dice que no necesita nada más), volvemos al inicio.
       // Si la cortó Javi con el botón, pararVoz ya puso conv = null y no se navega.
       onDisconnect: () => {

@@ -34,6 +34,17 @@
       }
     },
     {
+      "type": "client",
+      "name": "abrir_camara",
+      "description": "Abre en el móvil de Javi la pantalla para hacer una foto a un papel (carta, multa, factura, ticket) o un pantallazo de un mensaje. Úsala cuando Javi quiera que leas un papel o un mensaje, o diga que quiere hacer o subir una foto. Es una herramienta de CLIENTE: la ejecuta la pantalla de Javi (persona.html). Cuando termines de hablar, la conversación se cierra y se abre la cámara.",
+      "expects_response": true,
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
       "type": "webhook",
       "name": "guardar_decision",
       "description": "Guarda lo que la persona ha decidido y avisa a su círculo de apoyo si ella quiere compartirlo.",
