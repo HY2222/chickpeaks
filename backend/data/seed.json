@@ -161,6 +161,16 @@
           "ahorrado": 45.0,
           "aporte_mensual": 20.0
         }
+      ],
+      "contactos": [
+        {
+          "nombre": "Ana",
+          "telefono": "+34 600 000 101"
+        },
+        {
+          "nombre": "Compañero de piso",
+          "telefono": "+34 600 000 102"
+        }
       ]
     },
     {
@@ -238,6 +248,12 @@
           "otorgado_por": "ley",
           "consiente_avisos_estafa": true,
           "documento": "Patria potestad (menor de edad)"
+        }
+      ],
+      "contactos": [
+        {
+          "nombre": "Mamá",
+          "telefono": "+34 600 000 201"
         }
       ]
     }

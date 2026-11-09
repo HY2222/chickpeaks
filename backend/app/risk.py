@@ -33,8 +33,13 @@ _REGLAS_TEXTO = [
                          "de instagram", "de internet", "de whatsapp", "de tiktok", "de tinder",
                          "de facebook", "por facebook", "por tinder", "no lo conozco", "no la conozco"], 2,
      "Es una persona que conoces desde hace poco."),
-    ("suplantacion", ["soy del banco", "del banco", "hacienda", "la policia", "tu hijo", "tu hija"], 2,
+    ("suplantacion", ["soy del banco", "del banco", "hacienda", "la policia", "tu hijo", "tu hija",
+                      "soy yo", "nuevo numero", "numero nuevo", "cambiado de numero", "cambie de numero",
+                      "se me ha roto el movil", "perdi el movil"], 2,
      "Dicen que son del banco, de Hacienda o de la policía."),
+    ("pide_dinero", ["dame", "mandame", "enviame", "pasame", "ingresame", "hazme un bizum",
+                     "mandame un bizum", "necesito dinero", "necesito que me", "transfiereme"], 1,
+     "Te pide dinero."),
     ("prestamo", ["prestame", "prestar", "dejame dinero", "me lo devuelve", "me los devuelve",
                   "me la devuelve", "me las devuelve", "te lo devuelvo", "te los devuelvo",
                   "te lo devolvere", "te los devolvere", "me lo devolvera", "me los devolvera"], 1,
@@ -47,11 +52,34 @@ def _normalizar(texto: str) -> str:
     return "".join(c for c in texto if unicodedata.category(c) != "Mn")
 
 
+def _numero(telefono: str | None) -> str:
+    """'+34 600 000 101' -> '600000101'. Compara los 9 últimos dígitos (números de España)."""
+    return re.sub(r"\D", "", telefono or "")[-9:]
+
+
+numero = _numero  # para usarlo desde fuera
+
+
 def evaluar_pago(persona: dict[str, Any], destinatario: str, importe: float,
-                 contexto: str = "") -> dict[str, Any]:
+                 contexto: str = "", telefono: str | None = None) -> dict[str, Any]:
+    """`telefono`: el número de quien pide el dinero, si se sabe (por ejemplo, de un pantallazo)."""
     senales: list[dict[str, Any]] = []
+    contactos = persona.get("contactos", [])
     conocidos = {_normalizar(d) for d in persona.get("destinatarios_conocidos", [])}
-    if _normalizar(destinatario) not in conocidos:
+    conocidos |= {_normalizar(c["nombre"]) for c in contactos}
+    nombre_conocido = _normalizar(destinatario) in conocidos
+
+    numero = _numero(telefono)
+    contacto = next((c for c in contactos if numero and _numero(c["telefono"]) == numero), None)
+    if numero and contacto is None:
+        if nombre_conocido:
+            # "Hola, soy Ana, este es mi número nuevo": la estafa más típica por WhatsApp.
+            senales.append({"id": "numero_desconocido", "peso": 3,
+                            "explicacion": f"Dice que es {destinatario}, pero no tienes guardado este número."})
+        else:
+            senales.append({"id": "numero_desconocido", "peso": 2,
+                            "explicacion": "No tienes guardado este número."})
+    if not nombre_conocido and contacto is None:
         senales.append({"id": "destinatario_nuevo", "peso": 2,
                         "explicacion": f"Nunca has enviado dinero a {destinatario}."})
 
