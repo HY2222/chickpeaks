@@ -498,16 +498,14 @@ AL_ENTRAR["3"] = async () => {
   $("p3-picto").dataset.icono = /entrada/i.test(q.concepto) ? "entrada" : "bolsa";
   pintarIconos(document.querySelector("[data-pantalla=\"3\"]"));
 
-  const dia = $("p1-dia-fin").textContent || "30";
   const frases = [`Este mes te quedan ${euros(r.quedan_antes)}.`];
   if (r.alcanza) {
     frases.push(`Si compras ${corto}, te quedan ${euros(r.quedan_despues)}.`);
-    // TODO: frase del diseño. El backend aún no dice si llega para comida (está en otra hucha);
-    // se ajustará cuando se cuadre seed.json (fase 0). De momento solo sale si la compra cabe.
-    frases.push(`Con ${euros(r.quedan_despues)} tienes para comida hasta el día ${dia}.`);
   } else {
     frases.push(`Cuesta ${euros(r.importe)}.`, `Te faltan ${euros(-r.quedan_despues)}.`);
   }
+  // La comida tiene su propia hucha: el backend lo dice para que Javi no piense que se queda sin comer.
+  if (r.frase_comida) frases.push(r.frase_comida);
   // Con Noa conectada, la pantalla muestra lo que Noa ha dicho de verdad (sin las marcas
   // de tono como [cálido]). Sin Noa, las frases de arriba, que lee la voz del navegador.
   if (conv && estado.dichoNoa) {
