@@ -1,7 +1,7 @@
 import os
 
 os.environ["WILLO_HOY"] = "2026-11-08"
-os.environ.pop("WILLO_TOOL_TOKEN", None)
+os.environ["WILLO_TOOL_TOKEN"] = ""  # vacío: el .env de tu ordenador no lo pisa en los tests
 
 import pytest
 from fastapi.testclient import TestClient
