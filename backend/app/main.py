@@ -12,15 +12,23 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
+from fastapi.concurrency import run_in_threadpool
 from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import budget, easyread, expenses, report, risk, support
+from . import budget, documents, easyread, expenses, report, risk, support
 from .notify import avisar
 from .store import hoy, store
+
+# Carga las claves del archivo .env de la raíz del repo. No pisa variables que ya existan.
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+except ImportError:
+    pass
 
 app = FastAPI(title="Willo API", version="0.1.0",
               description="Your will, your money. Demo con datos inventados.")
@@ -164,6 +172,34 @@ def registrar_decision(persona_id: str, d: Decision):
 @app.get("/api/personas/{persona_id}/decisiones")
 def ver_decisiones(persona_id: str):
     return _persona(persona_id)["decisiones"]
+
+
+@app.post("/api/personas/{persona_id}/documentos/leer")
+async def leer_documento(persona_id: str, foto: UploadFile = File(...)):
+    """Pantallas 5-6: Noa lee la foto de un documento. Solo copia lo que pone; no hace cuentas.
+
+    La imagen no se guarda. Javi tiene que confirmar lo leído antes de usarlo (/documentos/confirmar).
+    """
+    _persona(persona_id)
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        raise HTTPException(503, "Falta ANTHROPIC_API_KEY en .env")
+    contenido = await foto.read()
+    try:
+        return await run_in_threadpool(documents.leer, contenido, foto.content_type)
+    except documents.FormatoNoValido:
+        return JSONResponse(status_code=415, content={
+            "error": "formato_no_valido",
+            "texto_lectura_facil": "Eso no es una foto. Haz una foto del papel."})
+    except documents.NoLegible:
+        return JSONResponse(status_code=422, content={
+            "error": "no_legible", "pictograma": "documento",
+            "texto_lectura_facil": documents.TEXTO_NO_LEGIBLE})
+    except Exception as e:  # fallo de red o de la API de Claude
+        if type(e).__module__.startswith("anthropic"):
+            raise HTTPException(502, f"Claude no ha respondido bien: {type(e).__name__}")
+        raise
+    finally:
+        del contenido  # la foto no se queda en el servidor
 
 
 @app.post("/api/personas/{persona_id}/evaluar_riesgo", dependencies=[Depends(token_herramientas)])
