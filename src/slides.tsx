@@ -166,19 +166,19 @@ export const slides: Slide[] = [
   {
     id: "mercado",
     notes:
-      "Nuestro mercado, de grande a pequeño. TAM: en España, cerca de 15 millones de personas tienen dificultades para entender lo que leen; a 2 euros al mes serían unos 360 millones al año. SAM: empezamos por las más de 400.000 personas con discapacidad intelectual y del desarrollo, unos 9,6 millones al año. SOM: nuestro primer mercado son las unas 150.000 personas de la red de Plena inclusión, unos 3,6 millones al año. Y quien paga ya tiene un motivo: la Ley 11/2023 obliga a los bancos a ser accesibles.",
+      "Nuestro mercado. TAM: según el IMSERSO, en España hay 157.895 personas con discapacidad intelectual o trastorno del desarrollo reconocida. SAM: calculamos que al principio podemos llegar a un 35 %, unas 55.263 personas, a través de bancos españoles. SOM: en los primeros años esperamos captar un 25 % de esas, unas 13.816 personas. A 2 euros al mes por usuario, eso son unos 330.000 euros al año.",
     render: () => {
       const rows = [
-        { k: "TAM", t: "Mercado total", n: "≈ 15 millones", d: "de personas en España (el 30\u00a0%) con dificultades para entender lo que leen.", e: "≈ 360 M€ al año" },
-        { k: "SAM", t: "Lo que podemos atacar", n: "+400.000", d: "personas con discapacidad intelectual y del desarrollo.", e: "≈ 9,6 M€ al año" },
-        { k: "SOM", t: "Primer mercado", n: "≈ 150.000", d: "personas en la red de Plena inclusión.", e: "≈ 3,6 M€ al año", accent: true },
+        { k: "TAM", t: "Mercado total", n: "157.895", d: "personas con discapacidad intelectual o del desarrollo reconocida.", e: "≈ 3,8 M€ al año" },
+        { k: "SAM", t: "Lo que podemos atacar", n: "55.263", d: "a las que llegamos al principio con bancos (35\u00a0% del TAM).", e: "≈ 1,3 M€ al año" },
+        { k: "SOM", t: "Primer mercado", n: "13.816", d: "que esperamos captar los primeros años (25\u00a0% del SAM).", e: "≈ 330.000 € al año", accent: true },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
           <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
             <Label>El mercado</Label>
             <h2 className={T72}>
-              <Words text="Empezamos por 150.000 personas. Detrás hay millones." />
+              <Words text="Casi 158.000 personas. Empezamos por 13.816." />
             </h2>
           </div>
           {/* Rectángulos uno dentro de otro, como en la plantilla de START. */}
@@ -191,7 +191,7 @@ export const slides: Slide[] = [
           <Rise o={5} className="absolute left-[478px] top-[580px] h-[280px] w-[350px] rounded-[24px] bg-verde">
             <p className="absolute left-[32px] top-[24px] text-[40px] font-bold text-fondo">SOM</p>
           </Rise>
-          <div className="absolute left-[968px] top-[400px] flex w-[824px] flex-col gap-[28px]">
+          <div className="absolute left-[968px] top-[390px] flex w-[824px] flex-col gap-[22px]">
             {rows.map((r, i) => (
               <Rise key={r.k} o={i + 6} className={i ? "border-t-2 border-salvia pt-[24px]" : ""}>
                 <p className={`text-[24px] font-bold ${r.accent ? "text-verde" : "text-suave"}`}>
@@ -205,7 +205,7 @@ export const slides: Slide[] = [
               </Rise>
             ))}
           </div>
-          <Foot n="05">Ingresos a 2 € al mes por persona. Fuentes: INE (2026), IFLA, Plena inclusión España.</Foot>
+          <Foot n="05">Fuente del TAM: IMSERSO (2024). SAM y SOM: hipótesis del equipo. Ingresos a 2 € al mes por usuario.</Foot>
         </div>
       );
     },
@@ -437,17 +437,17 @@ export const slides: Slide[] = [
   {
     id: "negocio",
     notes:
-      "¿Quién paga? El banco, por cada usuario activo. La Ley 11/2023 obliga a que los servicios bancarios sean accesibles, y Willo le ayuda a cumplirla. Es un modelo B2B2C: vendemos al banco, y lo usa su cliente. Cobramos como un SaaS, por usuario activo. Precio objetivo: 2 € al mes. Con 10.000 usuarios son 240.000 € al año. Más adelante, fundaciones, administraciones y bancos de otros países de Europa.",
+      "¿Quién paga? El banco. Es un modelo B2B2C basado en SaaS: el banco paga una suscripción mensual, por tramos según el número de usuarios, y ofrece Willo gratis a sus clientes con discapacidad intelectual. Así quitamos la barrera económica a quien más lo necesita. La Ley 11/2023 le da el motivo: sus servicios tienen que ser accesibles. Precio objetivo: unos 2 euros al mes por usuario; con nuestro SOM, unos 330.000 euros al año. En el futuro, servicios extra: personalización, integración con sus sistemas y analítica agregada.",
     render: () => {
       const items = [
-        { t: "Ahora: cuota por usuario activo", d: "El banco paga por cada persona que la usa. Para ella, gratis.", accent: true },
+        { t: "Ahora: suscripción del banco", d: "Cuota mensual por tramos de usuarios. Para la persona, gratis.", accent: true },
         { t: "Por qué paga", d: "La Ley 11/2023 obliga a que sus servicios sean accesibles." },
-        { t: "Después", d: "Fundaciones, administraciones (B2G) y bancos de Europa." },
+        { t: "Después: servicios extra", d: "Personalización, integración y analítica agregada." },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
           <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
-            <Label>Modelo de negocio · B2B2C · SaaS por usuario activo</Label>
+            <Label>Modelo de negocio · B2B2C · SaaS por suscripción</Label>
             <h2 className={T72}>
               <Words text="Paga el banco, porque la ley ya le pide ser accesible." />
             </h2>
@@ -466,10 +466,10 @@ export const slides: Slide[] = [
               <Count to={2} suffix=" €" o={6} />
             </p>
             <Fade o={10}>
-              <p className="text-[32px] leading-[1.3]">al mes por cada usuario activo. Lo paga el banco, no la persona.</p>
+              <p className="text-[32px] leading-[1.3]">al mes por usuario, dentro del tramo que elige el banco. La persona no paga nada.</p>
             </Fade>
             <Fade o={11}>
-              <p className="text-[26px] leading-[1.3] text-suave">Con 10.000 usuarios: 240.000 € al año.</p>
+              <p className="text-[26px] leading-[1.3] text-suave">Con el SOM (13.816 usuarios): ≈ 330.000 € al año.</p>
             </Fade>
           </div>
           <Foot n="11">Precio: propuesta del equipo, pendiente de validar con bancos.</Foot>
