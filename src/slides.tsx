@@ -537,9 +537,9 @@ export const slides: Slide[] = [
       "Somos seis y nos complementamos. Hackers: Inés, Cristina y Nolan hacen que funcione. Hipsters: Leo y Raúl lo hacen fácil de usar. Hustler: Anqi lo lleva a la calle. ¿Por qué nosotros? Porque ya tenemos una demo que funciona y la hemos pensado en lectura fácil desde el primer día. [Cada uno puede decir su nombre y qué ha hecho en una frase.]",
     render: () => {
       const groups = [
-        { k: "Hacker", d: "Que funcione", people: [{ n: "Inés", r: "Backend y cuentas" }, { n: "Cristina", r: "Lectura fácil y antiestafas" }, { n: "Nolan", r: "La voz de Noa" }] },
-        { k: "Hipster", d: "Que sea fácil", people: [{ n: "Leo y Raúl", r: "Pantallas de la app" }] },
-        { k: "Hustler", d: "Que llegue a la gente", people: [{ n: "Anqi", r: "Plena inclusión y datos" }] },
+        { k: "Hacker", d: "Que funcione", people: [{ n: "Inés", r: "Ciencia e Ingeniería de Datos" }, { n: "Cristina", r: "Ciencia e Ingeniería de Datos" }, { n: "Nolan", r: "Informática y ADE" }] },
+        { k: "Hipster", d: "Que sea fácil", people: [{ n: "Leo", r: "Informática y ADE" }, { n: "Raúl", r: "Telecomunicación" }] },
+        { k: "Hustler", d: "Que llegue a la gente", people: [{ n: "Anqi", r: "Economía" }] },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
