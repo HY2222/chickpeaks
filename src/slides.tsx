@@ -144,6 +144,103 @@ export const slides: Slide[] = [
     ),
   },
   {
+    id: "mercado",
+    notes:
+      "¿A quién llegamos? Empezamos por las más de 400.000 personas con discapacidad intelectual y del desarrollo que viven en España. Pero la lectura fácil también ayuda a mucha más gente: se calcula que el 30 % de la población tiene dificultades de comprensión lectora, como muchas personas mayores o personas que aún aprenden el idioma. Y quien paga ya tiene un motivo: desde el 28 de junio de 2025, la Ley 11/2023 obliga a los bancos a que sus servicios para consumidores sean accesibles.",
+    render: () => {
+      const card = "absolute top-[450px] flex h-[420px] w-[528px] flex-col gap-[16px] rounded-[20px] p-[40px]";
+      return (
+        <div className="absolute inset-0 bg-fondo text-texto">
+          <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
+            <Label>El mercado</Label>
+            <h2 className={T72}>
+              <Words text="Empezamos por 400.000 personas. Detrás hay muchas más." />
+            </h2>
+          </div>
+          <Rise o={5} className={`${card} left-[128px] bg-verde text-fondo`}>
+            <p className="text-[24px] font-bold text-salvia">Empezamos</p>
+            <p className="titular whitespace-nowrap text-[96px] font-semibold leading-none tabular-nums">
+              <Count to={400000} prefix={"+ "} o={6} />
+            </p>
+            <p className="text-[28px] leading-[1.3] text-salvia">personas con discapacidad intelectual y del desarrollo en España.</p>
+          </Rise>
+          <Rise o={7} className={`${card} left-[696px] bg-salvia`}>
+            <p className="text-[24px] font-bold text-verde">Después</p>
+            <p className="titular whitespace-nowrap text-[96px] font-semibold leading-none tabular-nums text-verde">
+              <Count to={30} suffix=" %" o={8} />
+            </p>
+            <p className="text-[28px] leading-[1.3]">de la población tiene dificultades para entender lo que lee: personas mayores, personas que aprenden el idioma…</p>
+          </Rise>
+          <Rise o={9} className={`${card} left-[1264px] bg-white`}>
+            <p className="text-[24px] font-bold text-suave">Quién paga</p>
+            <p className="titular text-[64px] font-semibold leading-[1.05]">Los bancos</p>
+            <p className="text-[28px] leading-[1.3] text-suave">Desde el 28 de junio de 2025, la Ley 11/2023 les obliga a ser accesibles. Da igual su tamaño.</p>
+          </Rise>
+          <Foot n="05">Fuentes: Plena inclusión España; IFLA; Ley 11/2023.</Foot>
+        </div>
+      );
+    },
+  },
+  {
+    id: "competencia",
+    notes:
+      "¿Qué hay hoy? Los bancos ya tienen asistentes con IA, como Blue de BBVA o el agente de CaixaBank, pero están pensados para el cliente medio, no en lectura fácil. Hay guías muy buenas en lectura fácil, como las de Santander con Plena inclusión, pero son guías: no te ayudan en el momento de pagar. Y lo más común es que la familia lo lleve todo, pero entonces la persona no decide. Willo junta las tres cosas.",
+    render: () => {
+      const cols = ["Habla en lectura fácil", "Ayuda en el momento de pagar", "Decide la persona"];
+      const rows = [
+        { t: "Asistentes con IA de los bancos", s: "BBVA Blue, agente IA de CaixaBank", v: [false, true, true] },
+        { t: "Guías en lectura fácil", s: "Santander y Plena inclusión", v: [true, false, true] },
+        { t: "La familia lo lleva todo", s: "Como Javi, hasta ahora", v: [true, true, false] },
+        { t: "Willo", s: "Voz, lectura fácil y círculo de apoyo", v: [true, true, true], willo: true },
+      ];
+      const colX = [1020, 1290, 1560];
+      return (
+        <div className="absolute inset-0 bg-fondo text-texto">
+          <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
+            <Label>La competencia</Label>
+            <h2 className={T72}>
+              <Words text="Hay ayudas sueltas. Ninguna hace las tres cosas." />
+            </h2>
+          </div>
+          {cols.map((c, i) => (
+            <Fade key={c} o={4} className="absolute top-[372px] w-[232px] text-center" style={{ left: colX[i] }}>
+              <p className="text-[24px] font-bold leading-[1.2] text-suave">{c}</p>
+            </Fade>
+          ))}
+          {rows.map((r, i) => (
+            <Rise
+              key={r.t}
+              o={i * 2 + 5}
+              className={`absolute left-[128px] flex h-[104px] w-[1664px] items-center rounded-[20px] px-[32px] ${r.willo ? "bg-verde text-fondo" : i % 2 ? "" : "bg-white"}`}
+              style={{ top: 460 + i * 116 }}
+            >
+              <div className="w-[860px]">
+                <h3 className="text-[32px] font-bold leading-[1.15]">{r.t}</h3>
+                <p className={`text-[24px] leading-[1.3] ${r.willo ? "text-salvia" : "text-suave"}`}>{r.s}</p>
+              </div>
+              {r.v.map((ok, j) => (
+                <div key={j} className="absolute flex w-[232px] justify-center" style={{ left: colX[j] - 128 }}>
+                  {ok ? (
+                    <svg width="48" height="48" viewBox="0 0 48 48" aria-label="Sí">
+                      <circle cx="24" cy="24" r="24" fill={r.willo ? "#F5F7F0" : ACCENT} />
+                      <path d="M14 24.5l7 7 13-14" stroke={r.willo ? ACCENT : "#F5F7F0"} strokeWidth="4.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    <svg width="48" height="48" viewBox="0 0 48 48" aria-label="No">
+                      <circle cx="24" cy="24" r="22.5" fill="none" stroke={GREY} strokeWidth="3" />
+                      <path d="M16 24h16" stroke="#A3B18F" strokeWidth="4.5" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </Rise>
+          ))}
+          <Foot n="06" />
+        </div>
+      );
+    },
+  },
+  {
     id: "demo",
     dark: true,
     notes:
@@ -162,7 +259,7 @@ export const slides: Slide[] = [
         <Fade o={9} className="absolute left-[128px] top-[800px] w-[960px]">
           <p className="text-[40px] leading-[1.3] text-crema/70">Fijaos en una cosa: Noa explica, pero <span className="text-crema">los botones los pulsa Javi.</span></p>
         </Fade>
-        <Foot n="05" dark />
+        <Foot n="07" dark />
       </div>
     ),
   },
@@ -193,7 +290,7 @@ export const slides: Slide[] = [
               </div>
             </Rise>
           ))}
-          <Foot n="06" />
+          <Foot n="08" />
         </div>
       );
     },
@@ -235,7 +332,7 @@ export const slides: Slide[] = [
               </Fade>
             </div>
           ))}
-          <Foot n="07">Cada nivel incluye el anterior. Ninguno puede bloquear un pago. Basado en la Ley 8/2021.</Foot>
+          <Foot n="09">Cada nivel incluye el anterior. Ninguno puede bloquear un pago. Basado en la Ley 8/2021.</Foot>
         </div>
       );
     },
@@ -282,7 +379,7 @@ export const slides: Slide[] = [
           <Fade o={12} className="absolute left-[128px] top-[860px] w-[1664px]">
             <p className="text-[28px] leading-[1.3] text-suave">App web instalable (PWA), sin tienda de apps · Desplegada en Render · Se guardan los datos, nunca las fotos.</p>
           </Fade>
-          <Foot n="08" />
+          <Foot n="10" />
         </div>
       );
     },
@@ -290,7 +387,7 @@ export const slides: Slide[] = [
   {
     id: "negocio",
     notes:
-      "¿Quién paga? El banco, por cada usuario activo. La Ley 11/2023 obliga a que los servicios bancarios sean accesibles, y Willo le ayuda a cumplirla. En España viven más de 400.000 personas con discapacidad intelectual y del desarrollo. [Contad aquí en qué punto está la validación con Plena inclusión y fundaciones.]",
+      "¿Quién paga? El banco, por cada usuario activo. La Ley 11/2023 obliga a que los servicios bancarios sean accesibles, y Willo le ayuda a cumplirla. Nuestro precio objetivo: 2 € al mes por usuario activo. Con 10.000 usuarios son 240.000 € al año. Para la persona, Willo es gratis.",
     render: () => {
       const items = [
         { t: "Cuota por usuario activo", d: "El banco paga por cada persona que usa Willo.", accent: true },
@@ -314,17 +411,105 @@ export const slides: Slide[] = [
             ))}
           </div>
           <div className="absolute left-[1008px] top-[470px] flex h-[450px] w-[784px] flex-col justify-center gap-[16px]">
+            <p className="text-[28px] font-bold text-verde">Precio objetivo</p>
             <p className="titular whitespace-nowrap text-[160px] font-semibold leading-none tracking-normal tabular-nums text-verde">
-              <Count to={400000} prefix={"+\u200A"} o={6} />
+              <Count to={2} suffix=" €" o={6} />
             </p>
             <Fade o={10}>
-              <p className="text-[32px] leading-[1.3]">personas con discapacidad intelectual y del desarrollo viven en España.</p>
+              <p className="text-[32px] leading-[1.3]">al mes por cada usuario activo. Lo paga el banco, no la persona.</p>
             </Fade>
             <Fade o={11}>
-              <p className="text-[26px] leading-[1.3] text-suave">Validación con Plena inclusión y fundaciones.</p>
+              <p className="text-[26px] leading-[1.3] text-suave">Con 10.000 usuarios: 240.000 € al año.</p>
             </Fade>
           </div>
-          <Foot n="09">Fuente de la cifra: Plena inclusión España.</Foot>
+          <Foot n="11">Precio: propuesta del equipo, pendiente de validar con bancos.</Foot>
+        </div>
+      );
+    },
+  },
+  {
+    id: "go-to-market",
+    notes:
+      "¿Cómo llegamos? Primero, validamos con Plena inclusión: agrupa unas 950 asociaciones que trabajan con unas 150.000 personas. Ellas prueban Willo y validan la lectura fácil. Segundo, un piloto con un banco: Willo va dentro de su app, y esa pantalla ya la tenemos hecha. Tercero, más bancos y Europa: la ley española viene de una directiva europea, así que los bancos de toda la UE tienen la misma obligación.",
+    render: () => {
+      const card = "absolute top-[450px] flex h-[350px] w-[480px] flex-col gap-[12px] rounded-[20px] p-[40px]";
+      return (
+        <div className="absolute inset-0 bg-fondo text-texto">
+          <div className="absolute left-[128px] top-[128px] flex w-[1500px] flex-col gap-[32px]">
+            <Label>Go to market</Label>
+            <h2 className={T72}>
+              <Words text="Entramos por las asociaciones. Vendemos a los bancos." />
+            </h2>
+          </div>
+          <Rise o={5} className={`${card} left-[128px] bg-white`}>
+            <p className="text-[24px] font-bold text-suave">Paso 1 · Validar</p>
+            <h3 className="text-[40px] font-bold leading-[1.15]">Con Plena inclusión</h3>
+            <p className="text-[26px] leading-[1.3] text-suave">Unas 950 asociaciones y 150.000 personas. Prueban Willo y validan la lectura fácil.</p>
+          </Rise>
+          <DrawArrow o={6} className="absolute left-[624px] top-[611px]" />
+          <Rise o={7} className={`${card} left-[720px] bg-verde text-fondo`}>
+            <p className="text-[24px] font-bold text-salvia">Paso 2 · Piloto</p>
+            <h3 className="text-[40px] font-bold leading-[1.15]">Con un banco</h3>
+            <p className="text-[26px] leading-[1.3] text-salvia">Willo va dentro de la app del banco. Esa pantalla ya está hecha.</p>
+          </Rise>
+          <DrawArrow o={8} className="absolute left-[1216px] top-[611px]" />
+          <Rise o={9} className={`${card} left-[1312px] bg-salvia`}>
+            <p className="text-[24px] font-bold text-verde">Paso 3 · Crecer</p>
+            <h3 className="text-[40px] font-bold leading-[1.15]">Más bancos y Europa</h3>
+            <p className="text-[26px] leading-[1.3]">La ley viene de una directiva europea (2019/882). Toda la UE tiene la misma obligación.</p>
+          </Rise>
+          <Fade o={10} className="absolute left-[128px] top-[860px] w-[1664px]">
+            <p className="text-[28px] leading-[1.3] text-suave">Lo que vendemos al banco: cumplir la ley de accesibilidad y llegar a clientes que hoy no usan su app.</p>
+          </Fade>
+          <Foot n="12">Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
+        </div>
+      );
+    },
+  },
+  {
+    id: "equipo",
+    notes:
+      "Somos siete. [Cada uno dice su nombre y qué ha hecho en una frase.] Nuestro objetivo: un piloto con un banco en 2027. Hoy buscamos dos cosas: contactos en bancos y mentoría para preparar ese piloto.",
+    render: () => {
+      const team = [
+        { n: "Inés", r: "Backend y cuentas" },
+        { n: "Cristina", r: "Lectura fácil y antiestafas" },
+        { n: "Nolan", r: "La voz de Noa" },
+        { n: "Leo y Raúl", r: "Pantallas de la app" },
+        { n: "Anqi", r: "Plena inclusión y datos" },
+        { n: "[Tu nombre]", r: "[Tu papel]" },
+      ];
+      return (
+        <div className="absolute inset-0 bg-fondo text-texto">
+          <Panel />
+          <div className="absolute left-[128px] top-[128px] flex w-[960px] flex-col gap-[32px]">
+            <Label>El equipo</Label>
+            <h2 className={T72}>
+              <Words text="Somos siete." />
+            </h2>
+          </div>
+          <div className="absolute left-[128px] top-[400px] grid w-[960px] grid-cols-2 gap-x-[48px] gap-y-[36px]">
+            {team.map((p, i) => (
+              <Rise key={p.n} o={i + 3} className="border-t-2 border-salvia pt-[20px]">
+                <h3 className="text-[36px] font-bold leading-[1.15]">{p.n}</h3>
+                <p className="mt-[6px] text-[26px] leading-[1.3] text-suave">{p.r}</p>
+              </Rise>
+            ))}
+          </div>
+          <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[32px]">
+            <Fade o={4}>
+              <Label>Nuestro objetivo</Label>
+            </Fade>
+            <Rise o={5}>
+              <p className="titular text-[64px] font-semibold leading-[1.1] text-verde">Un piloto con un banco en 2027.</p>
+            </Rise>
+            <Fade o={9}>
+              <p className="text-[32px] leading-[1.3]">Hoy buscamos dos cosas:</p>
+              <p className="mt-[16px] text-[32px] leading-[1.3]">· Contactos en bancos.</p>
+              <p className="mt-[8px] text-[32px] leading-[1.3]">· Mentoría para preparar el piloto.</p>
+            </Fade>
+          </div>
+          <Foot n="13" />
         </div>
       );
     },

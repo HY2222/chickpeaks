@@ -11,7 +11,7 @@ const H = 1080;
 /*
  * Capa de partículas que acompaña toda la presentación:
  * - diapositiva 1: forman "willo" en grande;
- * - diapositivas 2-9: se desmontan y forman el logo arriba a la derecha;
+ * - diapositivas intermedias: se desmontan y forman el logo arriba a la derecha;
  * - última diapositiva: vuelven a formar "willo".
  */
 const ACENTO = "#3E5A34";
