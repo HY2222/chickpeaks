@@ -534,12 +534,15 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos. Hackers: Inés, Cristina y Nolan hacen que funcione. Hipsters: Leo y Raúl lo hacen fácil de usar. Hustler: Anqi lo lleva a la calle. ¿Por qué nosotros? Porque ya tenemos una demo que funciona y la hemos pensado en lectura fácil desde el primer día. [Cada uno puede decir su nombre y qué ha hecho en una frase.]",
+      "Somos seis y nos complementamos: Inés y Cristina, de Ciencia e Ingeniería de Datos; Leo y Nolan, de Informática y ADE; Raúl, de Telecomunicación; y Anqi, de Economía. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, juntamos técnica y negocio, y hemos pensado Willo en lectura fácil desde el primer día.",
     render: () => {
-      const groups = [
-        { k: "Hacker", d: "Que funcione", people: [{ n: "Inés", r: "Ciencia e Ingeniería de Datos" }, { n: "Cristina", r: "Ciencia e Ingeniería de Datos" }, { n: "Nolan", r: "Informática y ADE" }] },
-        { k: "Hipster", d: "Que sea fácil", people: [{ n: "Leo", r: "Informática y ADE" }, { n: "Raúl", r: "Telecomunicación" }] },
-        { k: "Hustler", d: "Que llegue a la gente", people: [{ n: "Anqi", r: "Economía" }] },
+      const team = [
+        { n: "Inés", r: "Ciencia e Ingeniería de Datos" },
+        { n: "Cristina", r: "Ciencia e Ingeniería de Datos" },
+        { n: "Leo", r: "Informática y ADE" },
+        { n: "Nolan", r: "Informática y ADE" },
+        { n: "Raúl", r: "Telecomunicación" },
+        { n: "Anqi", r: "Economía" },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -550,27 +553,21 @@ export const slides: Slide[] = [
               <Words text="Somos seis, y nos complementamos." />
             </h2>
           </div>
-          {groups.map((g, i) => (
-            <Rise key={g.k} o={i + 4} className="absolute top-[440px] flex w-[296px] flex-col gap-[24px]" style={{ left: 128 + i * 328 }}>
-              <div className="rounded-[16px] bg-verde px-[24px] py-[16px] text-fondo">
-                <p className="text-[32px] font-bold leading-[1.1]">{g.k}</p>
-                <p className="text-[22px] text-salvia">{g.d}</p>
-              </div>
-              {g.people.map((p) => (
-                <div key={p.n} className="border-t-2 border-salvia pt-[14px]">
-                  <h3 className="text-[32px] font-bold leading-[1.15]">{p.n}</h3>
-                  <p className="mt-[4px] text-[24px] leading-[1.3] text-suave">{p.r}</p>
-                </div>
-              ))}
-            </Rise>
-          ))}
+          <div className="absolute left-[128px] top-[440px] grid w-[960px] grid-cols-2 gap-x-[48px] gap-y-[36px]">
+            {team.map((p, i) => (
+              <Rise key={p.n} o={i + 4} className="border-t-2 border-salvia pt-[20px]">
+                <h3 className="text-[36px] font-bold leading-[1.15]">{p.n}</h3>
+                <p className="mt-[6px] text-[26px] leading-[1.3] text-suave">{p.r}</p>
+              </Rise>
+            ))}
+          </div>
           <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[36px]">
             <Fade o={4}>
               <Label>¿Por qué nosotros?</Label>
             </Fade>
             {[
               { t: "Ya funciona", d: "Tenemos una demo real, que vais a ver en directo." },
-              { t: "Técnica, diseño y negocio", d: "Las tres patas, en el mismo equipo." },
+              { t: "Técnica y negocio", d: "Datos, informática, teleco, ADE y economía." },
               { t: "Lectura fácil desde el día uno", d: "No es un añadido: es cómo pensamos Willo." },
             ].map((b, i) => (
               <Rise key={b.t} o={i + 7} className="border-t-2 border-salvia-media pt-[24px]">
