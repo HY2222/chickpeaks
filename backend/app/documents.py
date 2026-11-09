@@ -218,6 +218,8 @@ def texto_leido(d: dict[str, Any]) -> str:
                       if d["fecha_limite"] else "Hay que contestar.")
     elif d["accion"] == "nada" and d["tipo"] == "ticket":
         frases.append("Ya está pagado.")
+    elif d["accion"] == "nada" and d["tipo"] == "recibo":
+        frases.append("Se paga solo desde tu cuenta. No tienes que hacer nada.")
     frases.append("¿Es correcto?")
     return " ".join(frases)
 

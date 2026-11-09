@@ -70,6 +70,15 @@ def test_ticket_ya_pagado(client, claude_falso):
     assert r["texto_lectura_facil"] == "He leído: ticket de la tienda de ropa. 30 €. Ya está pagado. ¿Es correcto?"
 
 
+def test_recibo_domiciliado_no_hay_que_pagar(client, claude_falso):
+    claude_falso["respuesta"]["datos"] = {**MULTA, "tipo": "recibo", "titulo": "Factura de luz",
+                                          "remitente": "Compañía luz", "importe": 32.74,
+                                          "fecha_limite": None, "accion": "nada"}
+    r = enviar(client).json()
+    assert r["texto_lectura_facil"] == ("He leído: factura de luz. 32,74 €. Se paga solo desde tu cuenta. "
+                                        "No tienes que hacer nada. ¿Es correcto?")
+
+
 def test_sospechoso_lleva_motivo(client, claude_falso):
     claude_falso["respuesta"]["datos"] = {**MULTA, "tipo": "carta_banco", "titulo": "Carta del banco",
                                           "accion": "contestar", "fecha_limite": None, "importe": None,
