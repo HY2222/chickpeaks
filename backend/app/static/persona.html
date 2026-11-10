@@ -749,6 +749,11 @@ async function leerDocumento(foto) {
   const r = await fetch(`/api/personas/${P}/documentos/leer`, {method: "POST", body: datos});
   const cuerpo = await r.json().catch(() => ({}));
   if (r.ok) return cuerpo;
+  if (r.status === 503) {  // sin ANTHROPIC_API_KEY (p. ej. el jurado en su ordenador): la demo sigue con la multa de ejemplo
+    mensajeP5("Modo demo: sin clave de Claude no puedo leer tu foto. Te enseño una multa de ejemplo.");
+    await new Promise(ok => setTimeout(ok, 3000));
+    return {...DOCUMENTO_DEMO};
+  }
   // 422 (foto mala) y 415 (no es una foto) traen la frase de Noa. Para lo demás, una frase nuestra.
   throw new Error(cuerpo.texto_lectura_facil || "Ahora no puedo leer documentos. Prueba otra vez en un rato.");
 }

@@ -170,3 +170,10 @@ def test_telefono_de_javi(client, monkeypatch):
     assert javi()["telefono"] == "+34 600 000 100"  # inventado: el real va en WILLO_TELEFONO_JAVI
     monkeypatch.setenv("WILLO_TELEFONO_JAVI", "+34 611 111 111")
     assert javi()["telefono"] == "+34 611 111 111"
+
+
+def test_raiz_lleva_a_la_demo_y_las_pantallas_no_se_guardan_en_cache(client):
+    r = client.get("/", follow_redirects=False)
+    assert r.status_code in (302, 307) and r.headers["location"] == "/demo/banco"
+    for ruta in ("/demo", "/demo/apoyo", "/demo/banco"):
+        assert client.get(ruta).headers["cache-control"] == "no-cache"

@@ -2,7 +2,7 @@
 
 Willo es una app con asistente de voz en **lectura fácil** para que las personas con discapacidad intelectual decidan sobre su propio dinero, con los apoyos que ellas eligen (Ley 8/2021). La asistente se llama **Noa** y funciona con **ElevenLabs**.
 
-- **La persona** pregunta a Noa por voz o por texto: «¿Puedo comprarme las zapatillas?». Noa responde: «En tu hucha de mis cosas te quedan 120 €. Si compras las zapatillas, te quedan 40 €. Tú decides.» La IA explica y nunca recomienda. **Las cuentas las hace el código, no el modelo.**
+- **La persona** pregunta a Noa por voz: «¿Puedo comprarme las zapatillas?». Noa responde: «En tu hucha de mis cosas te quedan 120 €. Si compras las zapatillas, te quedan 40 €. Tú decides.» La IA explica y nunca recomienda. **Las cuentas las hace el código, no el modelo.**
 - **Su decisión queda registrada** como constancia de su voluntad, y solo se comparte si ella quiere.
 - **Escudo antiestafas** con reglas explicables. Avisa al círculo de apoyo (con consentimiento previo) y **nunca bloquea**.
 - **Círculo de apoyo** en niveles N0 a N4 en vez de «control parental».
@@ -11,24 +11,55 @@ Willo es una app con asistente de voz en **lectura fácil** para que las persona
 
 > Demo con datos inventados. No se conecta a ningún banco.
 
+## Probar Willo (jurado)
+
+**Sin instalar nada:** https://willo-sfh4.onrender.com. Tiene la voz de Noa y la lectura de fotos con Claude. Si nadie la ha usado en un rato, la primera vez tarda **hasta 1 minuto** en arrancar; después va normal.
+
+**En tu ordenador** (si la web no responde): mira [Instalación](#instalación-y-ejecución), son 5 comandos. Sin claves funciona todo menos la voz de Noa (se usa una pregunta de ejemplo) y la lectura de fotos con Claude (se usa una multa de ejemplo).
+
+Recorrido de la demo (3 minutos). Abre cada enlace en una pestaña; con la ventana estrecha se ve como un móvil:
+
+| Paso | Enlace | Qué ver |
+|---|---|---|
+| 1 | `/demo/banco` | La app del banco con Willo dentro |
+| 2 | `/demo` → «Hablar con Noa» | Javi pregunta si puede comprar una entrada de 45 €. Noa da las cifras y dice «Tú decides» |
+| 3 | `/demo#5` → «Subir desde la galería» | Noa lee un documento. Javi confirma los datos antes de que se usen |
+| 4 | `/demo#8` | Posible estafa por Bizum: Willo explica las señales y **no bloquea**. Pulsa «Avisar a Ana» |
+| 5 | `/demo/apoyo` | El móvil de Ana: el aviso de estafa y el informe anual para el juzgado en PDF |
+
+Para empezar de cero: `POST /api/demo/reset` en `/docs`. Si varias personas usan la web a la vez, comparten los mismos datos.
+
 ## Requisitos
 
 - Python 3.11 o superior (o Docker)
-- Cuenta de ElevenLabs para la voz (la API y la demo en texto funcionan sin ella)
+- Opcional: claves de ElevenLabs (voz de Noa) y de Anthropic (leer fotos). Sin ellas la demo funciona con ejemplos.
 
 ## Instalación y ejecución
 
+Desde la carpeta del repositorio. En **Windows**:
+
 ```bash
-cp .env.example .env        # rellenad las claves de ElevenLabs si queréis voz
+copy .env.example .env
 cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python -m uvicorn app.main:app
+```
+
+En **Mac o Linux**:
+
+```bash
+cp .env.example .env
+cd backend
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m uvicorn app.main:app
 ```
 
 O con Docker, desde la raíz: `docker compose up --build`
 
-Después abrid:
+Después abre http://localhost:8000. Las claves (opcionales) van en `.env`, y la fecha de la demo está fijada en `WILLO_HOY=2026-11-08` para que los datos sean los del guion.
+
 - http://localhost:8000/demo · móvil de Javi (huchas, «¿Puedo comprarlo?», botón para hablar con Noa)
 - http://localhost:8000/demo/apoyo · móvil de Ana y panel de la curadora (avisos, gasto dictado, informe PDF)
 - http://localhost:8000/docs · todas las rutas de la API
@@ -41,7 +72,7 @@ Willo es una **app web instalable (PWA)**: se instala desde el navegador, aparec
 2. Android (Chrome): menú ⋮ → **Instalar aplicación**. iPhone (Safari): botón compartir → **Añadir a pantalla de inicio**.
 3. `/demo` se instala como «Willo» (Javi) y `/demo/apoyo` como «Willo Apoyo» (Ana).
 
-Para que la demo empiece siempre igual: `WILLO_HOY=2026-11-08` en `.env` y `POST /api/demo/reset` antes de presentar.
+Para que la demo empiece siempre igual: `POST /api/demo/reset` antes de presentar.
 
 ## Tests
 
