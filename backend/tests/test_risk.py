@@ -63,3 +63,20 @@ def test_hola_mama_he_cambiado_de_numero():
     assert {"numero_cambiado", "pide_dinero", "importe_alto"} <= ids
     assert "suplantacion" not in ids  # no dice que sea del banco ni de Hacienda
     assert r["nivel_riesgo"] == "alto"
+
+
+def test_dinero_a_los_hermanos_no_es_estafa():
+    """Un Bizum a la familia no salta como estafa solo por no haberlo hecho antes."""
+    from app import risk
+    p = {"huchas": [], "movimientos": [], "contactos": [], "destinatarios_conocidos": []}
+    r = risk.evaluar_pago(p, "mis hermanos", 20, "quiero enviar un bizum a mis hermanos")
+    assert r["nivel_riesgo"] == "bajo"
+    assert not any(s["id"] == "destinatario_nuevo" for s in r["senales"])
+
+
+def test_familia_con_numero_nuevo_sigue_siendo_sospechoso():
+    """"Hola mamá, soy tu hijo, nuevo número" no se libra por decir que es familia."""
+    from app import risk
+    p = {"huchas": [], "movimientos": [], "contactos": [], "destinatarios_conocidos": []}
+    r = risk.evaluar_pago(p, "mi hijo", 200, "mi hijo me dice que tiene un número nuevo y necesita dinero ya")
+    assert r["nivel_riesgo"] != "bajo"
