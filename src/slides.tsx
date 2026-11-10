@@ -545,11 +545,11 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos: Inés y Jiawen, de Ciencia e Ingeniería de Datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía. Cinco carreras distintas en un mismo equipo. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, dentro de la app de MyInvestor, y hemos pensado Willo en lectura fácil desde el primer día.",
+      "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía. Cinco carreras distintas en un mismo equipo. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, dentro de la app de MyInvestor, y hemos pensado Willo en lectura fácil desde el primer día.",
     render: () => {
       const team = [
-        { n: "Inés", r: "Ciencia e Ingeniería de Datos" },
-        { n: "Jiawen", r: "Ciencia e Ingeniería de Datos" },
+        { n: "Inés", r: "Arquitecta de ML" },
+        { n: "Jiawen", r: "Analista de Datos" },
         { n: "He Ye", r: "Informática y ADE" },
         { n: "Nolan", r: "Empresa y Tecnología" },
         { n: "XingYi", r: "Telecomunicación" },
