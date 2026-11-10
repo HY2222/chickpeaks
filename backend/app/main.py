@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import budget, documents, easyread, expenses, notify, report, risk, support
+from . import budget, documents, easyread, expenses, notify, purchases, report, risk, support
 from .notify import avisar
 from .store import hoy, store
 
@@ -76,6 +76,8 @@ class Decision(BaseModel):
     pidio_apoyo: bool = False
     compartir: bool = Field(default=True, description="Si la persona quiere que lo vea su círculo (N1+)")
     hucha: str | None = None
+    pagado: bool = Field(default=False, description="Solo con decision 'comprar': true si ya lo ha pagado. "
+                         "Si es false, se apunta en 'Quiero comprar' y el dinero no baja todavía.")
 
 
 class Pago(BaseModel):
@@ -188,21 +190,61 @@ def registrar_decision(persona_id: str, d: Decision):
     ahora = datetime.combine(hoy(), datetime.now().time()).isoformat(timespec="seconds")
     reg = {**d.model_dump(), "fecha": ahora}
     p["decisiones"].append(reg)
+    pendiente = None
     if d.decision == "comprar" and d.importe > 0:
         hucha = budget.buscar_hucha(p, d.hucha)["id"]
-        p["movimientos"].append({"fecha": hoy().isoformat(), "concepto": d.concepto.capitalize(),
-                                 "importe": d.importe, "tipo": "gasto", "hucha": hucha,
-                                 "destinatario": None, "registrado_por": "persona"})
+        if d.pagado:
+            # Ya está pagado: el dinero baja ahora. Si estaba en "Quiero comprar", sale de ahí.
+            purchases.pagar(p, d.concepto, d.importe, hucha)
+        else:
+            # Solo lo ha decidido: se apunta en "Quiero comprar". El dinero baja cuando lo pague.
+            pendiente = purchases.apuntar(p, d.concepto, d.importe, hucha)
     avisados = []
     if d.compartir:
-        verbo = {"comprar": "compró", "esperar": "decidió esperar para comprar", "hablarlo": "quiere hablar de"}[d.decision]
+        comprar = "compró" if d.pagado else "ha decidido comprar"
+        verbo = {"comprar": comprar, "esperar": "decidió esperar para comprar", "hablarlo": "quiere hablar de"}[d.decision]
         texto = f"{p['nombre']} {verbo} {d.concepto}. Lo decidió {p.get('pronombre', 'él')}."
         if d.decision == "hablarlo":
             texto = f"{p['nombre']} quiere hablar contigo de {d.concepto}."
         for m in support.con_permiso(p, "ver_decisiones"):
             avisados.append(avisar(p, m, "decision", texto))
+    texto = "Lo he apuntado. Es tu decisión."
+    if pendiente:
+        texto = ("Lo he apuntado en Quiero comprar. Tu dinero no baja todavía. "
+                 "Baja cuando lo pagues. Es tu decisión.")
     return {"guardado": reg, "avisados": [a["para_nombre"] for a in avisados],
-            "texto_lectura_facil": "Lo he apuntado. Es tu decisión."}
+            "compra_pendiente": pendiente, "texto_lectura_facil": texto}
+
+
+@app.get("/api/personas/{persona_id}/compras")
+def ver_compras(persona_id: str):
+    """Pantalla de Javi: lo que ha decidido comprar (aún sin pagar) y lo que ya ha pagado este mes.
+
+    Las compras decididas caducan solas a los 7 días si no se pagan."""
+    p = _persona(persona_id)
+    return {"pendientes": purchases.pendientes(p), "pagadas": purchases.pagadas_este_mes(p),
+            "dias_caducidad": purchases.DIAS_CADUCIDAD}
+
+
+@app.post("/api/personas/{persona_id}/compras/{compra_id}/pagada")
+def compra_pagada(persona_id: str, compra_id: str):
+    """Javi ya ha pagado algo que tenía en "Quiero comprar": pasa a pagado y el dinero baja.
+    Willo no paga nada: solo lo apunta (en la app real lo diría el banco)."""
+    p = _persona(persona_id)
+    c = purchases.buscar(p, compra_id)
+    if not c:
+        raise HTTPException(404, "Esa compra no está en Quiero comprar")
+    purchases.pagar(p, c["concepto"], c["importe"], c["hucha"], compra_id=compra_id)
+    return {"ok": True, "texto_lectura_facil": f"Apuntado. Has pagado {easyread.euros(c['importe'])}."}
+
+
+@app.delete("/api/personas/{persona_id}/compras/{compra_id}")
+def quitar_compra(persona_id: str, compra_id: str):
+    """Javi ya no quiere comprarlo: sale de "Quiero comprar". El dinero no cambia."""
+    p = _persona(persona_id)
+    if not purchases.quitar(p, compra_id):
+        raise HTTPException(404, "Esa compra no está en Quiero comprar")
+    return {"ok": True, "texto_lectura_facil": "Lo he quitado. Tu dinero sigue igual."}
 
 
 @app.get("/api/personas/{persona_id}/decisiones")

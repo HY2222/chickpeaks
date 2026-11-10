@@ -35,6 +35,7 @@ class Store:
             p["movimientos"] = self._historial(p)
             p["decisiones"] = []
             p["avisos"] = []
+            p["compras_pendientes"] = []
             self.personas[p["id"]] = p
 
     def _historial(self, p: dict[str, Any]) -> list[dict[str, Any]]:

@@ -28,7 +28,7 @@ def test_no_alcanza_no_recomienda(client):
 def test_decision_compra_avisa_a_ana(client):
     r = client.post("/api/personas/javi/decisiones",
                     json={"concepto": "zapatillas", "importe": 80, "decision": "comprar",
-                          "palabras_persona": "Sí, las quiero"}).json()
+                          "palabras_persona": "Sí, las quiero", "pagado": True}).json()
     assert "Ana" in r["avisados"]
     av = client.get("/api/personas/javi/avisos?para=ana").json()
     assert av[0]["texto"] == "Javi compró zapatillas. Lo decidió él."

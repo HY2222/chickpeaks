@@ -91,7 +91,15 @@ Respuesta:
 ```json
 {"guardado": {"...": "..."}, "avisados": ["Ana"], "texto_lectura_facil": "Lo he apuntado. Es tu decisión."}
 ```
-A Ana le llega: "Javi compró entrada del concierto. Lo decidió él."
+**Decidir no es pagar** (10 nov). Con `"decision": "comprar"`:
+- sin `pagado` (lo que manda Noa): la compra se apunta en "Quiero comprar" y **el dinero no baja**. A Ana le llega: "Javi ha decidido comprar entrada del concierto. Lo decidió él." La respuesta trae `compra_pendiente`.
+- con `"pagado": true` (el botón "simular pago" y "Enviar igualmente"): se apunta el gasto, **el dinero baja** y, si estaba en "Quiero comprar", sale de ahí. A Ana le llega: "Javi compró entrada del concierto. Lo decidió él."
+
+### 🆕 Compras (pantalla 12 "Mis compras")
+- `GET /api/personas/javi/compras` → `{"pendientes": [{"id": "co_1", "concepto": "...", "importe": 45, "caduca": "2026-11-17", "dias_restantes": 7}], "pagadas": [{"concepto": "...", "importe": 45, "fecha": "2026-11-10"}], "dias_caducidad": 7}`. `pagadas` son los gastos del mes de la hucha "Para tus cosas".
+- `POST /api/personas/javi/compras/{id}/pagada` → Javi ya lo ha pagado: pasa a pagadas y el dinero baja. Willo no paga nada, solo lo apunta.
+- `DELETE /api/personas/javi/compras/{id}` → "Ya no lo quiero": se quita. El dinero no cambia.
+- Lo que está en "Quiero comprar" **se quita solo a los 7 días** si no se ha pagado.
 
 ## 5-7. Noa lee un documento 🆕
 

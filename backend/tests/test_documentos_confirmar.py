@@ -24,7 +24,8 @@ def quedan_mis_cosas(client):
 def test_multa_como_el_contrato(client):
     # En el contrato, Javi ya se ha comprado la entrada del concierto (45 €): le quedan 165 €.
     client.post("/api/personas/javi/decisiones",
-                json={"concepto": "entrada del concierto", "importe": 45, "decision": "comprar"})
+                json={"concepto": "entrada del concierto", "importe": 45, "decision": "comprar",
+                      "pagado": True})
     r = confirmar(client)
     assert r["en_plan"] is False
     assert (r["quedan_antes"], r["quedan_despues"], r["alcanza"]) == (165.0, 75.0, True)

@@ -43,6 +43,7 @@
 
   <div class="botones">
     <a class="boton" href="#2">Hablar con Noa</a>
+    <a class="boton secundario" href="#12" id="p1-compras">Mis compras</a>
   </div>
 </section>
 
@@ -234,6 +235,23 @@
   </div>
 </section>
 
+<!-- 12 · Mis compras: lo que Javi ha decidido comprar (aún sin pagar) y lo que ya ha pagado -->
+<section class="pantalla" data-pantalla="12" hidden>
+  <a class="volver" href="#1">← Volver</a>
+  <h1 class="titulo">Mis compras</h1>
+
+  <h2 class="titulo-seccion">Quiero comprar</h2>
+  <p class="suave" id="p12-nota-pendientes"></p>
+  <div class="lista" id="p12-pendientes" aria-live="polite"></div>
+
+  <h2 class="titulo-seccion">Ya pagado este mes</h2>
+  <div class="lista" id="p12-pagadas"></div>
+
+  <div class="botones">
+    <a class="boton" href="#1">Vale</a>
+  </div>
+</section>
+
 <!-- Solo para la demo: botón invisible abajo a la derecha (pantallas 1, 3 y 4).
      Antes de pagar: hace como si Javi pagara en la taquilla con su tarjeta (→ pantalla 4).
      Después de pagar (pantallas 1 y 4): lleva a la foto del documento (→ pantalla 5).
@@ -272,7 +290,39 @@ const ICONOS = {
   luz: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
   bus: '<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>',
   aviso: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  // Dibujos de las compras (pantalla 12 "Mis compras").
+  cerveza: '<path d="M17 11h1a3 3 0 0 1 0 6h-1"/><path d="M9 12v6"/><path d="M13 12v6"/><path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z"/><path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"/>',
+  palomitas: '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/>',
+  tijeras: '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+  camiseta: '<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>',
+  regalo: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>',
+  musica: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  movil: '<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>',
+  cubiertos: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  cafe: '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>',
+  libro: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>',
+  pastilla: '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>',
 };
+
+// Qué dibujo le toca a cada compra, por las palabras de su nombre. Si no se reconoce: una bolsa.
+const DIBUJOS = [
+  [/entrada|concierto|teatro|partido|cine|pel[ií]cula/, "entrada"],
+  [/palomitas/, "palomitas"],
+  [/\bbar\b|cerveza|ca[ñn]a|copas|terraza/, "cerveza"],
+  [/peluquer|corte de pelo|barber/, "tijeras"],
+  [/camiseta|ropa|pantal|sudadera|chaqueta|abrigo|vestido|camisa|jersey/, "camiseta"],
+  [/regalo/, "regalo"],
+  [/m[uú]sica|disco|auriculares|cascos/, "musica"],
+  [/m[oó]vil|tel[eé]fono|recarga/, "movil"],
+  [/restaurante|comida|cena|pizza|hamburgues|men[uú]|kebab/, "cubiertos"],
+  [/caf[eé]|desayuno|merienda/, "cafe"],
+  [/libro|c[oó]mic|revista/, "libro"],
+  [/farmacia|medicin|pastilla/, "pastilla"],
+  [/autob[uú]s|metro|tren|transporte|abono/, "bus"],
+  [/multa|taxi|gasolina|coche/, "coche"],
+  [/bizum|enviar/, "enviar"],
+];
+const dibujoDe = concepto => DIBUJOS.find(([palabras]) => palabras.test(concepto.toLowerCase()))?.[1] ?? "bolsa";
 
 // Lo que Javi ha preguntado (lo usan las pantallas 2, 3 y 4).
 const estado = {pregunta: null, respuesta: null};
@@ -327,6 +377,11 @@ AL_ENTRAR["1"] = async () => {
       : [`Se paga solo el día ${p.dia}`, "El dinero ya está guardado"]);
     $("p1-pago-detalle").innerHTML = frases.map(f => `<p>${f}</p>`).join("");
   });
+
+  // Cuántas cosas ha decidido comprar y aún no ha pagado (pantalla 12).
+  const compras = await api("compras").catch(() => ({pendientes: []}));
+  $("p1-compras").textContent = compras.pendientes.length
+    ? `Mis compras (${compras.pendientes.length} sin pagar)` : "Mis compras";
 
   const metas = await api("metas").catch(() => []);
   $("p1-huchas").innerHTML = metas.map(m => `
@@ -616,14 +671,18 @@ $("p3-entendido").onclick = () => { pararVoz(); callar(); };
 // Javi paga él mismo en la taquilla. En la demo lo simula el botón invisible: apunta la compra
 // con POST /decisiones (decision "comprar"). El backend resta el gasto de la hucha y avisa a
 // quien Javi eligió (Ana). Si la compra ya estaba apuntada (p. ej. por Noa), no se apunta dos veces.
+// "La entrada del concierto" y "entrada del concierto" son la misma compra.
+const mismaCosa = (a, b) => sinArticulo(a.trim().toLowerCase()) === sinArticulo(b.trim().toLowerCase());
 const COMERCIO = "Entradas Concierto";  // nombre del comercio en el aviso de la tarjeta (dato de la demo)
 
 $("simular-pago").onclick = async () => {
   // La esquina secreta sigue el guion: pantalla 4 → foto del documento (pantalla 5).
   if (location.hash === "#4") { location.hash = "#5"; return; }
   const q = estado.pregunta ?? {concepto: "la entrada del concierto", importe: 45};
-  const yaApuntada = (await api("decisiones")).some(d =>
-    d.decision === "comprar" && d.concepto === q.concepto && d.importe === q.importe);
+  // "Ya apuntada" = ya pagada. Si solo la había decidido (está en "Quiero comprar"),
+  // ahora la paga: el backend la pasa a pagado y el dinero baja una sola vez.
+  const yaApuntada = (await api("compras")).pagadas.some(c =>
+    mismaCosa(c.concepto, q.concepto) && c.importe === q.importe);
   // En la pantalla 1 después de pagar, la esquina lleva a la parte 2 del guion (pantalla 5),
   // y después del documento, a la parte 3 (pantalla 8).
   if (yaApuntada && (location.hash === "#1" || location.hash === "")) {
@@ -634,7 +693,7 @@ $("simular-pago").onclick = async () => {
   if (!yaApuntada) {
     const r = await post("decisiones", {
       concepto: q.concepto, importe: q.importe, decision: "comprar",
-      palabras_persona: `Pagado con tarjeta en ${COMERCIO}`, compartir: true,
+      palabras_persona: `Pagado con tarjeta en ${COMERCIO}`, compartir: true, pagado: true,
     });
     avisados = r.avisados;
   } else {
@@ -646,8 +705,8 @@ $("simular-pago").onclick = async () => {
 
 AL_ENTRAR["4"] = async () => {
   const pago = estado.pago ?? {concepto: "la entrada del concierto", importe: 45, avisados: ["Ana"]};
-  $("p4-pagado").textContent = `Has pagado ${euros(pago.importe)}`;
-  $("p4-donde").textContent = `en ${COMERCIO}`;
+  $("p4-pagado").textContent = "Pago confirmado";
+  $("p4-donde").textContent = `${euros(pago.importe)} en ${COMERCIO}. El banco ha visto tu pago.`;
   $("p4-nota").textContent = pago.avisados.includes("Ana")
     ? "Ana ve este pago porque tú lo elegiste."
     : "Nadie más ve este pago.";
@@ -950,6 +1009,7 @@ async function decidirBizum(decision, extra, enviado) {
   const b = bizumActual();
   await post("decisiones", {
     concepto: conceptoBizum(b), importe: b.importe, decision, ...extra,
+    pagado: Boolean(enviado),   // si lo ha enviado, el dinero ya ha salido
   });
   estado.riesgo = null;
   estado.bizum = null;
@@ -982,6 +1042,51 @@ $("p8-no-enviar").onclick = async () => {
 $("p8-enviar-igual").onclick = async () => {
   await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true}, true);
   location.hash = "#1";
+};
+
+// ---------- 12 · Mis compras ----------
+// Decidir comprar algo no baja el dinero: se apunta en "Quiero comprar". El dinero baja cuando
+// Javi lo paga. Si pasan los días y no lo paga, sale solo de la lista (lo hace el backend).
+// Willo no paga nada: los botones solo apuntan lo que Javi ha hecho.
+const cuantosDias = n => n <= 0 ? "Se quita hoy" : n === 1 ? "Se quita mañana" : `Se quita en ${n} días`;
+const diaCorto = iso => new Date(iso + "T12:00").toLocaleDateString("es-ES", {day: "numeric", month: "long"});
+
+AL_ENTRAR["12"] = async () => {
+  const c = await api("compras");
+  $("p12-nota-pendientes").textContent = c.pendientes.length
+    ? "Tu dinero no baja hasta que lo pagues"
+    : "Ahora no tienes nada apuntado";
+  $("p12-pendientes").innerHTML = c.pendientes.map(x => `
+    <div class="tarjeta">
+      <div class="fila" style="display:flex;align-items:center;gap:20px">
+        <span class="picto" data-icono="${dibujoDe(x.concepto)}"></span>
+        <div>
+          <p class="nombre">${esc(mayuscula(sinArticulo(x.concepto)))}</p>
+          <p class="suave" style="margin-top:4px">${euros(x.importe)} · ${cuantosDias(x.dias_restantes)}</p>
+        </div>
+      </div>
+      <div class="botones" style="margin-top:16px;gap:12px">
+        <button class="boton" data-pagar="${esc(x.id)}">Ya lo he pagado</button>
+        <button class="boton secundario" data-quitar="${esc(x.id)}">Ya no lo quiero</button>
+      </div>
+    </div>`).join("");
+  $("p12-pagadas").innerHTML = c.pagadas.length ? c.pagadas.map(x => `
+    <div class="tarjeta fila">
+      <span class="picto" data-icono="${dibujoDe(x.concepto)}"></span>
+      <div>
+        <p class="nombre">${esc(x.concepto)}</p>
+        <p class="suave" style="margin-top:4px">${euros(x.importe)} · ${diaCorto(x.fecha)}</p>
+      </div>
+    </div>`).join("") : '<p class="suave">Este mes no has pagado nada con el dinero de tus cosas</p>';
+  pintarIconos(document.querySelector('[data-pantalla="12"]'));
+  $("p12-pendientes").querySelectorAll("button").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    try {
+      if (b.dataset.pagar) await post(`compras/${b.dataset.pagar}/pagada`, {});
+      else await api(`compras/${b.dataset.quitar}`, {method: "DELETE"});
+    } catch { /* ya no estaba en la lista: se vuelve a pintar */ }
+    AL_ENTRAR["12"]();
+  });
 };
 
 pintarIconos();
