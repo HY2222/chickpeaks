@@ -705,8 +705,8 @@ $("simular-pago").onclick = async () => {
 
 AL_ENTRAR["4"] = async () => {
   const pago = estado.pago ?? {concepto: "la entrada del concierto", importe: 45, avisados: ["Ana"]};
-  $("p4-pagado").textContent = `Has pagado ${euros(pago.importe)}`;
-  $("p4-donde").textContent = `en ${COMERCIO}`;
+  $("p4-pagado").textContent = "Pago confirmado";
+  $("p4-donde").textContent = `${euros(pago.importe)} en ${COMERCIO}. El banco ha visto tu pago.`;
   $("p4-nota").textContent = pago.avisados.includes("Ana")
     ? "Ana ve este pago porque tú lo elegiste."
     : "Nadie más ve este pago.";

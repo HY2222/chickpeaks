@@ -100,7 +100,7 @@ Reglas de lectura fácil (obligatorias):
 
 **4 · Aviso de pago**
 - Javi paga en la taquilla con su tarjeta. En la demo: **botón escondido "simular pago"** que crea el gasto en el backend.
-- Pictograma de check grande, "Has pagado 45 €", "en Entradas Concierto".
+- Pictograma de check grande, "Pago confirmado", "45 € en Entradas Concierto. El banco ha visto tu pago.".
 - Tarjeta salvia: "Te quedan" / **165 € este mes** / barra.
 - Nota blanca: "Ana ve este pago porque tú lo elegiste."
 - Botón principal "Vale".
