@@ -65,7 +65,7 @@
     {
       "type": "webhook",
       "name": "guardar_decision",
-      "description": "Guarda lo que la persona ha decidido y avisa a su círculo de apoyo si ella quiere compartirlo.",
+      "description": "Guarda lo que la persona ha decidido y avisa a su círculo de apoyo si ella quiere compartirlo. No paga ni apunta gastos: si decide comprar, queda en Quiero comprar y su dinero no baja.",
       "api_schema": {
         "url": "https://willo-sfh4.onrender.com/api/personas/javi/decisiones",
         "method": "POST",
