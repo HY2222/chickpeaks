@@ -570,7 +570,7 @@ def service_worker():
 
 @app.get("/demo/banco")
 def demo_banco():
-    """Pantalla 0: la app de un banco inventado, con Willo dentro."""
+    """Pantalla 0: maqueta de la app de MyInvestor (patrocinador), con Willo dentro."""
     return FileResponse(STATIC / "banco.html")
 
 
