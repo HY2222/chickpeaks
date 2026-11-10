@@ -3,92 +3,173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tu banco · demo</title>
+<title>MyInvestor + Willo · maqueta de la demo</title>
 <link rel="stylesheet" href="/static/willo.css">
-<meta name="theme-color" content="#1F3B5C">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" href="/static/icons/favicon-32.png">
 <style>
-  /* Pantalla 0: la app de un banco inventado. Willo vive dentro como un botón más.
+  /* Pantalla 0: maqueta de la app móvil de MyInvestor (patrocinador del hackathon)
+     con Willo integrado como «modo fácil». Es una maqueta para el jurado:
+     no es la app real, no tiene inicio de sesión y todos los datos son inventados.
      Colores del banco a propósito distintos de los de Willo. */
-  body { background: #EEF2F6; }
-  .banco { max-width: 390px; min-height: 100dvh; margin: 0 auto; padding: 48px 20px 32px;
-           display: flex; flex-direction: column; gap: 20px; color: #13263B; }
-  .banco-cab { display: flex; justify-content: space-between; align-items: center; }
-  .banco-marca { font-weight: 700; font-size: 20px; letter-spacing: .5px; color: #1F3B5C; }
-  .banco-hola { font-size: 16px; color: #4B5D70; }
-  .banco-saldo { background: #1F3B5C; color: #fff; border-radius: 16px; padding: 20px; }
-  .banco-saldo small { display: block; opacity: .8; font-size: 14px; }
-  .banco-saldo strong { display: block; font-size: 34px; margin-top: 4px; }
-  .banco-saldo span { display: block; font-size: 14px; opacity: .8; margin-top: 8px; }
-  .banco-rejilla { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; }
-  .banco-app { display: flex; flex-direction: column; align-items: center; gap: 6px;
-               font-size: 13px; color: #13263B; text-decoration: none; background: none;
-               border: 0; padding: 0; font-family: inherit; cursor: pointer; }
-  .banco-app i { width: 56px; height: 56px; border-radius: 16px; background: #fff;
-                 display: grid; place-items: center; font-style: normal; font-size: 24px;
-                 box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  .banco-app img { width: 56px; height: 56px; border-radius: 16px; display: block;
-                   box-shadow: 0 1px 3px rgba(0,0,0,.18); }
-  .banco-app.willo span { font-weight: 700; color: #3E5A34; }
-  .banco-destacado { display: flex; gap: 14px; align-items: center; background: #fff;
-                     border-radius: 16px; padding: 16px; text-decoration: none; color: inherit;
-                     border: 2px solid #A3B18F; }
-  .banco-destacado img { width: 52px; height: 52px; border-radius: 14px; }
-  .banco-destacado b { display: block; font-size: 17px; color: #3E5A34; }
-  .banco-destacado span { font-size: 14px; color: #4B5D70; }
-  .banco-movs h2 { font-size: 16px; margin-bottom: 8px; }
-  .banco-movs li { display: flex; justify-content: space-between; padding: 10px 0;
-                   border-bottom: 1px solid #DCE3EA; font-size: 15px; list-style: none; }
-  .banco-movs ul { padding: 0; margin: 0; }
-  .banco-pie { margin-top: auto; text-align: center; font-size: 12px; color: #7A8796; }
+  :root { --mi: #5B3FD6; --mi-suave: #EFEBFF; --mi-texto: #1B1530; --mi-gris: #6B6680;
+          --mi-linea: #E7E4F0; }
+  body { background: #F7F6FB; }
+  .mi { max-width: 390px; min-height: 100dvh; margin: 0 auto; padding: 20px 18px 104px;
+        display: flex; flex-direction: column; gap: 18px; color: var(--mi-texto); }
+  .mi-aviso { align-self: center; font-size: 12px; color: var(--mi-gris); background: #fff;
+              border: 1px dashed #CFC8E6; border-radius: 999px; padding: 4px 12px; }
+  .mi-cab { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .mi-marca { font-weight: 800; font-size: 22px; letter-spacing: -.3px; color: var(--mi); }
+  .mi-hola { font-size: 15px; color: var(--mi-gris); margin-top: 2px; }
+  .mi-iconos { display: flex; gap: 10px; align-items: center; }
+  .mi-redondo { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: grid;
+                place-items: center; box-shadow: 0 1px 3px rgba(27,21,48,.1); color: var(--mi); }
+  .mi-avatar { background: var(--mi); color: #fff; font-weight: 700; font-size: 15px; }
+
+  .mi-tarjeta { background: #fff; border-radius: 20px; padding: 18px;
+                box-shadow: 0 1px 4px rgba(27,21,48,.08); }
+  .mi-saldo small { display: block; font-size: 13px; color: var(--mi-gris); }
+  .mi-saldo strong { display: block; font-size: 32px; margin-top: 4px; letter-spacing: -.5px; }
+  .mi-saldo span { display: block; font-size: 13px; color: var(--mi-gris); margin-top: 6px; }
+  .mi-saldo .mi-etiqueta { display: inline-block; margin-top: 12px; background: var(--mi-suave);
+                           color: var(--mi); font-size: 12px; font-weight: 700; border-radius: 999px;
+                           padding: 4px 10px; }
+
+  /* El botón de Willo: lo más visible de la pantalla. */
+  .mi-willo { display: flex; gap: 14px; align-items: center; text-decoration: none; color: #fff;
+              background: #3E5A34; border-radius: 20px; padding: 16px;
+              box-shadow: 0 6px 18px rgba(62,90,52,.35); }
+  .mi-willo img { width: 60px; height: 60px; border-radius: 16px; flex: none;
+                  box-shadow: 0 0 0 3px rgba(255,255,255,.35); }
+  .mi-willo b { display: block; font-size: 19px; }
+  .mi-willo span { display: block; font-size: 14px; color: #D3DFC8; margin-top: 2px; }
+  .mi-willo em { margin-left: auto; font-style: normal; background: #F5F7F0; color: #3E5A34;
+                 font-weight: 700; font-size: 14px; border-radius: 999px; padding: 8px 14px; flex: none; }
+
+  .mi-acciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mi-accion { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px;
+               color: var(--mi-texto); text-decoration: none; background: none; border: 0; padding: 0;
+               font-family: inherit; cursor: pointer; }
+  .mi-accion i { width: 52px; height: 52px; border-radius: 16px; background: var(--mi-suave);
+                 color: var(--mi); display: grid; place-items: center; font-style: normal; }
+  .mi-accion img { width: 52px; height: 52px; border-radius: 16px; display: block; }
+  .mi-accion.willo span { font-weight: 700; color: #3E5A34; }
+
+  .mi-seccion h2 { font-size: 16px; margin: 0 0 10px; }
+  .mi-producto { display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
+                 border-bottom: 1px solid var(--mi-linea); font-size: 15px; }
+  .mi-producto:last-child { border-bottom: 0; }
+  .mi-producto small { display: block; font-size: 12px; color: var(--mi-gris); }
+  .mi-movs li { display: flex; justify-content: space-between; padding: 11px 0; list-style: none;
+                border-bottom: 1px solid var(--mi-linea); font-size: 15px; }
+  .mi-movs li:last-child { border-bottom: 0; }
+  .mi-movs ul { padding: 0; margin: 0; }
+  .mi-pos { color: #1E7A4C; }
+
+  .mi-nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%;
+            max-width: 390px; background: #fff; border-top: 1px solid var(--mi-linea);
+            display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px 6px 18px; }
+  .mi-nav a, .mi-nav button { display: flex; flex-direction: column; align-items: center; gap: 3px;
+            font-size: 11px; color: var(--mi-gris); text-decoration: none; background: none;
+            border: 0; font-family: inherit; cursor: pointer; padding: 0; }
+  .mi-nav .activo { color: var(--mi); font-weight: 700; }
+  .mi-nav img { width: 26px; height: 26px; border-radius: 8px; }
+  .mi-nav .willo { color: #3E5A34; font-weight: 700; }
+  svg { display: block; }
 </style>
 </head>
 <body>
-<main class="banco">
-  <header class="banco-cab">
+<main class="mi">
+  <p class="mi-aviso">Maqueta para la demo de Willo · no es la app real</p>
+
+  <header class="mi-cab">
     <div>
-      <div class="banco-marca">TU BANCO</div>
-      <div class="banco-hola">Hola, Javi</div>
+      <div class="mi-marca">MyInvestor</div>
+      <div class="mi-hola">Hola, Javi</div>
     </div>
-    <span aria-hidden="true">🔔</span>
+    <div class="mi-iconos">
+      <span class="mi-redondo" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </span>
+      <span class="mi-redondo mi-avatar" aria-hidden="true">J</span>
+    </div>
   </header>
 
-  <section class="banco-saldo" aria-label="Saldo">
-    <small>Cuenta nómina</small>
+  <section class="mi-tarjeta mi-saldo" aria-label="Saldo">
+    <small>Cuenta MyInvestor</small>
     <strong>472,00 €</strong>
     <span>ES00 0000 0000 0000 0000 1234</span>
+    <b class="mi-etiqueta">Sin comisiones</b>
   </section>
 
-  <a class="banco-destacado" href="/demo" aria-label="Abrir Willo">
+  <a class="mi-willo" href="/demo" aria-label="Abrir Willo, el modo fácil">
     <img src="/static/icons/icon-192.png" alt="">
     <div>
-      <b>Willo</b>
+      <b>Willo · Modo fácil</b>
       <span>Tu dinero, explicado fácil. Habla con Noa.</span>
     </div>
+    <em>Entrar</em>
   </a>
 
-  <nav class="banco-rejilla" aria-label="Servicios">
-    <button class="banco-app" type="button"><i>↔</i><span>Transferir</span></button>
-    <button class="banco-app" type="button"><i>📱</i><span>Bizum</span></button>
-    <button class="banco-app" type="button"><i>💳</i><span>Tarjetas</span></button>
-    <a class="banco-app willo" href="/demo"><img src="/static/icons/icon-192.png" alt=""><span>Willo</span></a>
-    <button class="banco-app" type="button"><i>🧾</i><span>Recibos</span></button>
-    <button class="banco-app" type="button"><i>📈</i><span>Ahorro</span></button>
-    <button class="banco-app" type="button"><i>🛡</i><span>Seguros</span></button>
-    <button class="banco-app" type="button"><i>⋯</i><span>Más</span></button>
+  <nav class="mi-acciones" aria-label="Acciones rápidas">
+    <button class="mi-accion" type="button">
+      <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></i>
+      <span>Transferir</span>
+    </button>
+    <button class="mi-accion" type="button">
+      <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></i>
+      <span>Bizum</span>
+    </button>
+    <button class="mi-accion" type="button">
+      <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></i>
+      <span>Tarjetas</span>
+    </button>
+    <a class="mi-accion willo" href="/demo">
+      <img src="/static/icons/icon-192.png" alt="">
+      <span>Willo</span>
+    </a>
   </nav>
 
-  <section class="banco-movs">
+  <section class="mi-tarjeta mi-seccion" aria-label="Tus productos">
+    <h2>Tus productos</h2>
+    <div class="mi-producto"><div>Cuenta MyInvestor<small>Cuenta corriente</small></div><b>472,00 €</b></div>
+    <div class="mi-producto"><div>Tarjeta de débito<small>•••• 1234</small></div><b>Activa</b></div>
+    <div class="mi-producto"><div>Cartera automatizada<small>Desde 150 €</small></div><b style="color:var(--mi)">Ver</b></div>
+  </section>
+
+  <section class="mi-tarjeta mi-seccion mi-movs" aria-label="Últimos movimientos">
     <h2>Últimos movimientos</h2>
     <ul>
       <li><span>Bar La Esquina</span><span>−22,00 €</span></li>
       <li><span>Cines del centro</span><span>−12,00 €</span></li>
       <li><span>Peluquería del barrio</span><span>−14,00 €</span></li>
-      <li><span>Nómina</span><span>+980,00 €</span></li>
+      <li><span>Nómina</span><span class="mi-pos">+980,00 €</span></li>
     </ul>
   </section>
-
-  <p class="banco-pie">Banco inventado para la demo de Willo</p>
 </main>
+
+<nav class="mi-nav" aria-label="Menú">
+  <button type="button" class="activo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+    <span>Inicio</span>
+  </button>
+  <button type="button">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+    <span>Cuentas</span>
+  </button>
+  <button type="button">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+    <span>Invertir</span>
+  </button>
+  <a href="/demo" class="willo">
+    <img src="/static/icons/icon-192.png" alt="">
+    <span>Willo</span>
+  </a>
+  <button type="button">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+    <span>Perfil</span>
+  </button>
+</nav>
 </body>
 </html>
