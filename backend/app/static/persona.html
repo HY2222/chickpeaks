@@ -290,7 +290,39 @@ const ICONOS = {
   luz: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
   bus: '<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>',
   aviso: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  // Dibujos de las compras (pantalla 12 "Mis compras").
+  cerveza: '<path d="M17 11h1a3 3 0 0 1 0 6h-1"/><path d="M9 12v6"/><path d="M13 12v6"/><path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z"/><path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"/>',
+  palomitas: '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4"/><path d="M10 22 9 8"/><path d="m14 22 1-14"/><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z"/>',
+  tijeras: '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+  camiseta: '<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>',
+  regalo: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>',
+  musica: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  movil: '<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>',
+  cubiertos: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  cafe: '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>',
+  libro: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>',
+  pastilla: '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>',
 };
+
+// Qué dibujo le toca a cada compra, por las palabras de su nombre. Si no se reconoce: una bolsa.
+const DIBUJOS = [
+  [/entrada|concierto|teatro|partido/, "entrada"],
+  [/cine|pel[ií]cula|palomitas/, "palomitas"],
+  [/\bbar\b|cerveza|ca[ñn]a|copas|terraza/, "cerveza"],
+  [/peluquer|corte de pelo|barber/, "tijeras"],
+  [/camiseta|ropa|pantal|sudadera|chaqueta|abrigo|vestido|camisa|jersey/, "camiseta"],
+  [/regalo/, "regalo"],
+  [/m[uú]sica|disco|auriculares|cascos/, "musica"],
+  [/m[oó]vil|tel[eé]fono|recarga/, "movil"],
+  [/restaurante|comida|cena|pizza|hamburgues|men[uú]|kebab/, "cubiertos"],
+  [/caf[eé]|desayuno|merienda/, "cafe"],
+  [/libro|c[oó]mic|revista/, "libro"],
+  [/farmacia|medicin|pastilla/, "pastilla"],
+  [/autob[uú]s|metro|tren|transporte|abono/, "bus"],
+  [/multa|taxi|gasolina|coche/, "coche"],
+  [/bizum|enviar/, "enviar"],
+];
+const dibujoDe = concepto => DIBUJOS.find(([palabras]) => palabras.test(concepto.toLowerCase()))?.[1] ?? "bolsa";
 
 // Lo que Javi ha preguntado (lo usan las pantallas 2, 3 y 4).
 const estado = {pregunta: null, respuesta: null};
@@ -1027,7 +1059,7 @@ AL_ENTRAR["12"] = async () => {
   $("p12-pendientes").innerHTML = c.pendientes.map(x => `
     <div class="tarjeta">
       <div class="fila" style="display:flex;align-items:center;gap:20px">
-        <span class="picto" data-icono="${/entrada/i.test(x.concepto) ? "entrada" : "bolsa"}"></span>
+        <span class="picto" data-icono="${dibujoDe(x.concepto)}"></span>
         <div>
           <p class="nombre">${esc(mayuscula(sinArticulo(x.concepto)))}</p>
           <p class="suave" style="margin-top:4px">${euros(x.importe)} · ${cuantosDias(x.dias_restantes)}</p>
@@ -1040,7 +1072,7 @@ AL_ENTRAR["12"] = async () => {
     </div>`).join("");
   $("p12-pagadas").innerHTML = c.pagadas.length ? c.pagadas.map(x => `
     <div class="tarjeta fila">
-      <span class="picto" data-icono="hecho"></span>
+      <span class="picto" data-icono="${dibujoDe(x.concepto)}"></span>
       <div>
         <p class="nombre">${esc(x.concepto)}</p>
         <p class="suave" style="margin-top:4px">${euros(x.importe)} · ${diaCorto(x.fecha)}</p>
