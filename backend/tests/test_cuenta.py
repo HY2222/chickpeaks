@@ -22,3 +22,12 @@ def test_pagar_en_willo_sale_en_el_banco(client):
     assert c["saldo"] == antes - 45
     assert c["movimientos"][0]["concepto"] == "La entrada del concierto"
     assert c["movimientos"][0]["importe"] == 45
+
+
+def test_el_banco_y_willo_dicen_lo_mismo_del_ahorro(client):
+    c = cuenta(client)
+    metas = client.get("/api/personas/javi/metas").json()
+    assert c["ahorro"] == sum(m["ahorrado"] for m in metas)
+    assert c["saldo"] == c["total"] - c["ahorro"]
+    informe = client.get("/api/personas/javi/informe_anual/resumen").json()
+    assert c["total"] == informe["saldo_final"]
