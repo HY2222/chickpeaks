@@ -25,7 +25,7 @@
   </header>
 
   <div class="tarjeta destacada saldo">
-    <p style="font-size:22px">Este mes te quedan</p>
+    <p style="font-size:22px" id="p1-quedan-texto">Este mes te quedan</p>
     <p class="cifra" id="p1-quedan">… €</p>
     <p class="suave">Hasta el día <span id="p1-dia-fin">30</span></p>
     <div class="barra"><span id="p1-barra" style="width:0"></span></div>
@@ -352,7 +352,9 @@ AL_ENTRAR["1"] = async () => {
   $("p1-dia-fin").textContent = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
 
   const h = d.huchas.find(x => x.id === "mis_cosas") ?? d.huchas[0];
-  $("p1-quedan").textContent = euros(h.quedan);
+  // Un número negativo no es lectura fácil: se dice "has gastado de más" y la cifra en positivo.
+  $("p1-quedan-texto").textContent = h.quedan < 0 ? "Este mes has gastado de más" : "Este mes te quedan";
+  $("p1-quedan").textContent = euros(Math.abs(h.quedan));
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
 
   // Pagos fijos (alquiler, luz...). Pagado: verde con ✓. Por pagar: blanco con borde y el día.
@@ -508,6 +510,11 @@ AL_ENTRAR["2"] = async () => {
           estado.esperandoNoa = false;
           estado.dichoNoa = m.message;
           if (location.hash === "#3") AL_ENTRAR["3"](); else location.hash = "#3";
+        } else if (m.source === "ai" && location.hash === "#3" && estado.dichoNoa
+                   && !estado.dichoNoa.endsWith(m.message)) {
+          // Noa sigue hablando (o su respuesta llega en trozos): se añade debajo, no se pierde.
+          estado.dichoNoa += " " + m.message;
+          AL_ENTRAR["3"]();
         }
       },
       onModeChange: async ({mode}) => {
@@ -1085,7 +1092,17 @@ AL_ENTRAR["12"] = async () => {
   $("p12-pendientes").querySelectorAll("button").forEach(b => b.onclick = async () => {
     b.disabled = true;
     try {
-      if (b.dataset.pagar) await post(`compras/${b.dataset.pagar}/pagada`, {});
+      if (b.dataset.pagar) {
+        // Antes de apuntar el pago, Javi ve cómo queda su hucha (las cuentas, del backend) y lo confirma.
+        // Si no le llega, se le dice. No se bloquea: es su dinero y su decisión.
+        const x = c.pendientes.find(p => p.id === b.dataset.pagar);
+        const r = await post("evaluar_compra", {importe: x.importe, concepto: x.concepto, hucha: x.hucha});
+        const como = r.alcanza ? `Te quedan ${euros(r.quedan_despues)}.`
+          : `No te llega. Te faltan ${euros(-r.quedan_despues)}. Tu hucha se queda en negativo.`;
+        if (confirm(`¿Ya has pagado ${x.concepto}? Son ${euros(x.importe)}.\n${como}`)) {
+          await post(`compras/${b.dataset.pagar}/pagada`, {});
+        }
+      }
       else await api(`compras/${b.dataset.quitar}`, {method: "DELETE"});
     } catch { /* ya no estaba en la lista: se vuelve a pintar */ }
     AL_ENTRAR["12"]();
