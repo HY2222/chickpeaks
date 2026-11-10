@@ -52,6 +52,19 @@ _REGLAS_TEXTO = [
 ]
 
 
+# Señales que hacen sospechoso un pago aunque se diga que es de la familia.
+_SENALES_DE_ENGANO = {"numero_desconocido", "numero_cambiado", "suplantacion", "secreto",
+                      "codigos", "premio", "relacion_nueva", "remitente_desconocido"}
+_FAMILIA = re.compile(r"\b(hermano|hermana|hermanos|hermanas|madre|padre|mama|papa|padres|abuelo|"
+                      r"abuela|abuelos|tio|tia|tios|primo|prima|primos|hijo|hija|hijos|familia|"
+                      r"familiar|familiares|cunado|cunada|sobrino|sobrina)\b")
+
+
+def _es_familia(destinatario: str | None, contexto_normalizado: str) -> bool:
+    """¿Se envía a la familia? Mira a quién va (p. ej. "mis hermanos") y lo que ha contado Javi."""
+    return bool(_FAMILIA.search(_normalizar(destinatario or "") + " " + contexto_normalizado))
+
+
 def _normalizar(texto: str) -> str:
     texto = unicodedata.normalize("NFD", texto.lower())
     return "".join(c for c in texto if unicodedata.category(c) != "Mn")
@@ -104,6 +117,12 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str | None, importe: flo
     for rid, claves, peso, explicacion in _REGLAS_TEXTO:
         if any(re.search(rf"\b{re.escape(_normalizar(c))}\b", ctx) for c in claves):
             senales.append({"id": rid, "peso": peso, "explicacion": explicacion})
+
+    # Dinero a la familia (un hermano, su madre…): no es "alguien nuevo". Solo si no hay otras
+    # señales de engaño: "mi hijo me escribe desde un número nuevo" sigue siendo sospechoso.
+    ids = {s["id"] for s in senales}
+    if (_es_familia(destinatario, ctx) and not ids & _SENALES_DE_ENGANO):
+        senales = [s for s in senales if s["id"] != "destinatario_nuevo"]
 
     puntos = sum(s["peso"] for s in senales)
     nivel = "alto" if puntos >= 5 else "medio" if puntos >= 3 else "bajo"
