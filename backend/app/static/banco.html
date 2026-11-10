@@ -40,7 +40,10 @@
   .leyenda b { display: block; color: var(--texto); font-size: 15px; margin-top: 2px; }
   .punto { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
 
-  .promo { display: flex; gap: 12px; align-items: center; margin-top: 12px; }
+  .promo { position: relative; display: flex; gap: 12px; align-items: center; margin-top: 12px; padding-right: 36px; }
+  .promo[hidden] { display: none; }
+  .promo-cerrar { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border: 0; border-radius: 50%;
+                  background: none; color: var(--texto); display: grid; place-items: center; cursor: pointer; }
   .promo-dibujo { width: 64px; height: 64px; border-radius: 14px; flex: none; display: grid; place-items: center;
                   background: #F1F6EC; }
   .promo-dibujo img { width: 48px; height: 48px; border-radius: 12px; }
@@ -163,12 +166,15 @@
       </div>
     </div>
 
-    <div class="tarjeta promo">
+    <div class="tarjeta promo" id="promo-willo">
+      <button class="promo-cerrar" id="promo-cerrar" type="button" aria-label="Quitar este aviso">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
       <div class="promo-dibujo"><img src="/static/icons/icon-192.png" alt=""></div>
       <div>
         <span class="etiqueta">Nuevo</span>
         <p><b>Willo, el modo fácil.</b> Tu dinero explicado en lectura fácil y por voz.</p>
-        <a href="#perfil" id="promo-enlace">Actívalo en Perfil</a>
+        <a href="#perfil">Actívalo en Perfil</a>
       </div>
     </div>
 
@@ -314,21 +320,27 @@ mostrar(location.hash.slice(1));
 
 // ---------- Activar Willo (se guarda en este móvil) ----------
 // Por defecto está desactivado: en la demo se activa desde Perfil.
-// Con ?willo=1 o ?willo=0 en la dirección se fuerza encendido o apagado.
+// Con ?willo=1 o ?willo=0 en la dirección se fuerza encendido o apagado (?willo=0 también vuelve a enseñar el aviso).
 const CLAVE = "myinvestor-willo-activado";
 const leer = () => { try { return localStorage.getItem(CLAVE) === "1"; } catch { return false; } };
 const guardar = on => { try { localStorage.setItem(CLAVE, on ? "1" : "0"); } catch {} };
 const forzar = new URLSearchParams(location.search).get("willo");
 if (forzar === "1" || forzar === "0") guardar(forzar === "1");
+if (forzar === "0") { try { localStorage.removeItem("myinvestor-willo-promo-cerrada"); } catch {} }
 
 function pintarWillo(on) {
   document.getElementById("acceso-willo").hidden = !on;
   document.getElementById("acciones").classList.toggle("con-willo", on);
   document.getElementById("interruptor-willo").setAttribute("aria-checked", on ? "true" : "false");
-  const enlace = document.getElementById("promo-enlace");
-  enlace.textContent = on ? "Ya lo tienes activado · Abrir Willo" : "Actívalo en Perfil";
-  enlace.href = on ? "/demo" : "#perfil";
+  // El aviso de Inicio solo sale si Willo está apagado y nadie lo ha cerrado con la cruz.
+  document.getElementById("promo-willo").hidden = on || promoCerrada();
 }
+const CLAVE_PROMO = "myinvestor-willo-promo-cerrada";
+const promoCerrada = () => { try { return localStorage.getItem(CLAVE_PROMO) === "1"; } catch { return false; } };
+document.getElementById("promo-cerrar").addEventListener("click", () => {
+  try { localStorage.setItem(CLAVE_PROMO, "1"); } catch {}
+  document.getElementById("promo-willo").hidden = true;
+});
 function avisar(texto) {
   const a = document.getElementById("aviso");
   a.textContent = texto; a.classList.add("visible");
