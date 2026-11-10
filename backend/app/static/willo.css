@@ -34,6 +34,8 @@ h1, h2, h3, p { margin: 0; }
   gap: 24px;
 }
 .pantalla[hidden] { display: none; }
+/* Cualquier elemento con `hidden` se oculta aunque su clase le ponga display (p. ej. .pago-detalle con flex). */
+[hidden] { display: none !important; }
 .pantalla > .botones { margin-top: auto; } /* los botones siempre abajo */
 
 /* ---------- Textos ---------- */

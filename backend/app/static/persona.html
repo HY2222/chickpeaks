@@ -431,6 +431,9 @@ async function frasePorDefecto() {
     await new Promise(r => setTimeout(r, 220));
   }
   await oido(frase);
+  // Sin voz no hay Noa que conteste: tras una pausa corta, se pasa sola a la respuesta (pantalla 3).
+  await new Promise(r => setTimeout(r, 1200));
+  if (location.hash === "#2" && estado.respuesta) location.hash = "#3";
 }
 
 // Corta la conversación con Noa. No espera más de 1 segundo: si ElevenLabs tarda en

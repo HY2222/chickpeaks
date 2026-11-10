@@ -128,3 +128,12 @@ def test_informe_cuenta_avisos_de_estafa(client):
     riesgo(client)  # el mismo envío: sigue siendo un aviso
     riesgo(client, destinatario="Marcos")
     assert client.get("/api/personas/javi/informe_anual/resumen").json()["avisos_estafa"] == 2
+
+
+def test_texto_aviso_estafa_sin_puntuacion_doble(client):
+    client.post("/api/demo/reset")
+    r = client.post("/api/personas/javi/evaluar_riesgo", json={
+        "destinatario": "Desconocido", "importe": 300,
+        "contexto": "Hola mamá, he cambiado de número, hazme un bizum urgente"}).json()
+    aviso = next(a for a in client.get("/api/personas/javi/avisos?para=ana").json() if a["id"] == r["aviso_id"])
+    assert ".;" not in aviso["texto"] and ".." not in aviso["texto"]

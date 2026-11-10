@@ -358,7 +358,7 @@ def _riesgo_y_aviso(p: dict, pago: Pago) -> dict:
 def _crear_aviso_estafa(p: dict, pago: Pago, r: dict, miembros: list[dict], antes: str = "") -> dict:
     texto = (f"{antes}Aviso de Willo: puede que alguien esté intentando engañar a {p['nombre']}. "
              f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
-             f"Señales: {'; '.join(s['explicacion'] for s in r['senales'])}. "
+             f"Señales: {'; '.join(s['explicacion'].rstrip('. ') for s in r['senales'])}. "
              f"La decisión es suya. Llámale con calma.")
     return avisar(p, miembros, "posible_estafa", texto, destinatario=pago.destinatario,
                   importe=float(pago.importe), senales=[s["explicacion"] for s in r["senales"]])
