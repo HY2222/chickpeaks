@@ -226,6 +226,27 @@ def ver_compras(persona_id: str):
             "dias_caducidad": purchases.DIAS_CADUCIDAD}
 
 
+@app.get("/api/personas/{persona_id}/cuenta")
+def ver_cuenta(persona_id: str, ultimos: int = 6):
+    """Pantalla 0 (la app del banco): saldo de la cuenta y últimos movimientos.
+
+    Sale de los mismos movimientos que usa Willo, así el banco y Willo enseñan siempre
+    los mismos gastos. Los traspasos a la hucha de ahorro no cuentan como gasto,
+    pero sí salen de la cuenta corriente."""
+    p = _persona(persona_id)
+    movs = p["movimientos"]
+    entra = sum(m["importe"] for m in movs if m["tipo"] == "ingreso")
+    sale = sum(m["importe"] for m in movs if m["tipo"] != "ingreso")
+    ahorro = sum(m["importe"] for m in movs if m["tipo"] != "ingreso" and m.get("hucha") == "ahorro")
+    recientes = sorted(reversed(movs), key=lambda m: m["fecha"], reverse=True)[:max(1, min(ultimos, 20))]
+    return {
+        "saldo": round(p.get("saldo_inicial_anio", 0.0) + entra - sale, 2),
+        "ahorro_este_anio": round(ahorro, 2),
+        "movimientos": [{"fecha": m["fecha"], "concepto": m["concepto"], "destinatario": m.get("destinatario"),
+                         "importe": m["importe"], "tipo": m["tipo"]} for m in recientes],
+    }
+
+
 @app.post("/api/personas/{persona_id}/compras/{compra_id}/pagada")
 def compra_pagada(persona_id: str, compra_id: str):
     """Javi ya ha pagado algo que tenía en "Quiero comprar": pasa a pagado y el dinero baja.
