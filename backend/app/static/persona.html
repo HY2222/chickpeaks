@@ -521,7 +521,7 @@ AL_ENTRAR["2"] = async () => {
         if (!nueva || conv !== nueva) return;   // una conversación ya cerrada
         conv = null;
         const colgoNoa = true;
-        if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 1500);
+        if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 200);
       },
     });
     // Si Javi pulsó Parar (o salió de la pantalla) mientras Noa se conectaba, se cierra ya.
