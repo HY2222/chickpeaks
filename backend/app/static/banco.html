@@ -2,180 +2,382 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MyInvestor + Willo · maqueta de la demo</title>
-<link rel="stylesheet" href="/static/willo.css">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#EAF0FA">
 <link rel="icon" type="image/png" href="/static/icons/favicon-32.png">
 <style>
   /* Pantalla 0: maqueta de la app móvil de MyInvestor (patrocinador del hackathon)
-     con Willo integrado como «modo fácil». Es una maqueta para el jurado:
-     no es la app real, no tiene inicio de sesión y todos los datos son inventados.
-     Colores del banco a propósito distintos de los de Willo. */
-  :root { --mi: #5B3FD6; --mi-suave: #EFEBFF; --mi-texto: #1B1530; --mi-gris: #6B6680;
-          --mi-linea: #E7E4F0; }
-  body { background: #F7F6FB; }
-  .mi { max-width: 390px; min-height: 100dvh; margin: 0 auto; padding: 20px 18px 104px;
-        display: flex; flex-direction: column; gap: 18px; color: var(--mi-texto); }
-  .mi-aviso { align-self: center; font-size: 12px; color: var(--mi-gris); background: #fff;
-              border: 1px dashed #CFC8E6; border-radius: 999px; padding: 4px 12px; }
-  .mi-cab { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
-  .mi-marca { font-weight: 800; font-size: 22px; letter-spacing: -.3px; color: var(--mi); }
-  .mi-hola { font-size: 15px; color: var(--mi-gris); margin-top: 2px; }
-  .mi-iconos { display: flex; gap: 10px; align-items: center; }
-  .mi-redondo { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: grid;
-                place-items: center; box-shadow: 0 1px 3px rgba(27,21,48,.1); color: var(--mi); }
-  .mi-avatar { background: var(--mi); color: #fff; font-weight: 700; font-size: 15px; }
+     con Willo integrado como «modo fácil». Solo es la superficie: lo único que funciona
+     es el botón de Willo y la opción «Activar Willo» en Perfil.
+     No es la app real, no tiene inicio de sesión y los datos son los de Javi (inventados). */
+  :root { --fondo: #EAF0FA; --blanco: #fff; --texto: #16192B; --suave: #5E6478; --azul: #1747D1;
+          --azul-claro: #8FA9EE; --linea: #E6EAF2; --promo: #D6338A; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: -apple-system, "SF Pro Text", "Inter", Helvetica, Arial, sans-serif; color: var(--texto);
+         background: linear-gradient(#DCE6F8 0, var(--fondo) 160px, #F3F5F9 520px); min-height: 100dvh; }
+  h1, h2, h3, p { margin: 0; }
+  button { font-family: inherit; }
+  .app { max-width: 390px; margin: 0 auto; padding: 14px 14px 110px; }
+  .vista[hidden] { display: none; }
+  .maqueta { display: block; width: max-content; margin: 0 auto 8px; font-size: 11px; color: var(--suave);
+             border: 1px dashed #B9C3DA; border-radius: 999px; padding: 3px 10px; background: rgba(255,255,255,.6); }
 
-  .mi-tarjeta { background: #fff; border-radius: 20px; padding: 18px;
-                box-shadow: 0 1px 4px rgba(27,21,48,.08); }
-  .mi-saldo small { display: block; font-size: 13px; color: var(--mi-gris); }
-  .mi-saldo strong { display: block; font-size: 32px; margin-top: 4px; letter-spacing: -.5px; }
-  .mi-saldo span { display: block; font-size: 13px; color: var(--mi-gris); margin-top: 6px; }
-  .mi-saldo .mi-etiqueta { display: inline-block; margin-top: 12px; background: var(--mi-suave);
-                           color: var(--mi); font-size: 12px; font-weight: 700; border-radius: 999px;
-                           padding: 4px 10px; }
+  .barra { display: flex; justify-content: space-between; align-items: center; height: 40px; margin-bottom: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: #fff; border-radius: 10px; padding: 6px 10px;
+          font-size: 13px; font-weight: 700; box-shadow: 0 1px 2px rgba(20,30,60,.08); }
+  .iconos { display: flex; gap: 12px; color: var(--texto); }
+  .ico { width: 24px; height: 24px; display: grid; place-items: center; }
 
-  .mi-acciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .mi-accion { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px;
-               color: var(--mi-texto); text-decoration: none; background: none; border: 0; padding: 0;
-               font-family: inherit; cursor: pointer; }
-  .mi-accion i { width: 52px; height: 52px; border-radius: 16px; background: var(--mi-suave);
-                 color: var(--mi); display: grid; place-items: center; font-style: normal; }
-  .mi-accion img { width: 52px; height: 52px; border-radius: 16px; display: block; }
-  .mi-accion.willo span { font-weight: 700; color: #3E5A34; }
+  .tarjeta { background: var(--blanco); border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(20,30,60,.06); }
+  .total { text-align: center; }
+  .total .cifra { font-size: 30px; font-weight: 700; letter-spacing: -.5px; }
+  .total .cifra sup { font-size: 12px; font-weight: 700; vertical-align: 14px; margin-left: 1px; }
+  .reparto { height: 6px; border-radius: 3px; background: #E9ECF3; margin: 14px 0 8px; overflow: hidden; display: flex; }
+  .reparto i { display: block; height: 100%; }
+  .leyenda { display: flex; justify-content: space-between; font-size: 11px; color: var(--suave); }
+  .leyenda b { display: block; color: var(--texto); font-size: 15px; margin-top: 2px; }
+  .punto { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; }
 
-  .mi-seccion h2 { font-size: 16px; margin: 0 0 10px; }
-  .mi-producto { display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
-                 border-bottom: 1px solid var(--mi-linea); font-size: 15px; }
-  .mi-producto:last-child { border-bottom: 0; }
-  .mi-producto small { display: block; font-size: 12px; color: var(--mi-gris); }
-  .mi-movs li { display: flex; justify-content: space-between; padding: 11px 0; list-style: none;
-                border-bottom: 1px solid var(--mi-linea); font-size: 15px; }
-  .mi-movs li:last-child { border-bottom: 0; }
-  .mi-movs ul { padding: 0; margin: 0; }
-  .mi-pos { color: #1E7A4C; }
-  .mi-movs li small { display: block; font-size: 12px; color: var(--mi-gris); }
-  .mi-movs li > span:last-child { white-space: nowrap; padding-left: 12px; }
+  .promo { display: flex; gap: 12px; align-items: center; margin-top: 12px; }
+  .promo-dibujo { width: 64px; height: 64px; border-radius: 14px; flex: none; display: grid; place-items: center;
+                  background: #F1F6EC; }
+  .promo-dibujo img { width: 48px; height: 48px; border-radius: 12px; }
+  .etiqueta { display: inline-block; background: var(--promo); color: #fff; font-size: 11px; font-weight: 700;
+              border-radius: 6px; padding: 2px 8px; margin-bottom: 6px; }
+  .promo p { font-size: 13px; line-height: 1.35; }
+  .promo a { color: var(--azul); font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; margin-top: 4px; }
 
-  .mi-nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%;
-            max-width: 390px; background: #fff; border-top: 1px solid var(--mi-linea);
-            display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px 6px 18px; }
-  .mi-nav a, .mi-nav button { display: flex; flex-direction: column; align-items: center; gap: 3px;
-            font-size: 11px; color: var(--mi-gris); text-decoration: none; background: none;
-            border: 0; font-family: inherit; cursor: pointer; padding: 0; }
-  .mi-nav .activo { color: var(--mi); font-weight: 700; }
-  .mi-nav img { width: 26px; height: 26px; border-radius: 8px; }
-  .mi-nav .willo { color: #3E5A34; font-weight: 700; }
+  .acciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 18px 0 6px; }
+  .acciones.con-willo { grid-template-columns: repeat(5, 1fr); }
+  .accion { display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: 0; padding: 0;
+            font-size: 11.5px; line-height: 1.25; color: var(--texto); text-align: center; text-decoration: none; cursor: pointer; }
+  .accion .circulo { width: 46px; height: 46px; border-radius: 50%; background: #fff; display: grid; place-items: center;
+                     box-shadow: 0 1px 3px rgba(20,30,60,.08); color: var(--azul); }
+  .accion.willo .circulo { background: none; box-shadow: none; }
+  .accion.willo img { width: 46px; height: 46px; border-radius: 14px; box-shadow: 0 2px 8px rgba(62,90,52,.35); }
+  .accion.willo span { font-weight: 700; color: #3E5A34; }
+  .accion.willo[hidden] { display: none; }
+
+  .bloque { display: flex; justify-content: space-between; align-items: flex-end; margin: 22px 2px 10px; }
+  .bloque h2 { font-size: 16px; }
+  .bloque a { display: block; color: var(--azul); font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 2px; }
+  .bloque .der { text-align: right; font-size: 11px; color: var(--suave); }
+  .bloque .der b { display: block; font-size: 15px; color: var(--texto); }
+  .cuenta { display: flex; flex-direction: column; gap: 10px; }
+  .cuenta .fila { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .avatar { width: 26px; height: 26px; border-radius: 50%; background: #16192B; color: #fff; font-size: 10px; font-weight: 700;
+            display: grid; place-items: center; }
+
+  /* Explorar */
+  .pestanas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 8px 0 14px; }
+  .pestana { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: var(--suave); background: none; border: 0; }
+  .pestana.activa { color: var(--azul); font-weight: 700; }
+  .buscar { display: flex; justify-content: space-between; align-items: center; background: #F2F4F8; border-radius: 12px;
+            padding: 14px; font-size: 14px; color: var(--suave); }
+  .boton-azul { display: block; width: 100%; border: 0; border-radius: 12px; padding: 12px; margin-top: 12px; background: var(--azul-claro);
+                color: #fff; font-weight: 700; font-size: 14px; }
+  .lista-h { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .producto { min-width: 230px; display: flex; gap: 12px; align-items: center; }
+  .producto i { width: 54px; height: 54px; border-radius: 12px; background: #EEF2FA; flex: none; display: grid; place-items: center; color: var(--azul); font-style: normal; }
+  .producto b { display: block; font-size: 14px; margin-bottom: 4px; }
+  .producto span { font-size: 12px; color: var(--suave); line-height: 1.35; }
+
+  /* Actividad */
+  .filtros { display: flex; gap: 6px; margin: 8px 0 14px; font-size: 13px; }
+  .filtros span { padding: 6px 10px; border-radius: 8px; color: var(--azul); }
+  .filtros .activo { background: #fff; color: var(--texto); font-weight: 700; }
+  .movs { list-style: none; padding: 0; margin: 0; }
+  .movs li { display: flex; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .movs li:last-child { border-bottom: 0; }
+  .movs small { display: block; font-size: 12px; color: var(--suave); margin-top: 2px; }
+  .movs .importe { white-space: nowrap; font-weight: 600; }
+  .movs .pos { color: #13804D; }
+
+  /* Perfil */
+  .persona { display: flex; align-items: center; gap: 10px; margin: 6px 2px 12px; }
+  .persona .avatar { width: 34px; height: 34px; font-size: 12px; }
+  .persona h1 { font-size: 20px; }
+  .planes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .planes .tarjeta { font-size: 13px; color: var(--suave); padding: 14px; }
+  .planes b { display: block; color: var(--texto); font-size: 14px; }
+  .grupo-titulo { font-size: 14px; font-weight: 700; margin: 20px 2px 8px; }
+  .opciones { background: #fff; border-radius: 16px; padding: 2px 14px; box-shadow: 0 1px 3px rgba(20,30,60,.06); }
+  .opcion { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--linea); font-size: 14px; }
+  .opcion:last-child { border-bottom: 0; }
+  .opcion .flecha { margin-left: auto; color: var(--azul); }
+  .opcion svg { flex: none; }
+
+  /* La opción de Willo dentro de Perfil */
+  .opcion-willo { align-items: flex-start; }
+  .opcion-willo img { width: 36px; height: 36px; border-radius: 10px; flex: none; }
+  .opcion-willo b { display: block; font-size: 14px; }
+  .opcion-willo small { display: block; font-size: 12px; color: var(--suave); line-height: 1.35; margin-top: 2px; }
+  .interruptor { margin-left: auto; flex: none; width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 3px;
+                 background: #D3D8E4; cursor: pointer; transition: background .2s; }
+  .interruptor::after { content: ""; display: block; width: 24px; height: 24px; border-radius: 50%; background: #fff;
+                        box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+  .interruptor[aria-checked="true"] { background: #3E5A34; }
+  .interruptor[aria-checked="true"]::after { transform: translateX(20px); }
+  .cerrar { display: block; text-align: center; color: var(--azul); font-weight: 700; font-size: 14px; margin: 22px 0 6px; }
+  .pie { text-align: center; font-size: 11px; color: var(--suave); }
+
+  /* Barra de abajo: una píldora flotante y el botón del chat */
+  .nav { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); width: calc(100% - 28px); max-width: 362px;
+         display: flex; gap: 10px; align-items: center; }
+  .nav-pildora { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-radius: 22px; padding: 6px;
+                 box-shadow: 0 4px 16px rgba(20,30,60,.12); }
+  .nav-pildora button { display: flex; flex-direction: column; align-items: center; gap: 2px; border: 0; background: none;
+                        font-size: 10px; color: var(--texto); padding: 6px 0; border-radius: 16px; cursor: pointer; }
+  .nav-pildora button.activo { background: #EEF2FA; font-weight: 700; }
+  .nav-chat { width: 52px; height: 52px; border-radius: 50%; background: #fff; display: grid; place-items: center;
+              box-shadow: 0 4px 16px rgba(20,30,60,.12); }
+
+  .aviso { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); background: #16192B; color: #fff; font-size: 13px;
+           border-radius: 12px; padding: 10px 14px; max-width: 340px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .aviso.visible { opacity: 1; }
   svg { display: block; }
 </style>
 </head>
 <body>
-<main class="mi">
-  <p class="mi-aviso">Maqueta para la demo de Willo · no es la app real</p>
+<div class="app">
+  <span class="maqueta">Maqueta para la demo de Willo · no es la app real</span>
 
-  <header class="mi-cab">
-    <div>
-      <div class="mi-marca">MyInvestor</div>
-      <div class="mi-hola">Hola, Javi</div>
+  <!-- ============ INICIO ============ -->
+  <section class="vista" id="v-inicio">
+    <div class="barra">
+      <span></span>
+      <div class="iconos">
+        <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17.5h.01"/></svg></span>
+      </div>
     </div>
-    <div class="mi-iconos">
-      <span class="mi-redondo" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      </span>
-      <span class="mi-redondo mi-avatar" aria-hidden="true">J</span>
+
+    <div class="tarjeta total">
+      <div class="cifra" id="total">—</div>
+      <div class="reparto"><i id="barra-efectivo" style="background:#3BB3E6;width:0"></i><i id="barra-ahorro" style="background:#8A63E8;width:0"></i></div>
+      <div class="leyenda">
+        <div><span class="punto" style="background:#3BB3E6"></span>Efectivo <span id="pct-efectivo"></span><b id="efectivo">—</b></div>
+        <div style="text-align:right">Ahorro e inversión <span id="pct-ahorro"></span><span class="punto" style="background:#8A63E8;margin:0 0 0 4px"></span><b id="ahorro">—</b></div>
+      </div>
     </div>
-  </header>
 
-  <section class="mi-tarjeta mi-saldo" aria-label="Saldo">
-    <small>Cuenta MyInvestor</small>
-    <strong id="mi-saldo">—</strong>
-    <span>ES00 0000 0000 0000 0000 1234</span>
-    <b class="mi-etiqueta">Sin comisiones</b>
+    <div class="tarjeta promo">
+      <div class="promo-dibujo"><img src="/static/icons/icon-192.png" alt=""></div>
+      <div>
+        <span class="etiqueta">Nuevo</span>
+        <p><b>Willo, el modo fácil.</b> Tu dinero explicado en lectura fácil y por voz.</p>
+        <a href="#perfil" id="promo-enlace">Actívalo en Perfil</a>
+      </div>
+    </div>
+
+    <nav class="acciones" id="acciones" aria-label="Acciones rápidas">
+      <a class="accion willo" id="acceso-willo" href="/demo" hidden>
+        <span class="circulo"><img src="/static/icons/icon-192.png" alt=""></span><span>Willo</span>
+      </a>
+      <button class="accion" type="button"><span class="circulo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>Hacer transferencia</span></button>
+      <button class="accion" type="button"><span class="circulo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E0457B" stroke-width="2"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M8 7V5h8v2"/></svg></span><span>Aportar a mi cartera</span></button>
+      <button class="accion" type="button"><span class="circulo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3BB3E6" stroke-width="2" stroke-linecap="round"><path d="M4 19h16"/><path d="M5 15l5-5 3 3 6-6"/></svg></span><span>Comprar fondos</span></button>
+      <button class="accion" type="button"><span class="circulo"><svg width="20" height="20" viewBox="0 0 24 24" fill="#F2A23A"><circle cx="7" cy="7" r="2"/><circle cx="17" cy="7" r="2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></span><span>Ver más opciones</span></button>
+    </nav>
+
+    <div class="bloque">
+      <div><h2>Mi día a día</h2><a href="#actividad">Ver más información</a></div>
+      <div class="der"><b id="saldo-dia">—</b>Saldo total</div>
+    </div>
+    <div class="tarjeta cuenta">
+      <div class="fila"><span class="avatar">JA</span></div>
+      <div class="fila"><b>Mi Cuenta MyInvestor</b></div>
+      <div class="fila"><span>Saldo</span><b id="saldo-cuenta">—</b></div>
+    </div>
+
+    <div class="bloque">
+      <div><h2>Mi ahorro e inversión</h2><a href="#explorar">Ver más información</a></div>
+      <div class="der"><b id="ahorro-2">—</b>Valor de mercado</div>
+    </div>
+    <div class="tarjeta cuenta">
+      <div class="fila"><b>Hucha de ahorro</b><b id="ahorro-3">—</b></div>
+    </div>
   </section>
 
-  <nav class="mi-acciones" aria-label="Acciones rápidas">
-    <button class="mi-accion" type="button">
-      <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></i>
-      <span>Transferir</span>
-    </button>
-    <button class="mi-accion" type="button">
-      <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></i>
-      <span>Bizum</span>
-    </button>
-    <button class="mi-accion" type="button">
-      <i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></i>
-      <span>Tarjetas</span>
-    </button>
-    <a class="mi-accion willo" href="/demo">
-      <img src="/static/icons/icon-192.png" alt="">
-      <span>Willo</span>
-    </a>
-  </nav>
-
-  <section class="mi-tarjeta mi-seccion" aria-label="Tus productos">
-    <h2>Tus productos</h2>
-    <div class="mi-producto"><div>Cuenta MyInvestor<small>Cuenta corriente</small></div><b id="mi-saldo-2">—</b></div>
-    <div class="mi-producto"><div>Hucha de ahorro<small>Guardado este año</small></div><b id="mi-ahorro">—</b></div>
-    <div class="mi-producto"><div>Tarjeta de débito<small>•••• 1234</small></div><b>Activa</b></div>
-    <div class="mi-producto"><div>Cartera automatizada<small>Desde 150 €</small></div><b style="color:var(--mi)">Ver</b></div>
+  <!-- ============ EXPLORAR ============ -->
+  <section class="vista" id="v-explorar" hidden>
+    <div class="barra">
+      <span class="chip">★ Mejorar plan</span>
+      <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17.5h.01"/></svg></span>
+    </div>
+    <div class="pestanas">
+      <button class="pestana activa" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16"/><path d="M5 15l5-5 3 3 6-6"/></svg>Invertir</button>
+      <button class="pestana" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v10c0 1.7 3.1 3 7 3s7-1.3 7-3V7"/></svg>Ahorrar</button>
+      <button class="pestana" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M8 8l4-4 4 4"/></svg>Financiar</button>
+      <button class="pestana" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Día a día</button>
+    </div>
+    <div class="tarjeta">
+      <div class="buscar">Fondos, acciones, ETF, ISIN <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div>
+      <button class="boton-azul" type="button">Buscar</button>
+    </div>
+    <div class="bloque"><h2>Carteras automatizadas</h2><a>Ver más</a></div>
+    <div class="lista-h">
+      <div class="tarjeta producto"><i>▲</i><div><b>Carteras indexadas</b><span>Inversión automática en fondos indexados.</span></div></div>
+      <div class="tarjeta producto"><i>◆</i><div><b>Más carteras</b><span>Elige la que encaje contigo.</span></div></div>
+    </div>
+    <div class="bloque"><h2>Fondos y acciones</h2><a>Ver más</a></div>
+    <div class="lista-h">
+      <div class="tarjeta producto"><i>▤</i><div><b>Fondos de inversión</b><span>Busca y compara fondos.</span></div></div>
+      <div class="tarjeta producto"><i>▥</i><div><b>Acciones y ETF</b><span>Mercados nacionales e internacionales.</span></div></div>
+    </div>
   </section>
 
-  <section class="mi-tarjeta mi-seccion mi-movs" aria-label="Últimos movimientos">
-    <h2>Últimos movimientos</h2>
-    <ul id="mi-movs"><li><span>Cargando…</span><span></span></li></ul>
+  <!-- ============ ACTIVIDAD ============ -->
+  <section class="vista" id="v-actividad" hidden>
+    <div class="barra">
+      <span></span>
+      <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17.5h.01"/></svg></span>
+    </div>
+    <div class="filtros"><span>Todo</span><span class="activo">Movimientos</span><span>Notificaciones</span><span>Promociones</span></div>
+    <div class="tarjeta"><ul class="movs" id="movs"><li><span>Cargando…</span><span></span></li></ul></div>
   </section>
-</main>
 
-<nav class="mi-nav" aria-label="Menú">
-  <button type="button" class="activo">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
-    <span>Inicio</span>
-  </button>
-  <button type="button">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
-    <span>Cuentas</span>
-  </button>
-  <button type="button">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
-    <span>Invertir</span>
-  </button>
-  <a href="/demo" class="willo">
-    <img src="/static/icons/icon-192.png" alt="">
-    <span>Willo</span>
-  </a>
-  <button type="button">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-    <span>Perfil</span>
-  </button>
+  <!-- ============ PERFIL ============ -->
+  <section class="vista" id="v-perfil" hidden>
+    <div class="barra">
+      <span class="chip">★ Mejorar plan</span>
+      <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17.5h.01"/></svg></span>
+    </div>
+    <div class="persona"><span class="avatar">JA</span><h1>Javi</h1></div>
+    <div class="planes">
+      <div class="tarjeta">Mi plan<b>Estándar</b></div>
+      <div class="tarjeta">Plan amigo<b>Invita a tus amigos</b></div>
+    </div>
+
+    <div class="opciones" style="margin-top:12px">
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Datos personales<span class="flecha">→</span></div>
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Perfil inversor<span class="flecha">→</span></div>
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Seguridad<span class="flecha">→</span></div>
+    </div>
+
+    <h2 class="grupo-titulo">Accesibilidad</h2>
+    <div class="opciones">
+      <div class="opcion opcion-willo">
+        <img src="/static/icons/icon-192.png" alt="">
+        <div>
+          <b>Activar Willo · Modo fácil</b>
+          <small>La app explicada en lectura fácil y por voz, con Noa. Para personas con discapacidad intelectual.</small>
+        </div>
+        <button class="interruptor" id="interruptor-willo" type="button" role="switch" aria-checked="false" aria-label="Activar Willo"></button>
+      </div>
+    </div>
+
+    <h2 class="grupo-titulo">Configuración</h2>
+    <div class="opciones">
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Límites de transferencias inmediatas<span class="flecha">→</span></div>
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10l9-6 9 6M5 10v9M19 10v9M9 10v9M15 10v9M3 21h18"/></svg>Cambio de banco<span class="flecha">→</span></div>
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Preferencia de comunicaciones<span class="flecha">→</span></div>
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Apariencia<span class="flecha">→</span></div>
+    </div>
+
+    <h2 class="grupo-titulo">Información y contacto</h2>
+    <div class="opciones">
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/></svg>Te ayudamos<span class="flecha">→</span></div>
+      <div class="opcion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Atención al cliente<span class="flecha">→</span></div>
+    </div>
+    <span class="cerrar">Cerrar sesión</span>
+    <p class="pie">Maqueta para la demo de Willo</p>
+  </section>
+</div>
+
+<nav class="nav" aria-label="Menú">
+  <div class="nav-pildora">
+    <button type="button" data-vista="inicio"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10l8-6 8 6v9a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+    <button type="button" data-vista="explorar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>Explorar</button>
+    <button type="button" data-vista="actividad"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Actividad</button>
+    <button type="button" data-vista="perfil"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Perfil</button>
+  </div>
+  <span class="nav-chat" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></span>
 </nav>
+<div class="aviso" id="aviso" role="status"></div>
+
 <script>
-// Los datos salen de la misma API que usa Willo (/api/personas/javi/cuenta):
-// si Javi paga algo en Willo, al volver aquí sale en los movimientos y el saldo baja.
+// ---------- Pestañas (Inicio, Explorar, Actividad, Perfil) ----------
+const VISTAS = ["inicio", "explorar", "actividad", "perfil"];
+function mostrar(v) {
+  if (!VISTAS.includes(v)) v = "inicio";
+  for (const n of VISTAS) document.getElementById("v-" + n).hidden = n !== v;
+  document.querySelectorAll(".nav-pildora button").forEach(b => b.classList.toggle("activo", b.dataset.vista === v));
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".nav-pildora button").forEach(b =>
+  b.addEventListener("click", () => { location.hash = b.dataset.vista; }));
+window.addEventListener("hashchange", () => mostrar(location.hash.slice(1)));
+mostrar(location.hash.slice(1));
+
+// ---------- Activar Willo (se guarda en este móvil) ----------
+// Por defecto está desactivado: en la demo se activa desde Perfil.
+// Con ?willo=1 o ?willo=0 en la dirección se fuerza encendido o apagado.
+const CLAVE = "myinvestor-willo-activado";
+const leer = () => { try { return localStorage.getItem(CLAVE) === "1"; } catch { return false; } };
+const guardar = on => { try { localStorage.setItem(CLAVE, on ? "1" : "0"); } catch {} };
+const forzar = new URLSearchParams(location.search).get("willo");
+if (forzar === "1" || forzar === "0") guardar(forzar === "1");
+
+function pintarWillo(on) {
+  document.getElementById("acceso-willo").hidden = !on;
+  document.getElementById("acciones").classList.toggle("con-willo", on);
+  document.getElementById("interruptor-willo").setAttribute("aria-checked", on ? "true" : "false");
+  const enlace = document.getElementById("promo-enlace");
+  enlace.textContent = on ? "Ya lo tienes activado · Abrir Willo" : "Actívalo en Perfil";
+  enlace.href = on ? "/demo" : "#perfil";
+}
+function avisar(texto) {
+  const a = document.getElementById("aviso");
+  a.textContent = texto; a.classList.add("visible");
+  clearTimeout(avisar.t); avisar.t = setTimeout(() => a.classList.remove("visible"), 2200);
+}
+document.getElementById("interruptor-willo").addEventListener("click", () => {
+  const on = !leer();
+  guardar(on); pintarWillo(on);
+  if (on) {
+    avisar("Willo activado. Lo tienes en Inicio.");
+    setTimeout(() => { location.hash = "inicio"; }, 900);
+  } else {
+    avisar("Willo desactivado.");
+  }
+});
+pintarWillo(leer());
+
+// ---------- Datos de Javi: los mismos que usa Willo (/api/personas/javi/cuenta) ----------
 const euros = n => n.toLocaleString("es-ES", {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always"}) + " €";
+const grande = n => { const [e, d] = euros(n).replace(" €", "").split(","); return `${e}<sup>,${d} €</sup>`; };
 const fecha = f => new Date(f + "T12:00:00").toLocaleDateString("es-ES", {day: "numeric", month: "short"});
 const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const poner = (id, t) => { const e = document.getElementById(id); if (e) e.textContent = t; };
 
 async function cargar() {
   try {
-    const r = await fetch("/api/personas/javi/cuenta?ultimos=6", {cache: "no-store"});
+    const r = await fetch("/api/personas/javi/cuenta?ultimos=10", {cache: "no-store"});
     if (!r.ok) throw new Error(r.status);
     const c = await r.json();
-    document.getElementById("mi-saldo").textContent = euros(c.saldo);
-    document.getElementById("mi-saldo-2").textContent = euros(c.saldo);
-    document.getElementById("mi-ahorro").textContent = euros(c.ahorro_este_anio);
-    document.getElementById("mi-movs").innerHTML = c.movimientos.map(m => {
+    const total = c.saldo + c.ahorro_este_anio;
+    const pe = total ? Math.round(c.saldo / total * 100) : 0;
+    document.getElementById("total").innerHTML = grande(total);
+    document.getElementById("barra-efectivo").style.width = pe + "%";
+    document.getElementById("barra-ahorro").style.width = (100 - pe) + "%";
+    poner("pct-efectivo", pe + " %"); poner("pct-ahorro", (100 - pe) + " %");
+    for (const id of ["efectivo", "saldo-dia", "saldo-cuenta"]) poner(id, euros(c.saldo));
+    for (const id of ["ahorro", "ahorro-2", "ahorro-3"]) poner(id, euros(c.ahorro_este_anio));
+    document.getElementById("movs").innerHTML = c.movimientos.map(m => {
       const entra = m.tipo === "ingreso";
       const detalle = [fecha(m.fecha), m.destinatario].filter(Boolean).map(esc).join(" · ");
       return `<li><span>${esc(m.concepto)}<small>${detalle}</small></span>` +
-             `<span${entra ? ' class="mi-pos"' : ""}>${entra ? "+" : "−"}${euros(m.importe)}</span></li>`;
+             `<span class="importe${entra ? " pos" : ""}">${entra ? "+" : "−"}${euros(m.importe)}</span></li>`;
     }).join("");
   } catch (e) {
-    document.getElementById("mi-movs").innerHTML = "<li><span>No se han podido cargar los movimientos</span><span></span></li>";
+    document.getElementById("movs").innerHTML = "<li><span>No se han podido cargar los movimientos</span><span></span></li>";
   }
 }
 cargar();
-// Al volver de Willo (botón atrás o cambiar de pestaña), se vuelven a pedir los datos.
+// Al volver de Willo se vuelven a pedir los datos (si Javi ha pagado algo, ya sale aquí).
 window.addEventListener("pageshow", e => { if (e.persisted) cargar(); });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) cargar(); });
 </script>
