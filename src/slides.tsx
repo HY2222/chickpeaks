@@ -294,7 +294,7 @@ export const slides: Slide[] = [
     id: "demo",
     dark: true,
     notes:
-      "Vamos a verlo en directo con los móviles de Javi y de su hermana Ana. Seguid el guion de la demo: entrada del concierto, multa de aparcamiento, Bizum de Carlos e informe anual. Si falla la conexión, pasad al vídeo de respaldo: [enlace al vídeo].",
+      "Vamos a verlo en directo con los móviles de Javi y de su hermana Ana. Empezamos en la app de MyInvestor: Willo es un botón más, el modo fácil. Seguid el guion de la demo: entrada del concierto, multa de aparcamiento, Bizum de Carlos e informe anual. Si falla la conexión, pasad al vídeo de respaldo: [enlace al vídeo].",
     render: () => (
       <div className="absolute inset-0 bg-noche text-crema">
         <div className="absolute left-[128px] top-[128px] flex w-[1040px] flex-col gap-[40px]">
@@ -306,6 +306,17 @@ export const slides: Slide[] = [
         <MockupIn o={2} className="absolute left-[1305px] top-[100px]">
           <img src={img("02-escucha.png")} alt="Pantalla Noa te escucha, con el botón del micrófono" className="h-[880px] w-[407px] rounded-[32px] object-contain" />
         </MockupIn>
+        <Rise o={7} className="absolute left-[128px] top-[600px]">
+          <a
+            href="https://willo-sfh4.onrender.com/demo/banco"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-[16px] rounded-full bg-crema px-[44px] py-[22px] text-[34px] font-bold text-noche no-underline"
+          >
+            Abrir la demo <span aria-hidden="true">↗</span>
+          </a>
+        </Rise>
         <Fade o={9} className="absolute left-[128px] top-[800px] w-[960px]">
           <p className="text-[40px] leading-[1.3] text-crema/70">Fijaos en una cosa: Noa explica, pero <span className="text-crema">los botones los pulsa Javi.</span></p>
         </Fade>
