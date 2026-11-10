@@ -44,6 +44,7 @@
   <div class="botones">
     <a class="boton" href="#2">Hablar con Noa</a>
     <a class="boton secundario" href="#12" id="p1-compras">Mis compras</a>
+    <a class="boton secundario" href="/demo/banco" id="p1-banco">Ir a mi banco</a>
   </div>
 </section>
 
@@ -520,7 +521,7 @@ AL_ENTRAR["2"] = async () => {
         if (!nueva || conv !== nueva) return;   // una conversación ya cerrada
         conv = null;
         const colgoNoa = true;
-        if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 1500);
+        if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 200);
       },
     });
     // Si Javi pulsó Parar (o salió de la pantalla) mientras Noa se conectaba, se cierra ya.
