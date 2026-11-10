@@ -545,14 +545,14 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos: Inés y Cristina, de Ciencia e Ingeniería de Datos; Leo y Nolan, de Informática y ADE; Raúl, de Telecomunicación; y Anqi, de Economía. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, juntamos técnica y negocio, y hemos pensado Willo en lectura fácil desde el primer día.",
+      "Somos seis y nos complementamos: Inés y Jiawen, de Ciencia e Ingeniería de Datos; He Ye y Nolan, de Informática y ADE; XingYi, de Telecomunicación; y Anqi, de Economía. Cinco carreras distintas en un mismo equipo. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, dentro de la app de MyInvestor, y hemos pensado Willo en lectura fácil desde el primer día.",
     render: () => {
       const team = [
         { n: "Inés", r: "Ciencia e Ingeniería de Datos" },
-        { n: "Cristina", r: "Ciencia e Ingeniería de Datos" },
-        { n: "Leo", r: "Informática y ADE" },
+        { n: "Jiawen", r: "Ciencia e Ingeniería de Datos" },
+        { n: "He Ye", r: "Informática y ADE" },
         { n: "Nolan", r: "Informática y ADE" },
-        { n: "Raúl", r: "Telecomunicación" },
+        { n: "XingYi", r: "Telecomunicación" },
         { n: "Anqi", r: "Economía" },
       ];
       return (
@@ -572,18 +572,46 @@ export const slides: Slide[] = [
               </Rise>
             ))}
           </div>
-          <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[36px]">
+          <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[24px]">
             <Fade o={4}>
               <Label>¿Por qué nosotros?</Label>
             </Fade>
+            {/* Tarjeta principal: cinco carreras distintas en un mismo equipo. */}
+            <Rise o={6} className="rounded-[28px] bg-verde p-[36px] text-fondo">
+              <div className="flex items-end gap-[24px]">
+                <p className="titular text-[132px] font-semibold leading-[0.85] tabular-nums">
+                  <Count to={5} o={7} />
+                </p>
+                <p className="pb-[6px] text-[32px] font-bold leading-[1.15]">carreras distintas en un mismo equipo</p>
+              </div>
+              <div className="mt-[28px] flex justify-between gap-[6px] whitespace-nowrap">
+                {["Datos", "Informática", "Teleco", "ADE", "Economía"].map((c) => (
+                  <span key={c} className="rounded-full border-2 border-salvia/40 px-[11px] py-[4px] text-[19px] text-salvia">
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </Rise>
             {[
-              { t: "Ya funciona", d: "Tenemos una demo real, que vais a ver en directo." },
-              { t: "Técnica y negocio", d: "Datos, informática, teleco, ADE y economía." },
-              { t: "Lectura fácil desde el día uno", d: "No es un añadido: es cómo pensamos Willo." },
+              {
+                t: "Ya funciona",
+                d: "Demo real dentro de la app de MyInvestor. La vais a ver en directo.",
+                icon: <path d="M8 5l11 7-11 7z" fill="currentColor" />,
+              },
+              {
+                t: "Pensado en lectura fácil",
+                d: "Desde el primer día: no es un añadido, es cómo pensamos Willo.",
+                icon: <path d="M5 6.5h14M5 12h14M5 17.5h9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" fill="none" />,
+              },
             ].map((b, i) => (
-              <Rise key={b.t} o={i + 7} className="border-t-2 border-salvia-media pt-[24px]">
-                <h3 className="text-[36px] font-bold leading-[1.15]">{b.t}</h3>
-                <p className="mt-[8px] text-[26px] leading-[1.3]">{b.d}</p>
+              <Rise key={b.t} o={i + 9} className="flex items-start gap-[24px] rounded-[24px] bg-white/80 p-[28px]">
+                <span className="grid h-[64px] w-[64px] flex-none place-items-center rounded-full bg-verde text-fondo">
+                  <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true">{b.icon}</svg>
+                </span>
+                <div>
+                  <h3 className="text-[32px] font-bold leading-[1.15]">{b.t}</h3>
+                  <p className="mt-[6px] text-[24px] leading-[1.3] text-suave">{b.d}</p>
+                </div>
               </Rise>
             ))}
           </div>
