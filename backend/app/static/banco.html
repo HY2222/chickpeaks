@@ -66,6 +66,8 @@
   .mi-movs li:last-child { border-bottom: 0; }
   .mi-movs ul { padding: 0; margin: 0; }
   .mi-pos { color: #1E7A4C; }
+  .mi-movs li small { display: block; font-size: 12px; color: var(--mi-gris); }
+  .mi-movs li > span:last-child { white-space: nowrap; padding-left: 12px; }
 
   .mi-nav { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%;
             max-width: 390px; background: #fff; border-top: 1px solid var(--mi-linea);
@@ -98,7 +100,7 @@
 
   <section class="mi-tarjeta mi-saldo" aria-label="Saldo">
     <small>Cuenta MyInvestor</small>
-    <strong>472,00 €</strong>
+    <strong id="mi-saldo">—</strong>
     <span>ES00 0000 0000 0000 0000 1234</span>
     <b class="mi-etiqueta">Sin comisiones</b>
   </section>
@@ -133,19 +135,15 @@
 
   <section class="mi-tarjeta mi-seccion" aria-label="Tus productos">
     <h2>Tus productos</h2>
-    <div class="mi-producto"><div>Cuenta MyInvestor<small>Cuenta corriente</small></div><b>472,00 €</b></div>
+    <div class="mi-producto"><div>Cuenta MyInvestor<small>Cuenta corriente</small></div><b id="mi-saldo-2">—</b></div>
+    <div class="mi-producto"><div>Hucha de ahorro<small>Guardado este año</small></div><b id="mi-ahorro">—</b></div>
     <div class="mi-producto"><div>Tarjeta de débito<small>•••• 1234</small></div><b>Activa</b></div>
     <div class="mi-producto"><div>Cartera automatizada<small>Desde 150 €</small></div><b style="color:var(--mi)">Ver</b></div>
   </section>
 
   <section class="mi-tarjeta mi-seccion mi-movs" aria-label="Últimos movimientos">
     <h2>Últimos movimientos</h2>
-    <ul>
-      <li><span>Bar La Esquina</span><span>−22,00 €</span></li>
-      <li><span>Cines del centro</span><span>−12,00 €</span></li>
-      <li><span>Peluquería del barrio</span><span>−14,00 €</span></li>
-      <li><span>Nómina</span><span class="mi-pos">+980,00 €</span></li>
-    </ul>
+    <ul id="mi-movs"><li><span>Cargando…</span><span></span></li></ul>
   </section>
 </main>
 
@@ -171,5 +169,35 @@
     <span>Perfil</span>
   </button>
 </nav>
+<script>
+// Los datos salen de la misma API que usa Willo (/api/personas/javi/cuenta):
+// si Javi paga algo en Willo, al volver aquí sale en los movimientos y el saldo baja.
+const euros = n => n.toLocaleString("es-ES", {minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always"}) + " €";
+const fecha = f => new Date(f + "T12:00:00").toLocaleDateString("es-ES", {day: "numeric", month: "short"});
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+
+async function cargar() {
+  try {
+    const r = await fetch("/api/personas/javi/cuenta?ultimos=6", {cache: "no-store"});
+    if (!r.ok) throw new Error(r.status);
+    const c = await r.json();
+    document.getElementById("mi-saldo").textContent = euros(c.saldo);
+    document.getElementById("mi-saldo-2").textContent = euros(c.saldo);
+    document.getElementById("mi-ahorro").textContent = euros(c.ahorro_este_anio);
+    document.getElementById("mi-movs").innerHTML = c.movimientos.map(m => {
+      const entra = m.tipo === "ingreso";
+      const detalle = [fecha(m.fecha), m.destinatario].filter(Boolean).map(esc).join(" · ");
+      return `<li><span>${esc(m.concepto)}<small>${detalle}</small></span>` +
+             `<span${entra ? ' class="mi-pos"' : ""}>${entra ? "+" : "−"}${euros(m.importe)}</span></li>`;
+    }).join("");
+  } catch (e) {
+    document.getElementById("mi-movs").innerHTML = "<li><span>No se han podido cargar los movimientos</span><span></span></li>";
+  }
+}
+cargar();
+// Al volver de Willo (botón atrás o cambiar de pestaña), se vuelven a pedir los datos.
+window.addEventListener("pageshow", e => { if (e.persisted) cargar(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) cargar(); });
+</script>
 </body>
 </html>
