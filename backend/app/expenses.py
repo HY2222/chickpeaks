@@ -45,5 +45,6 @@ def interpretar(texto: str) -> dict:
         # Lo que va después de "de"/"en" tras el importe, como concepto aproximado.
         resto = texto[m.end():]
         cm = re.search(r"\b(?:de|en|para)\s+(.+?)(?:\s+de\s+\w+)?[.]?$", resto, re.IGNORECASE)
-        concepto = cm.group(1).strip().capitalize() if cm else "Gasto"
+        concepto = cm.group(1).strip() if cm else "Gasto"
+        concepto = concepto[:1].upper() + concepto[1:]  # no .capitalize(): pasaría "Marta" a "marta"
     return {"importe": importe, "hucha": hucha, "concepto": concepto, "texto_original": texto}

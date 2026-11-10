@@ -81,7 +81,7 @@ def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
         frases.append(f"Si compras {concepto}, te quedan {euros(quedan_despues)}.")
     else:
         falta = round(-quedan_despues, 2)
-        frases.append(f"{concepto.capitalize()} cuesta {euros(importe)}.")
+        frases.append(f"{concepto[:1].upper() + concepto[1:]} cuesta {euros(importe)}.")
         frases.append(f"Te faltan {euros(falta)}.")
         dias = _dias_hasta_fin_de_mes()
         frases.append(f"El mes que viene la hucha se llena otra vez. Faltan {dias} días.")
