@@ -168,7 +168,9 @@ function fraseDecision(d) {
   if (d.decision === "comprar") {
     if (/^enviar /i.test(c)) return `Javi ha enviado ${c.replace(/^enviar /i, "")}.`;
     const cosa = c.replace(/^la /i, "una ").replace(/^el /i, "un ").replace(/\s+del?\s.*$/i, "");
-    return `Javi ha pagado ${cosa} de ${euros(d.importe)}.`;
+    // Decidir comprar no es pagar: el dinero de Javi solo baja cuando lo paga.
+    return d.pagado ? `Javi ha pagado ${cosa} de ${euros(d.importe)}.`
+                    : `Javi ha decidido comprar ${cosa} de ${euros(d.importe)}.`;
   }
   if (d.decision === "hablarlo") return `Javi quiere hablar contigo de ${c}.`;
   return `Javi ha decidido esperar: ${c}.`;
