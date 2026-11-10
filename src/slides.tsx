@@ -545,13 +545,13 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos: Inés y Jiawen, de Ciencia e Ingeniería de Datos; He Ye y Nolan, de Informática y ADE; XingYi, de Telecomunicación; y Anqi, de Economía. Cinco carreras distintas en un mismo equipo. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, dentro de la app de MyInvestor, y hemos pensado Willo en lectura fácil desde el primer día.",
+      "Somos seis y nos complementamos: Inés y Jiawen, de Ciencia e Ingeniería de Datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía. Cinco carreras distintas en un mismo equipo. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, dentro de la app de MyInvestor, y hemos pensado Willo en lectura fácil desde el primer día.",
     render: () => {
       const team = [
         { n: "Inés", r: "Ciencia e Ingeniería de Datos" },
         { n: "Jiawen", r: "Ciencia e Ingeniería de Datos" },
         { n: "He Ye", r: "Informática y ADE" },
-        { n: "Nolan", r: "Informática y ADE" },
+        { n: "Nolan", r: "Empresa y Tecnología" },
         { n: "XingYi", r: "Telecomunicación" },
         { n: "Anqi", r: "Economía" },
       ];
@@ -584,8 +584,8 @@ export const slides: Slide[] = [
                 </p>
                 <p className="pb-[6px] text-[32px] font-bold leading-[1.15]">carreras distintas en un mismo equipo</p>
               </div>
-              <div className="mt-[28px] flex justify-between gap-[6px] whitespace-nowrap">
-                {["Datos", "Informática", "Teleco", "ADE", "Economía"].map((c) => (
+              <div className="mt-[28px] flex flex-wrap gap-[8px] whitespace-nowrap">
+                {["Datos", "Informática y ADE", "Empresa y Tecnología", "Teleco", "Economía"].map((c) => (
                   <span key={c} className="rounded-full border-2 border-salvia/40 px-[11px] py-[4px] text-[19px] text-salvia">
                     {c}
                   </span>
