@@ -75,7 +75,7 @@ def pagar(persona: dict[str, Any], concepto: str, importe: float, hucha: str,
                      or next((c for c in lista if c["importe"] == importe and c["hucha"] == hucha), None))
     if pendiente:
         persona["compras_pendientes"] = [c for c in lista if c is not pendiente]
-    mov = {"fecha": hoy().isoformat(), "concepto": concepto.capitalize(), "importe": importe,
+    mov = {"fecha": hoy().isoformat(), "concepto": concepto[:1].upper() + concepto[1:], "importe": importe,
            "tipo": "gasto", "hucha": hucha, "destinatario": None, "registrado_por": "persona"}
     persona["movimientos"].append(mov)
     return mov

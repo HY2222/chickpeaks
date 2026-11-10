@@ -73,3 +73,16 @@ def test_caduca_a_los_siete_dias(client, monkeypatch):
     assert compras(client)["pendientes"] == []
     monkeypatch.setenv("WILLO_HOY", base.isoformat())
     assert quedan(client) == antes
+
+
+def test_decision_con_hucha_que_no_existe_da_400_y_no_se_guarda(client):
+    r = client.post("/api/personas/javi/decisiones", json={
+        "concepto": "x", "importe": 5, "decision": "comprar", "hucha": "no_existe"})
+    assert r.status_code == 400
+    assert client.get("/api/personas/javi/decisiones").json() == []
+
+
+def test_pagar_no_cambia_mayusculas_del_nombre(client):
+    client.post("/api/personas/javi/decisiones", json={
+        "concepto": "zapatillas Nike", "importe": 5, "decision": "comprar", "pagado": True})
+    assert client.get("/api/personas/javi/compras").json()["pagadas"][0]["concepto"] == "Zapatillas Nike"

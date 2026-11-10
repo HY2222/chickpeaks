@@ -1,6 +1,6 @@
 // Service worker de Willo: guarda las pantallas para que la app abra rápido.
 // Los datos (/api) siempre se piden al servidor, nunca se guardan.
-const CACHE = "willo-v3";
+const CACHE = "willo-v4";
 const BASE = ["/demo/banco", "/demo", "/demo/apoyo", "/static/icons/favicon-32.png", "/static/willo.css", "/static/pwa.js",
               "/static/icons/icon-192.png", "/static/icons/icon-512.png"];
 
@@ -20,7 +20,10 @@ self.addEventListener("fetch", e => {
   // Primero la red (para ver siempre la última versión); si no hay conexión, lo guardado.
   e.respondWith(
     fetch(e.request)
-      .then(r => { const copia = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copia)); return r; })
+      .then(r => {
+        if (r.ok) { const copia = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copia)); }  // un error no se guarda
+        return r;
+      })
       .catch(() => caches.match(e.request))
   );
 });

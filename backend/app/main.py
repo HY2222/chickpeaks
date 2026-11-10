@@ -187,12 +187,15 @@ def evaluar_compra(persona_id: str, compra: Compra):
 def registrar_decision(persona_id: str, d: Decision):
     """Herramienta de Noa: guarda lo que decidió la persona. La app respeta la decisión."""
     p = _persona(persona_id)
+    try:
+        hucha = budget.buscar_hucha(p, d.hucha)["id"]
+    except KeyError:
+        raise HTTPException(400, f"No existe la hucha {d.hucha}")
     ahora = datetime.combine(hoy(), datetime.now().time()).isoformat(timespec="seconds")
     reg = {**d.model_dump(), "fecha": ahora}
     p["decisiones"].append(reg)
     pendiente = None
     if d.decision == "comprar" and d.importe > 0:
-        hucha = budget.buscar_hucha(p, d.hucha)["id"]
         if d.pagado:
             # Ya está pagado: el dinero baja ahora. Si estaba en "Quiero comprar", sale de ahí.
             purchases.pagar(p, d.concepto, d.importe, hucha)
@@ -321,7 +324,8 @@ def confirmar_documento(persona_id: str, doc: DocumentoConfirmado):
     if doc.tipo == "mensaje":
         # Las reglas antiestafa (código) revisan el mensaje otra vez, con lo que Javi confirmó.
         # Si el riesgo es alto, se crea el mismo aviso para Ana que en la pantalla 8.
-        datos["riesgo"] = _riesgo_y_aviso(p, Pago(destinatario=doc.remitente or "esa persona",
+        # Sin remitente va "": así las reglas dicen "No se ve quién te lo pide" y no "Nunca has enviado dinero a…".
+        datos["riesgo"] = _riesgo_y_aviso(p, Pago(destinatario=doc.remitente or "",
                                                   importe=doc.importe or 0.01,
                                                   contexto=doc.texto_mensaje or "",
                                                   telefono=doc.telefono))
@@ -357,19 +361,20 @@ def _riesgo_y_aviso(p: dict, pago: Pago) -> dict:
 
 def _crear_aviso_estafa(p: dict, pago: Pago, r: dict, miembros: list[dict], antes: str = "") -> dict:
     texto = (f"{antes}Aviso de Willo: puede que alguien esté intentando engañar a {p['nombre']}. "
-             f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario}. "
+             f"Le piden {easyread.euros(pago.importe)} para {pago.destinatario or 'alguien desconocido'}. "
              f"Señales: {'; '.join(s['explicacion'].rstrip('. ') for s in r['senales'])}. "
              f"La decisión es suya. Llámale con calma.")
-    return avisar(p, miembros, "posible_estafa", texto, destinatario=pago.destinatario,
+    return avisar(p, miembros, "posible_estafa", texto, destinatario=pago.destinatario or "alguien desconocido",
                   importe=float(pago.importe), senales=[s["explicacion"] for s in r["senales"]])
 
 
 def _aviso_abierto(p: dict, pago: Pago) -> dict | None:
     """Un aviso de estafa de hoy, al mismo destinatario y por el mismo importe, que aún no tiene resultado."""
     hoy_iso = hoy().isoformat()
+    destinatario = (pago.destinatario or "alguien desconocido").strip().lower()
     for a in reversed(p["avisos"]):
         if (a["tipo"] == "posible_estafa" and a["fecha"].startswith(hoy_iso) and a["resultado"] is None
-                and a.get("destinatario", "").strip().lower() == pago.destinatario.strip().lower()
+                and a.get("destinatario", "").strip().lower() == destinatario
                 and a.get("importe") == float(pago.importe)):
             return a
     return None

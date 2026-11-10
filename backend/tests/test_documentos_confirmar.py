@@ -121,3 +121,14 @@ def test_datos_malos_dan_422(client):
     assert client.post(URL, json={**MULTA, "tipo": "pizza"}).status_code == 422
     assert client.post(URL, json={**MULTA, "titulo": "   "}).status_code == 422
     assert client.post(URL, json={**MULTA, "fecha_limite": "20/12/2026"}).status_code == 422
+
+
+def test_mensaje_sin_remitente_dice_que_no_se_sabe_quien_es(client):
+    r = client.post("/api/personas/javi/documentos/confirmar", json={
+        "tipo": "mensaje", "titulo": "Mensaje", "texto_mensaje": "Hazme un bizum urgente"}).json()
+    assert not any("esa persona" in s for s in r["senales"])
+    assert any("No se ve quién te lo pide" in s for s in r["senales"])
+    # Confirmar dos veces el mismo mensaje no crea otro aviso para Ana.
+    client.post("/api/personas/javi/documentos/confirmar", json={
+        "tipo": "mensaje", "titulo": "Mensaje", "texto_mensaje": "Hazme un bizum urgente"})
+    assert len(client.get("/api/personas/javi/avisos?tipo=posible_estafa").json()) == 1

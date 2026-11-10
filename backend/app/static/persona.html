@@ -463,8 +463,8 @@ AL_ENTRAR["2"] = async () => {
     // Pide permiso del micro y lo suelta enseguida: dejarlo abierto puede dar problemas
     // en Android (el SDK de ElevenLabs abre el suyo).
     (await navigator.mediaDevices.getUserMedia({audio: true})).getTracks().forEach(t => t.stop());
-    // P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
-    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
+    // Versión fija: la que había cuando se probó la demo (9-11-2026). Una nueva puede cambiar la API.
+    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.35.0/+esm");
     let nueva = null;
     nueva = await Conversation.startSession({
       signedUrl: signed_url,
@@ -523,8 +523,7 @@ AL_ENTRAR["2"] = async () => {
       onDisconnect: () => {
         if (!nueva || conv !== nueva) return;   // una conversación ya cerrada
         conv = null;
-        const colgoNoa = true;
-        if (colgoNoa) setTimeout(() => { location.hash = "#1"; }, 200);
+        setTimeout(() => { location.hash = "#1"; }, 200);
       },
     });
     // Si Javi pulsó Parar (o salió de la pantalla) mientras Noa se conectaba, se cierra ya.
@@ -806,7 +805,7 @@ async function noaDice(textoParaNoa) {
     // Pide permiso del micro y lo suelta enseguida: dejarlo abierto puede dar problemas
     // en Android (el SDK de ElevenLabs abre el suyo).
     (await navigator.mediaDevices.getUserMedia({audio: true})).getTracks().forEach(t => t.stop());
-    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
+    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.35.0/+esm");
     let nueva = null;
     nueva = await Conversation.startSession({
       signedUrl: signed_url,
@@ -937,7 +936,7 @@ $("p7-ana").onclick = async () => {
   $("p7-ana").disabled = true;
   try {
     if (d.tipo === "mensaje" && d.sospechoso) {
-      const envio = {destinatario: d.remitente || "esa persona", importe: d.importe || 0.01,
+      const envio = {destinatario: d.remitente || "", importe: d.importe || 0.01,
                      contexto: d.texto_mensaje || "", telefono: d.telefono};
       await (r.aviso_id ? post(`avisos/${r.aviso_id}/pedir_hablar`) : post("avisos/pedir_hablar", envio));
     }
