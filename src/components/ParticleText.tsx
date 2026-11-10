@@ -605,7 +605,7 @@ export default function ParticleText({
     animate(p.ry, 0, back);
   };
 
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const onPointerMove = (e: { clientX: number; clientY: number }) => {
     if (!interactive || reduced || !wrapRef.current) return;
     const rect = wrapRef.current.getBoundingClientRect();
     const { w, h } = sizeRef.current;
@@ -641,12 +641,29 @@ export default function ParticleText({
     for (const p of particles.current) if (p.repelled) release(p);
   };
 
+  // La capa de puntos no recibe clics (pointer-events-none) para que se pueda pulsar
+  // lo que hay debajo, como el botón «Abrir la demo». El ratón se escucha en el contenedor.
+  const moveRef = useRef(onPointerMove);
+  const leaveRef = useRef(onPointerLeave);
+  moveRef.current = onPointerMove;
+  leaveRef.current = onPointerLeave;
+  useEffect(() => {
+    const el = wrapRef.current?.parentElement;
+    if (!el) return;
+    const m = (e: PointerEvent) => moveRef.current(e);
+    const l = () => leaveRef.current();
+    el.addEventListener("pointermove", m);
+    el.addEventListener("pointerleave", l);
+    return () => {
+      el.removeEventListener("pointermove", m);
+      el.removeEventListener("pointerleave", l);
+    };
+  }, []);
+
   return (
     <div
       ref={wrapRef}
-      className={`absolute inset-0 ${className}`}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
+      className={`pointer-events-none absolute inset-0 ${className}`}
       role="img"
       aria-label={text}
     >
