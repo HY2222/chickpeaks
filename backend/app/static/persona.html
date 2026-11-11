@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css">
+<link rel="stylesheet" href="/static/willo.css?v=2">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -358,7 +358,8 @@ AL_ENTRAR["1"] = async () => {
   const h = d.huchas.find(x => x.id === "mis_cosas") ?? d.huchas[0];
   // Un número negativo no es lectura fácil: se dice "has gastado de más" y la cifra en positivo.
   $("p1-quedan-texto").textContent = h.quedan < 0 ? "Este mes has gastado de más" : "Este mes te quedan";
-  $("p1-quedan").textContent = euros(Math.abs(h.quedan), true);
+  const [entero, centimos] = euros(Math.abs(h.quedan), true).split(",");  // solo cifras: seguro como HTML
+  $("p1-quedan").innerHTML = `${entero}<span class="centimos">,${centimos}</span>`;
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
   $("p1-limite").textContent = euros(h.limite_mensual, true);  // lo que tiene la hucha al empezar el mes
 
