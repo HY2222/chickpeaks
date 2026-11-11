@@ -44,7 +44,7 @@ const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: string; e: string; d: string }; top: number; w: number; small?: boolean }) {
   return (
     <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center text-center" style={{ top, width: w }}>
-      <p className="text-[22px] font-bold uppercase tracking-[0.08em] opacity-70">{r.k} · {r.t}</p>
+      <p className="text-[46px] font-black leading-[1.05] tracking-[0.06em]">{r.k}</p>
       <p className={`titular whitespace-nowrap ${small ? "text-[64px]" : "text-[76px]"} font-semibold leading-[1.05]`}>{r.n}</p>
       <p className={`${small ? "text-[20px]" : "text-[22px]"} opacity-80`}>{r.d}</p>
       <p className={`mt-[6px] ${small ? "text-[24px]" : "text-[28px]"} font-bold`}>{r.e}</p>
@@ -189,8 +189,8 @@ export const slides: Slide[] = [
       "Nuestro mercado. TAM, Europa: hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año. SAM, España: según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año. SOM: empezamos por las personas que ya están en asociaciones y organizaciones como AMÁS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.",
     render: () => {
       const rows = [
-        { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "personas con discapacidad intelectual", e: "≈ 200 M€ al año" },
-        { k: "SAM", t: "España", n: "157.895", d: "con discapacidad reconocida", e: "≈ 4,5 M€ al año" },
+        { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "personas con discapacidad intelectual en Europa", e: "≈ 200 M€ al año" },
+        { k: "SAM", t: "España", n: "157.895", d: "con discapacidad reconocida en España", e: "≈ 4,5 M€ al año" },
         { k: "SOM", t: "Organizaciones", n: "13.816", d: "personas en asociaciones", e: "≈ 416.000 € al año", accent: true },
       ];
       return (
@@ -202,13 +202,13 @@ export const slides: Slide[] = [
           </div>
           {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
           <Rise o={3} className="absolute left-[760px] top-[80px] h-[920px] w-[920px] rounded-full bg-salvia text-verde">
-            <Circulo r={rows[0]} top={40} w={580} />
+            <Circulo r={rows[0]} top={30} w={580} />
           </Rise>
           <Rise o={4} className="absolute left-[900px] top-[332px] h-[640px] w-[640px] rounded-full bg-salvia-media text-texto">
-            <Circulo r={rows[1]} top={34} w={480} />
+            <Circulo r={rows[1]} top={26} w={480} />
           </Rise>
           <Rise o={5} className="absolute left-[1040px] top-[584px] h-[360px] w-[360px] rounded-full bg-verde text-fondo">
-            <Circulo r={rows[2]} top={78} w={300} small />
+            <Circulo r={rows[2]} top={62} w={300} small />
           </Rise>
           {/* Columna izquierda: lo que significan las cifras, sin repetirlas. */}
           <Rise o={6} className="absolute left-[128px] top-[380px] w-[520px]">
