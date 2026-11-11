@@ -614,7 +614,7 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía. Cinco carreras distintas en un mismo equipo. ¿Por qué nosotros? Porque ya tenemos una demo que funciona, dentro de la app de MyInvestor, y hemos pensado Willo en lectura fácil desde el primer día.",
+      "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía.",
     render: () => {
       const team = [
         { n: "Inés", r: "Arquitecta de ML" },
@@ -626,61 +626,17 @@ export const slides: Slide[] = [
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
-          <Panel />
-          <div className="absolute left-[128px] top-[128px] flex w-[960px] flex-col gap-[32px]">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
             <Label>El equipo</Label>
             <h2 className={T72}>
               <Words text="Somos seis, y nos complementamos." />
             </h2>
           </div>
-          <div className="absolute left-[128px] top-[440px] grid w-[960px] grid-cols-2 gap-x-[48px] gap-y-[36px]">
+          <div className="absolute left-[128px] top-[470px] grid w-[1664px] grid-cols-3 gap-x-[64px] gap-y-[64px]">
             {team.map((p, i) => (
               <Rise key={p.n} o={i + 4} className="border-t-2 border-salvia pt-[20px]">
-                <h3 className="text-[36px] font-bold leading-[1.15]">{p.n}</h3>
-                <p className="mt-[6px] text-[26px] leading-[1.3] text-suave">{p.r}</p>
-              </Rise>
-            ))}
-          </div>
-          <div className="absolute left-[1280px] top-[128px] flex w-[560px] flex-col gap-[24px]">
-            <Fade o={4}>
-              <Label>¿Por qué nosotros?</Label>
-            </Fade>
-            {/* Tarjeta principal: cinco carreras distintas en un mismo equipo. */}
-            <Rise o={6} className="rounded-[28px] bg-verde p-[36px] text-fondo">
-              <div className="flex items-end gap-[24px]">
-                <p className="titular text-[132px] font-semibold leading-[0.85] tabular-nums">
-                  <Count to={5} o={7} />
-                </p>
-                <p className="pb-[6px] text-[32px] font-bold leading-[1.15]">carreras distintas en un mismo equipo</p>
-              </div>
-              <div className="mt-[28px] flex flex-wrap gap-[8px] whitespace-nowrap">
-                {["Datos", "Informática y ADE", "Empresa y Tecnología", "Teleco", "Economía"].map((c) => (
-                  <span key={c} className="rounded-full border-2 border-salvia/40 px-[11px] py-[4px] text-[19px] text-salvia">
-                    {c}
-                  </span>
-                ))}
-              </div>
-            </Rise>
-            {[
-              {
-                t: "Ya funciona",
-                d: "Demo real dentro de la app de MyInvestor. La vais a ver en directo.",
-                icon: <path d="M8 5l11 7-11 7z" fill="currentColor" />,
-              },
-              {
-                t: "Pensado en lectura fácil",
-                d: "Desde el primer día: no es un añadido, es cómo pensamos Willo.",
-                icon: <path d="M5 6.5h14M5 12h14M5 17.5h9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" fill="none" />,
-              },
-            ].map((b, i) => (
-              <Rise key={b.t} o={i + 9} className="flex items-start gap-[24px] rounded-[24px] bg-white/80 p-[28px]">
-                <span className="grid h-[64px] w-[64px] flex-none place-items-center rounded-full bg-verde text-fondo">
-                  <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true">{b.icon}</svg>
-                </span>
-                <div>
-                  <h3 className="text-[32px] font-bold leading-[1.15]">{b.t}</h3>
-                  <p className="mt-[6px] text-[24px] leading-[1.3] text-suave">{b.d}</p>
-                </div>
+                <h3 className="text-[44px] font-bold leading-[1.15]">{p.n}</h3>
+                <p className="mt-[8px] text-[30px] leading-[1.3] text-suave">{p.r}</p>
               </Rise>
             ))}
           </div>
