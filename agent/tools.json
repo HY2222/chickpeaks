@@ -205,6 +205,29 @@
         "url": "https://willo-sfh4.onrender.com/api/personas/javi/pagos_del_mes",
         "method": "GET"
       }
+    },
+    {
+      "type": "client",
+      "name": "crear_hucha",
+      "description": "Crea una hucha nueva (una meta de ahorro) vacía para Javi. Úsala cuando Javi pida crear una hucha o ahorrar para algo. Pide el nombre y cuánto quiere juntar si no los dice. Es una herramienta de CLIENTE: la ejecuta la pantalla de Javi (persona.html), que llama al backend. Las huchas se ven en el inicio, en \"Tus huchas\".",
+      "expects_response": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "description": "Para qué ahorra, con sus palabras. Ej: 'una bici'"
+          },
+          "importe": {
+            "type": "number",
+            "description": "Cuánto dinero quiere juntar, en euros"
+          }
+        },
+        "required": [
+          "nombre",
+          "importe"
+        ]
+      }
     }
   ]
 }

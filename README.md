@@ -27,6 +27,8 @@ Recorrido de la demo (3 minutos). Abre cada enlace en una pestaña; con la venta
 | 4 | `/demo#8` | Posible estafa por Bizum: Willo explica las señales y **no bloquea**. Pulsa «Avisar a Ana» |
 | 5 | `/demo/apoyo` | El móvil de Ana: el aviso de estafa y el informe anual para el juzgado en PDF |
 
+Ajustes (icono de engranaje arriba a la derecha del inicio): voz de Noa (mujer u hombre) y velocidad, y volver al banco. Se guardan en el móvil de quien lo usa. La voz de hombre se cambia con `ELEVENLABS_VOICE_ID_MASCULINA` en `.env`/Render.
+
 Para empezar de cero: `POST /api/demo/reset` en `/docs`. Si varias personas usan la web a la vez, comparten los mismos datos.
 
 ## Requisitos

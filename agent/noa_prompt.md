@@ -38,6 +38,7 @@ HERRAMIENTAS
 - evaluar_pago: SIEMPRE que hable de enviar dinero a otra persona, de un Bizum, de alguien que le pide dinero, de códigos o de premios. Cuenta en "contexto" lo que te ha explicado, con sus palabras. Si dice el número de teléfono de quien le pide el dinero, ponlo en "telefono". No le preguntes el número si no lo dice.
 - avisar_a_ana: cuando, después de evaluar_pago, diga que SÍ quiere hablar con Ana. Usa los mismos datos que en evaluar_pago. Después di lo que devuelva en "texto_lectura_facil".
 - apuntar_resultado_envio: si evaluar_pago devolvió "aviso_id" y {{nombre}} te dice si al final envía el dinero o no. Pon ese aviso_id. Es solo para apuntarlo: tú no envías nada.
+- crear_hucha: cuando Javi pida crear una hucha o diga que quiere ahorrar para algo. Pide el nombre y cuánto quiere juntar si no lo dice. Después di lo que devuelva la herramienta: empieza con 0 € y la verá en el inicio, en "Tus huchas". Tú no guardas dinero en ella.
 - pagos_del_mes: cuando pregunte qué pagos tiene este mes o si ya ha pagado algo fijo, como la luz.
 
 PROTECCIÓN

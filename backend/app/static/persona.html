@@ -22,6 +22,7 @@
       <h1 class="titulo">Hola, Javi</h1>
       <p class="suave" id="p1-fecha"></p>
     </div>
+    <a class="ajustes" href="#14" id="p1-ajustes" aria-label="Ajustes"><span data-icono="ajustes"></span></a>
   </header>
 
   <div class="tarjeta destacada saldo">
@@ -38,15 +39,15 @@
     <div class="pago-detalle" id="p1-pago-detalle" aria-live="polite" hidden></div>
   </div>
 
-  <h2 class="titulo-seccion">Tus huchas</h2>
-  <div class="lista" id="p1-huchas" aria-live="polite"></div>
-  <button class="boton secundario" id="p1-huchas-mas" type="button" aria-expanded="false" hidden></button>
+  <button class="desplegable" id="p1-huchas-boton" type="button" aria-expanded="false" aria-controls="p1-huchas">
+    <span id="p1-huchas-titulo">Tus huchas</span><span class="flecha" aria-hidden="true">▾</span>
+  </button>
+  <div class="lista" id="p1-huchas" aria-live="polite" hidden></div>
   <a class="boton secundario" href="#13" id="p1-nueva-hucha">Crear una hucha</a>
 
   <div class="botones">
     <a class="boton" href="#2">Hablar con Noa</a>
     <a class="boton secundario" href="#12" id="p1-compras">Mis compras</a>
-    <a class="boton secundario" href="/demo/banco" id="p1-banco">Ir a mi banco</a>
   </div>
 </section>
 
@@ -272,6 +273,36 @@
   </form>
 </section>
 
+<!-- 14 · Cómo suena Noa: voz de mujer u hombre y velocidad. Se guarda en este móvil, para quien lo usa. -->
+<section class="pantalla" data-pantalla="14" hidden>
+  <a class="volver" href="#1">← Volver</a>
+  <h1 class="titulo">Ajustes</h1>
+  <h2 class="titulo-seccion">La voz de Noa</h2>
+  <div class="tarjeta">
+    <p class="etiqueta">¿Cómo quieres que suene?</p>
+    <div class="opciones" role="group" aria-label="Voz de Noa">
+      <button class="boton secundario" type="button" data-voz="femenina" aria-pressed="false">Voz de mujer</button>
+      <button class="boton secundario" type="button" data-voz="masculina" aria-pressed="false">Voz de hombre</button>
+    </div>
+    <p class="etiqueta" style="margin-top:24px">¿Qué velocidad?</p>
+    <div class="opciones" role="group" aria-label="Velocidad de Noa">
+      <button class="boton secundario" type="button" data-ritmo="despacio" aria-pressed="false">Más despacio</button>
+      <button class="boton secundario" type="button" data-ritmo="normal" aria-pressed="false">Normal</button>
+      <button class="boton secundario" type="button" data-ritmo="rapido" aria-pressed="false">Más rápido</button>
+    </div>
+    <p class="suave" id="p14-nota" style="margin-top:20px"></p>
+  </div>
+  <div class="botones">
+    <button class="boton" type="button" id="p14-probar">Probar la voz</button>
+  </div>
+
+  <h2 class="titulo-seccion">Mi banco</h2>
+  <div class="botones">
+    <a class="boton secundario" href="/demo/banco" id="p14-banco">Volver al banco</a>
+    <a class="boton secundario" href="#1">Listo</a>
+  </div>
+</section>
+
 <!-- Solo para la demo: botón invisible abajo a la derecha (pantallas 1, 3 y 4).
      Antes de pagar: hace como si Javi pagara en la taquilla con su tarjeta (→ pantalla 4).
      Después de pagar (pantallas 1 y 4): lleva a la foto del documento (→ pantalla 5).
@@ -297,6 +328,7 @@ const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
 // ---------- Pictogramas (iconos Lucide; en la versión final, ARASAAC) ----------
 const ICONOS = {
   persona: '<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+  ajustes: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
   hucha: '<path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/>',
   micro: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/>',
   entrada: '<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>',
@@ -406,27 +438,24 @@ AL_ENTRAR["1"] = async () => {
     ? `Mis compras (${compras.pendientes.length} sin pagar)` : "Mis compras";
 
   const metas = await api("metas").catch(() => []);
-  const VISIBLES = 2;   // las demás se despliegan con "Ver todas"
-  const todas = metas.length <= VISIBLES;
-  const pintarHuchas = (abiertas) => {
-    $("p1-huchas").innerHTML = (abiertas ? metas : metas.slice(0, VISIBLES)).map(m => `
-      <div class="tarjeta fila" style="padding-right:40px">
-        <span class="picto" data-icono="hucha"></span>
-        <div>
-          <p class="nombre">${esc(m.nombre)}</p>
-          <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
-          <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
-        </div>
-      </div>`).join("");
-    pintarIconos($("p1-huchas"));
-    const b = $("p1-huchas-mas");
-    b.hidden = todas;
-    b.setAttribute("aria-expanded", String(abiertas));
-    b.textContent = abiertas ? "Ver menos huchas" : `Ver todas mis huchas (${metas.length})`;
-    b.onclick = () => pintarHuchas(!abiertas);
-  };
-  pintarHuchas(false);
+  $("p1-huchas-titulo").textContent = `Tus huchas (${metas.length})`;
+  $("p1-huchas").innerHTML = metas.map(m => `
+    <div class="tarjeta fila" style="padding-right:40px">
+      <span class="picto" data-icono="hucha"></span>
+      <div>
+        <p class="nombre">${esc(m.nombre)}</p>
+        <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
+        <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
+      </div>
+    </div>`).join("");
   pintarIconos($("p1-huchas"));
+  // Las huchas están cerradas: Javi las abre con un toque (y se cierran al volver a pulsar).
+  const abrirHuchas = abiertas => {
+    $("p1-huchas").hidden = !abiertas;
+    $("p1-huchas-boton").setAttribute("aria-expanded", String(abiertas));
+  };
+  abrirHuchas(false);
+  $("p1-huchas-boton").onclick = () => abrirHuchas($("p1-huchas").hidden);
 };
 
 // ---------- 2 · Hablando con Noa ----------
@@ -491,14 +520,14 @@ AL_ENTRAR["2"] = async () => {
   try {
     const r = await fetch("/api/voz/signed-url");
     if (!r.ok) throw new Error("voz no configurada");
-    const { signed_url } = await r.json();
+    const { signed_url, voces } = await r.json();
     // Pide permiso del micro y lo suelta enseguida: dejarlo abierto puede dar problemas
     // en Android (el SDK de ElevenLabs abre el suyo).
     (await navigator.mediaDevices.getUserMedia({audio: true})).getTracks().forEach(t => t.stop());
     // Versión fija: la que había cuando se probó la demo (9-11-2026). Una nueva puede cambiar la API.
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.35.0/+esm");
     let nueva = null;
-    nueva = await Conversation.startSession({
+    nueva = await abrirConversacion(Conversation, {
       signedUrl: signed_url,
       // El prompt de Noa usa {{nombre}}: sin este valor, la conversación puede no arrancar.
       dynamicVariables: {nombre: "Javi"},
@@ -511,6 +540,18 @@ AL_ENTRAR["2"] = async () => {
           estado.dichoNoa = null;
           estado.esperandoNoa = true;   // la próxima frase de Noa es la explicación de esta compra
           return JSON.stringify(estado.respuesta);
+        },
+        // Javi pide una hucha nueva por voz ("créame una hucha para una bici de 120 euros").
+        // La crea el backend; Noa solo dice lo que devuelve. Las huchas se ven en el inicio.
+        crear_hucha: async ({nombre, importe}) => {
+          const n = Number(String(importe).replace(",", "."));
+          if (!nombre || !(n > 0)) return "Falta el nombre o cuánto dinero quiere juntar. Pregúntaselo.";
+          try {
+            const m = await post("metas", {nombre: String(nombre), importe: n});
+            return `Hucha creada: ${m.nombre}, para juntar ${euros(m.importe)}. Empieza con 0 €. Las verá en el inicio, en "Tus huchas".`;
+          } catch {
+            return "No he podido crear la hucha. Puede que ya tenga una con ese nombre. Díselo con calma.";
+          }
         },
         // Javi quiere que Noa lea un papel o un mensaje: cuando Noa termine de hablar,
         // se cierra la conversación y se abre la pantalla de la foto (5).
@@ -562,7 +603,7 @@ AL_ENTRAR["2"] = async () => {
         conv = null;
         setTimeout(() => { location.hash = "#1"; }, 200);
       },
-    });
+    }, voces);
     // Si Javi pulsó Parar (o salió de la pantalla) mientras Noa se conectaba, se cierra ya.
     if (miSesion !== sesionVoz) { nueva.endSession().catch(() => {}); return; }
     conv = nueva;
@@ -630,6 +671,37 @@ function cifrasEnNumeros(texto) {
 const sinArticulo = s => s.replace(/^(la|el|los|las|un|una|unos|unas)\s+/i, "");
 const mayuscula = s => s[0].toUpperCase() + s.slice(1);
 
+// ---------- Cómo suena Noa (pantalla 14) ----------
+// Cada persona elige voz (mujer u hombre) y velocidad. Se guarda en su móvil. Con las opciones por
+// defecto (voz de mujer, normal) no se cambia nada: suena la Noa de ElevenLabs tal cual.
+const RITMOS = {despacio: 0.85, normal: 1.0, rapido: 1.15};
+const VOZ_POR_DEFECTO = {voz: "femenina", ritmo: "normal"};
+function preferenciasVoz() {
+  try {
+    const p = JSON.parse(localStorage.getItem("willo_voz") || "{}");
+    return {voz: p.voz === "masculina" ? "masculina" : "femenina", ritmo: RITMOS[p.ritmo] ? p.ritmo : "normal"};
+  } catch { return {...VOZ_POR_DEFECTO}; }
+}
+function guardarPreferenciasVoz(p) { try { localStorage.setItem("willo_voz", JSON.stringify(p)); } catch { /* sin almacenamiento */ } }
+// Lo que se le cambia a Noa al abrir la conversación. Vacío si no se ha tocado nada.
+function ajustesDeVoz(voces) {
+  const p = preferenciasVoz(), tts = {};
+  if (p.voz === "masculina" && voces?.masculina) tts.voiceId = voces.masculina;
+  if (p.ritmo !== "normal") tts.speed = RITMOS[p.ritmo];
+  return Object.keys(tts).length ? {tts} : null;
+}
+// Abre la conversación con los ajustes de voz. Si ElevenLabs no los admite, abre con la voz de siempre.
+async function abrirConversacion(Conversation, opciones, voces) {
+  const ajustes = ajustesDeVoz(voces);
+  if (!ajustes) return Conversation.startSession(opciones);
+  try {
+    return await Conversation.startSession({...opciones, overrides: {...opciones.overrides, ...ajustes}});
+  } catch (e) {
+    console.warn("Sin ajustes de voz:", e);
+    return Conversation.startSession(opciones);
+  }
+}
+
 // Cuando no hay conversación de voz abierta, las pantallas hablan con la voz de Noa (ElevenLabs).
 // Si falla (sin clave o sin internet), habla la voz del navegador.
 let audioNoa = null;
@@ -640,7 +712,7 @@ function callar() {
 function decirConNavegador(texto) {
   if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(texto);
-  u.lang = "es-ES"; u.rate = 0.9;
+  u.lang = "es-ES"; u.rate = 0.9 * RITMOS[preferenciasVoz().ritmo];
   speechSynthesis.speak(u);
 }
 async function decir(texto) {
@@ -648,7 +720,8 @@ async function decir(texto) {
   if (!texto) return;
   try {
     const r = await fetch("/api/voz/decir", {method: "POST", headers: {"Content-Type": "application/json"},
-                                             body: JSON.stringify({texto})});
+                                             body: JSON.stringify({texto, voz: preferenciasVoz().voz,
+                                                                   velocidad: RITMOS[preferenciasVoz().ritmo]})});
     if (!r.ok) throw new Error(r.status);
     const audio = new Audio(URL.createObjectURL(await r.blob()));
     audioNoa = audio;
@@ -713,7 +786,8 @@ $("p3-entendido").onclick = () => { pararVoz(); callar(); };
 // quien Javi eligió (Ana). Si la compra ya estaba apuntada (p. ej. por Noa), no se apunta dos veces.
 // "La entrada del concierto" y "entrada del concierto" son la misma compra.
 const mismaCosa = (a, b) => sinArticulo(a.trim().toLowerCase()) === sinArticulo(b.trim().toLowerCase());
-const COMERCIO = "Entradas Concierto";  // nombre del comercio en el aviso de la tarjeta (dato de la demo)
+// Lo que ve Javi en el aviso es lo que él dijo que iba a comprar ("entrada del concierto", "zapatillas"…).
+const queCompra = concepto => mayuscula(sinArticulo(concepto.trim()));
 
 $("simular-pago").onclick = async () => {
   // La esquina secreta sigue el guion: pantalla 4 → foto del documento (pantalla 5).
@@ -733,7 +807,7 @@ $("simular-pago").onclick = async () => {
   if (!yaApuntada) {
     const r = await post("decisiones", {
       concepto: q.concepto, importe: q.importe, decision: "comprar",
-      palabras_persona: `Pagado con tarjeta en ${COMERCIO}`, compartir: true, pagado: true,
+      palabras_persona: `Pagado con tarjeta: ${sinArticulo(q.concepto.trim())}`, compartir: true, pagado: true,
     });
     avisados = r.avisados;
   } else {
@@ -746,7 +820,7 @@ $("simular-pago").onclick = async () => {
 AL_ENTRAR["4"] = async () => {
   const pago = estado.pago ?? {concepto: "la entrada del concierto", importe: 45, avisados: ["Ana"]};
   $("p4-pagado").textContent = "Pago confirmado";
-  $("p4-donde").textContent = `${euros(pago.importe)} en ${COMERCIO}. El banco ha visto tu pago.`;
+  $("p4-donde").textContent = `${euros(pago.importe)} · ${queCompra(pago.concepto)}. El banco ha visto tu pago.`;
   $("p4-nota").textContent = pago.avisados.includes("Ana")
     ? "Ana ve este pago porque tú lo elegiste."
     : "Nadie más ve este pago.";
@@ -843,13 +917,13 @@ async function noaDice(textoParaNoa) {
   try {
     const r = await fetch("/api/voz/signed-url");
     if (!r.ok) return false;
-    const { signed_url } = await r.json();
+    const { signed_url, voces } = await r.json();
     // Pide permiso del micro y lo suelta enseguida: dejarlo abierto puede dar problemas
     // en Android (el SDK de ElevenLabs abre el suyo).
     (await navigator.mediaDevices.getUserMedia({audio: true})).getTracks().forEach(t => t.stop());
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.35.0/+esm");
     let nueva = null;
-    nueva = await Conversation.startSession({
+    nueva = await abrirConversacion(Conversation, {
       signedUrl: signed_url,
       dynamicVariables: {nombre: "Javi"},
       overrides: {agent: {firstMessage: ""}},   // sin "Hola, soy Noa": va directa al documento
@@ -865,7 +939,7 @@ async function noaDice(textoParaNoa) {
         },
       },
       onDisconnect: () => { if (nueva && conv === nueva) conv = null; },
-    });
+    }, voces);
     if (miSesion !== sesionVoz) { nueva.endSession().catch(() => {}); return false; }
     conv = nueva;
     conv.sendUserMessage(textoParaNoa);
@@ -1095,6 +1169,19 @@ $("p8-enviar-igual").onclick = async () => {
 // Willo no paga nada: los botones solo apuntan lo que Javi ha hecho.
 const cuantosDias = n => n <= 0 ? "Se quita hoy" : n === 1 ? "Se quita mañana" : `Se quita en ${n} días`;
 const diaCorto = iso => new Date(iso + "T12:00").toLocaleDateString("es-ES", {day: "numeric", month: "long"});
+
+AL_ENTRAR["14"] = () => {
+  const p = preferenciasVoz();
+  const pintar = () => {
+    document.querySelectorAll("[data-voz]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.voz === p.voz)));
+    document.querySelectorAll("[data-ritmo]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ritmo === p.ritmo)));
+    $("p14-nota").textContent = "Vale para Noa en este móvil. Se aplica la próxima vez que hables con ella.";
+  };
+  document.querySelectorAll("[data-voz]").forEach(b => b.onclick = () => { p.voz = b.dataset.voz; guardarPreferenciasVoz(p); pintar(); });
+  document.querySelectorAll("[data-ritmo]").forEach(b => b.onclick = () => { p.ritmo = b.dataset.ritmo; guardarPreferenciasVoz(p); pintar(); });
+  $("p14-probar").onclick = () => decir("Hola. Soy Noa. Así suena mi voz. Si quieres, puedes cambiarla.");
+  pintar();
+};
 
 AL_ENTRAR["13"] = () => {
   $("p13-nombre").value = $("p13-importe").value = "";

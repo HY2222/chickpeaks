@@ -251,3 +251,20 @@ h1, h2, h3, p { margin: 0; }
   font: inherit; font-size: 22px; color: var(--texto); background: var(--blanco);
   border: 2px solid var(--verde-oscuro); border-radius: 16px; }
 .campo:focus-visible { outline: 3px solid var(--verde-oscuro); outline-offset: 2px; }
+
+/* Lista desplegable (huchas del inicio): todo el título es un botón grande */
+.desplegable { display: flex; align-items: center; justify-content: space-between; width: 100%;
+  box-sizing: border-box; padding: 16px 20px; font: inherit; font-size: 26px; font-weight: 700;
+  color: var(--texto); background: var(--blanco); border: 2px solid var(--verde-oscuro);
+  border-radius: 16px; cursor: pointer; text-align: left; }
+.desplegable .flecha { font-size: 28px; transition: transform .15s; }
+.desplegable[aria-expanded="true"] .flecha { transform: rotate(180deg); }
+
+/* Grupos de botones para elegir una opción (voz de Noa). El elegido va en verde. */
+.opciones { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.opciones .boton[aria-pressed="true"] { background: var(--verde-oscuro); color: var(--blanco); }
+
+/* Icono de ajustes arriba a la derecha del inicio: botón grande, fácil de tocar */
+.ajustes { margin-left: auto; display: grid; place-items: center; width: 56px; height: 56px; flex: none;
+  color: var(--verde-oscuro); background: var(--blanco); border: 2px solid var(--verde-oscuro); border-radius: 50%; }
+.ajustes svg { width: 28px; height: 28px; }

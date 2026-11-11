@@ -146,6 +146,12 @@ class Texto(BaseModel):
     texto: str
 
 
+class TextoConVoz(Texto):
+    """Lo que Javi pide a las pantallas que lean: con su voz (mujer u hombre) y su velocidad."""
+    voz: Literal["femenina", "masculina"] = "femenina"
+    velocidad: float = Field(default=1.0, ge=0.7, le=1.2)
+
+
 # ---------- Persona ----------
 
 @app.get("/api/personas")
@@ -621,6 +627,14 @@ def comprobar_lectura_facil(t: Texto):
     return easyread.comprobar(t.texto)
 
 
+def voces_de_noa() -> dict[str, str]:
+    """Las dos voces entre las que elige el usuario. La de mujer es la de Noa; la de hombre se cambia
+    en .env (ELEVENLABS_VOICE_ID_MASCULINA) sin tocar el código. Por defecto, una voz que viene con
+    todas las cuentas de ElevenLabs."""
+    return {"femenina": os.getenv("ELEVENLABS_VOICE_ID", "dNjJKg63Fr5AXwIdkATa"),
+            "masculina": os.getenv("ELEVENLABS_VOICE_ID_MASCULINA", "pNInz6obpgDQGcFmaJgB")}
+
+
 @app.get("/api/voz/signed-url")
 async def signed_url():
     """URL firmada para hablar con Noa sin exponer la API key en el navegador."""
@@ -632,11 +646,11 @@ async def signed_url():
                         params={"agent_id": agent}, headers={"xi-api-key": key})
     if r.status_code >= 400:
         raise HTTPException(502, f"ElevenLabs respondió {r.status_code}")
-    return r.json()
+    return {**r.json(), "voces": voces_de_noa()}
 
 
 @app.post("/api/voz/decir")
-async def decir_con_voz_de_noa(t: Texto):
+async def decir_con_voz_de_noa(t: TextoConVoz):
     """Lee un texto con la voz de Noa (ElevenLabs). Lo usan las pantallas cuando no hay conversación de voz abierta.
 
     Si falta la clave o ElevenLabs falla, devuelve un error y la pantalla usa la voz del navegador.
@@ -647,13 +661,13 @@ async def decir_con_voz_de_noa(t: Texto):
     texto = t.texto.strip()[:800]
     if not texto:
         raise HTTPException(422, "No hay texto")
-    voz = os.getenv("ELEVENLABS_VOICE_ID", "dNjJKg63Fr5AXwIdkATa")  # la voz de Noa
+    voz = voces_de_noa()[t.voz]
     async with httpx.AsyncClient(timeout=30) as c:
         r = await c.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voz}",
                          params={"output_format": "mp3_44100_128"},
                          headers={"xi-api-key": key},
                          json={"text": texto, "model_id": os.getenv("ELEVENLABS_TTS_MODEL", "eleven_flash_v2_5"),
-                               "language_code": "es"})
+                               "language_code": "es", "voice_settings": {"speed": t.velocidad}})
     if r.status_code >= 400:
         raise HTTPException(502, f"ElevenLabs respondió {r.status_code}")
     return Response(r.content, media_type="audio/mpeg")
