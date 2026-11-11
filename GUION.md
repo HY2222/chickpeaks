@@ -60,7 +60,7 @@ En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base
 Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía.
 
 ## 16 · Objetivo (≈ 25 s)
-Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Ya tenemos la demo; en los próximos meses, los 100 primeros usuarios con AMAS; en 2027, el piloto con un banco; y después, más bancos y Europa.
+Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Ya tenemos la demo; en los próximos meses, los primeros usuarios con AMAS y Plena inclusión; en 2027, el piloto con un banco; y después, más bancos y Europa.
 
 ## 17 · Cierre (≈ 5 s)
 Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.
