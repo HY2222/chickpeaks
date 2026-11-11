@@ -22,11 +22,21 @@ TEXTO_LIMITE_APP = "Error: esa cantidad no es posible. En Willo el máximo es 1.
 
 
 class FueraDeLimite(Exception):
-    """El movimiento no se apunta. `texto` es la frase en lectura fácil para la persona."""
+    """El movimiento no se apunta. `texto`: la frase para la persona. `para_apoyo`: la de su círculo
+    (main.py se la manda al momento). Sin `para_apoyo` no se avisa a nadie."""
 
-    def __init__(self, texto: str, codigo: str):
+    def __init__(self, texto: str, codigo: str, para_apoyo: str | None = None):
         super().__init__(texto)
-        self.texto, self.codigo = texto, codigo
+        self.texto, self.codigo, self.para_apoyo = texto, codigo, para_apoyo
+
+
+def avisar_bloqueo(persona: dict[str, Any], texto: str) -> list[str]:
+    """Un pago que no se ha podido apuntar: se avisa al círculo (quien ve sus decisiones). Devuelve a quién."""
+    miembros = con_permiso(persona, "ver_decisiones")
+    if not miembros:
+        return []
+    return avisar(persona, miembros, "pago_no_permitido",
+                  f"Aviso de Willo: {texto} No se ha apuntado. Llámale con calma.")["para_nombres"]
 
 
 def movido_hoy(persona: dict[str, Any], tipo: str = "gasto") -> float:
@@ -60,12 +70,16 @@ def comprobar(persona: dict[str, Any], importe: float, concepto: str, hucha: str
     Si pasa de 1.000 € hoy, avisa al círculo y devuelve a quién (para decírselo a la persona).
     """
     r = revisar(persona, importe, hucha, tipo)
+    nombre = persona["nombre"]
     if r["fuera_de_app"]:
-        raise FueraDeLimite(TEXTO_LIMITE_APP, "limite_app")
+        raise FueraDeLimite(TEXTO_LIMITE_APP, "limite_app",
+                            f"{nombre} ha intentado apuntar {euros(importe)} ({concepto}). Es más de 1.000.000 €.")
     if r["negativo"] and not ya_pagado:
         falta = round(importe - r["quedan"], 2)
         raise FueraDeLimite(f"No te llega. Te faltan {euros(falta)}. "
-                            "No lo apunto: tu hucha se quedaría en negativo.", "saldo_negativo")
+                            "No lo apunto: tu hucha se quedaría en negativo.", "saldo_negativo",
+                            f"{nombre} ha intentado pagar {euros(importe)} ({concepto}), pero no le llega: "
+                            f"le faltan {euros(falta)}.")
     if not r["pasa_limite_diario"]:
         return []
     miembros = con_permiso(persona, "ver_decisiones")

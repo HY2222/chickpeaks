@@ -39,17 +39,31 @@ app = FastAPI(title="Willo API", version="0.1.0",
 app.add_middleware(CORSMiddleware, allow_origins=os.getenv("WILLO_CORS", "*").split(","),
                    allow_methods=["*"], allow_headers=["*"])
 
+def _bloqueado(request: Request, status: int, codigo: str, texto: str, para_apoyo: str | None) -> JSONResponse:
+    """Respuesta de un pago que no se apunta. Si hay `para_apoyo`, se avisa al círculo al momento."""
+    p = store.persona(request.path_params.get("persona_id", ""))
+    avisados = limites.avisar_bloqueo(p, para_apoyo) if p and para_apoyo else []
+    if avisados:
+        texto += f" Se lo he dicho a {' y '.join(avisados)}."
+    return JSONResponse(status_code=status, content={"error": codigo, "texto_lectura_facil": texto,
+                                                     "avisados": avisados})
+
+
 @app.exception_handler(limites.FueraDeLimite)
-async def fuera_de_limite(_: Request, e: limites.FueraDeLimite):
+async def fuera_de_limite(request: Request, e: limites.FueraDeLimite):
     """Un movimiento que no se puede apuntar (negativo, más de 1.000.000 €...). 409 con la frase para la persona."""
-    return JSONResponse(status_code=409, content={"error": e.codigo, "texto_lectura_facil": e.texto})
+    return _bloqueado(request, 409, e.codigo, e.texto, e.para_apoyo)
 
 
 @app.exception_handler(RequestValidationError)
 async def datos_no_validos(request: Request, e: RequestValidationError):
     """Más de 1.000.000 € en cualquier cantidad: se dice "Error" en lectura fácil. Lo demás, como FastAPI."""
-    if any(err["type"] == "less_than_equal" and err["loc"][-1] == "importe" for err in e.errors()):
-        return JSONResponse(status_code=422, content={"error": "limite_app", "texto_lectura_facil": limites.TEXTO_LIMITE_APP})
+    absurdo = next((err for err in e.errors() if err["type"] == "less_than_equal" and err["loc"][-1] == "importe"), None)
+    if absurdo:
+        p = store.persona(request.path_params.get("persona_id", ""))
+        nombre = p["nombre"] if p else "La persona"
+        return _bloqueado(request, 422, "limite_app", limites.TEXTO_LIMITE_APP,
+                          f"{nombre} ha intentado usar {easyread.euros(absurdo['input'])}. Es más de 1.000.000 €.")
     from fastapi.exception_handlers import request_validation_exception_handler
     return await request_validation_exception_handler(request, e)
 
@@ -250,9 +264,11 @@ def registrar_decision(persona_id: str, d: Decision):
             # Algo que no le llega no se apunta: después no lo podría pagar sin quedarse en negativo.
             if limites.revisar(p, d.importe, hucha)["negativo"]:
                 quedan = limites.revisar(p, d.importe, hucha)["quedan"]
+                falta = easyread.euros(round(d.importe - quedan, 2))
                 raise limites.FueraDeLimite(
-                    f"No te llega. Te faltan {easyread.euros(round(d.importe - quedan, 2))}. "
-                    "No lo apunto en Quiero comprar.", "saldo_negativo")
+                    f"No te llega. Te faltan {falta}. No lo apunto en Quiero comprar.", "saldo_negativo",
+                    f"{p['nombre']} ha querido apuntar {d.concepto} ({easyread.euros(d.importe)}), "
+                    f"pero no le llega: le faltan {falta}.")
             pendiente = purchases.apuntar(p, d.concepto, d.importe, hucha)
     ahora = datetime.combine(hoy(), datetime.now().time()).isoformat(timespec="seconds")
     reg = {**d.model_dump(), "fecha": ahora}

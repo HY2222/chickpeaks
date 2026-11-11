@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Ana</title>
-<link rel="stylesheet" href="/static/willo.css?v=4">
+<link rel="stylesheet" href="/static/willo.css?v=5">
 <link rel="manifest" href="/static/manifest-apoyo.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -204,13 +204,21 @@ async function pintarAna() {
 
   // Tarjetas con campana: lo que Javi decidió y quiso compartir (lo más nuevo arriba).
   // El envío de la caja de estafa no se repite aquí.
-  const visibles = decisiones.filter(d => d.compartir && d !== pidio).reverse();
-  $("p9-avisos").innerHTML = visibles.map(d => `
+  // Junto a ellas, los avisos de dinero: un pago que no se ha podido apuntar o más de 1.000 € en un día.
+  const tarjetas = [
+    ...decisiones.filter(d => d.compartir && d !== pidio).map(d => ({
+      fecha: d.fecha, icono: "campana", frase: fraseDecision(d),
+      pie: `${d.decision === "comprar" ? "Lo decidió él. · " : ""}${cuando(d.fecha, presupuesto.fecha)}`})),
+    ...avisos.filter(a => a.tipo === "pago_no_permitido" || a.tipo === "limite_diario").map(a => ({
+      fecha: a.fecha, icono: "aviso", frase: a.texto.replace(/^Aviso de Willo: /, ""),
+      pie: cuando(a.fecha, presupuesto.fecha)})),
+  ].sort((a, b) => b.fecha.localeCompare(a.fecha));   // lo más nuevo arriba
+  $("p9-avisos").innerHTML = tarjetas.map(t => `
     <div class="tarjeta fila aviso-ana">
-      <span class="picto" data-icono="campana"></span>
+      <span class="picto" data-icono="${t.icono}"></span>
       <div>
-        <p class="nombre">${esc(fraseDecision(d))}</p>
-        <p class="suave" style="margin-top:8px">${d.decision === "comprar" ? "Lo decidió él. · " : ""}${cuando(d.fecha, presupuesto.fecha)}</p>
+        <p class="nombre">${esc(t.frase)}</p>
+        <p class="suave" style="margin-top:8px">${esc(t.pie)}</p>
       </div>
     </div>`).join("");
 
