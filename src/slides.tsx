@@ -166,12 +166,12 @@ export const slides: Slide[] = [
   {
     id: "mercado",
     notes:
-      "Nuestro mercado. TAM, Europa: hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 213 millones de euros al año. SAM, España: según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,8 millones al año. SOM: empezamos por las personas que ya están en asociaciones y organizaciones como AMAS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 420.000 euros al año.",
+      "Nuestro mercado. TAM, Europa: hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año. SAM, España: según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año. SOM: empezamos por las personas que ya están en asociaciones y organizaciones como AMAS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.",
     render: () => {
       const rows = [
-        { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "de personas con discapacidad intelectual. La misma ley en toda la UE.", e: "≈ 213 M€ al año" },
-        { k: "SAM", t: "España", n: "157.895", d: "personas con discapacidad intelectual o del desarrollo reconocida.", e: "≈ 4,8 M€ al año" },
-        { k: "SOM", t: "Organizaciones", n: "13.816", d: "personas que ya van a asociaciones (Plena inclusión apoya a 150.000).", e: "≈ 420.000 € al año", accent: true },
+        { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "de personas con discapacidad intelectual. La misma ley en toda la UE.", e: "≈ 200 M€ al año" },
+        { k: "SAM", t: "España", n: "157.895", d: "personas con discapacidad intelectual o del desarrollo reconocida.", e: "≈ 4,5 M€ al año" },
+        { k: "SOM", t: "Organizaciones", n: "13.816", d: "personas que ya van a asociaciones (Plena inclusión apoya a 150.000).", e: "≈ 416.000 € al año", accent: true },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -205,7 +205,7 @@ export const slides: Slide[] = [
               </Rise>
             ))}
           </div>
-          <Foot n="05">Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, al precio del plan Escala.</Foot>
+          <Foot n="05">Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).</Foot>
         </div>
       );
     },
@@ -517,13 +517,12 @@ export const slides: Slide[] = [
   {
     id: "negocio",
     notes:
-      "¿Quién paga? El banco, no la persona. Es un SaaS B2B2C: el banco se lo da gratis a sus clientes con discapacidad intelectual. ¿Por qué paga? Porque la Ley 11/2023 ya le obliga a ser accesible. Cobramos dos cosas. Una cuota de implantación, una sola vez, de 15.000 euros: integrar Willo en la app del banco, con su marca, y formar a su equipo. Y una cuota fija al mes según su tamaño: plan Piloto, hasta 1.000 usuarios, 3.000 euros; Crecimiento, hasta 5.000, 12.000 euros; y Escala, hasta 15.000, 35.000 euros. Así el banco sabe siempre lo que va a pagar. Si supera el límite, pasa al plan siguiente.",
+      "¿Quién paga? El banco, no la persona. Es un SaaS B2B2C: el banco se lo da gratis a sus clientes con discapacidad intelectual. ¿Por qué paga? Porque la Ley 11/2023 ya le obliga a ser accesible. Cobramos en tres partes. Una implantación de 15.000 euros, una sola vez: integrar Willo en su app, con su marca, y formar a su equipo. Una cuota base de 1.500 euros al mes, que cubre la plataforma y el soporte. Y 2,40 euros al mes por cada usuario activo: solo cuenta quien usa Willo ese mes. Así el banco paga según el uso real. Por ejemplo, un banco con 13.816 usuarios paga unos 34.700 euros al mes.",
     render: () => {
-      const plans = [
-        { t: "Piloto", u: "Hasta 1.000 usuarios", p: "3.000 €" },
-        { t: "Crecimiento", u: "Hasta 5.000 usuarios", p: "12.000 €" },
-        { t: "Escala", u: "Hasta 15.000 usuarios", p: "35.000 €", accent: true },
-        { t: "A medida", u: "Más de 15.000 usuarios", p: "A medida" },
+      const parts = [
+        { t: "Cuota base", d: "Plataforma, soporte y mantenimiento", p: "1.500 €", u: "al mes" },
+        { t: "Por usuario activo", d: "Solo cuenta quien usa Willo ese mes", p: "2,40 €", u: "al mes", accent: true },
+        { t: "Implantación", d: "Integración, marca y formación", p: "15.000 €", u: "una vez" },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -533,30 +532,33 @@ export const slides: Slide[] = [
               <Words text="Paga el banco, porque la ley ya le pide ser accesible." />
             </h2>
           </div>
-          <div className="absolute left-[128px] top-[410px] flex w-[784px] flex-col">
+          <div className="absolute left-[128px] top-[420px] flex w-[784px] flex-col">
             <Fade o={5}>
-              <p className="pb-[12px] text-[28px] font-bold text-verde">Cuota fija al mes, según el tamaño del banco</p>
+              <p className="pb-[12px] text-[28px] font-bold text-verde">Lo que paga el banco</p>
             </Fade>
-            {plans.map((it, i) => (
-              <Rise key={it.t} o={i + 6} className={`flex items-center justify-between py-[14px] ${i ? "border-t-2 border-salvia" : ""}`}>
+            {parts.map((it, i) => (
+              <Rise key={it.t} o={i + 6} className={`flex items-center justify-between py-[20px] ${i ? "border-t-2 border-salvia" : ""}`}>
                 <p className="flex flex-col">
-                  <span className={`text-[34px] font-bold leading-[1.15] ${it.accent ? "text-verde" : ""}`}>{it.t}</span>
-                  <span className="text-[22px] leading-[1.3] text-suave">{it.u}</span>
+                  <span className={`text-[36px] font-bold leading-[1.15] ${it.accent ? "text-verde" : ""}`}>{it.t}</span>
+                  <span className="text-[24px] leading-[1.3] text-suave">{it.d}</span>
                 </p>
-                <span className={`titular whitespace-nowrap text-[48px] font-semibold leading-none ${it.accent ? "text-verde" : "text-suave"}`}>{it.p}</span>
+                <p className="flex flex-col items-end">
+                  <span className={`titular whitespace-nowrap text-[52px] font-semibold leading-none ${it.accent ? "text-verde" : ""}`}>{it.p}</span>
+                  <span className="mt-[6px] text-[22px] text-suave">{it.u}</span>
+                </p>
               </Rise>
             ))}
           </div>
           <div className="absolute left-[1008px] top-[440px] flex h-[480px] w-[784px] flex-col justify-center gap-[16px]">
-            <p className="text-[28px] font-bold text-verde">Implantación, una sola vez</p>
-            <Emphasis o={6} className="origin-left">
-              <p className="titular whitespace-nowrap text-[160px] font-semibold leading-none tracking-normal tabular-nums text-verde">15.000 €</p>
+            <p className="text-[28px] font-bold text-verde">Ejemplo: un banco con 13.816 usuarios</p>
+            <Emphasis o={9} className="origin-left">
+              <p className="titular whitespace-nowrap text-[128px] font-semibold leading-none tracking-normal tabular-nums text-verde">34.658 €</p>
             </Emphasis>
             <Fade o={10}>
-              <p className="text-[32px] leading-[1.3]">Willo dentro de la app del banco, con su marca, y formación a su equipo.</p>
+              <p className="text-[32px] leading-[1.3]">al mes: 1.500 € de base + 13.816 × 2,40 €.</p>
             </Fade>
             <Fade o={11}>
-              <p className="text-[26px] leading-[1.3] text-suave">La persona no paga nada. Si el banco supera el límite de usuarios, pasa al plan siguiente.</p>
+              <p className="text-[26px] leading-[1.3] text-suave">La persona no paga nada. El banco paga según el uso real.</p>
             </Fade>
           </div>
           <Foot n="12">Precios sin IVA. Propuesta del equipo, pendiente de validar con bancos. Ley 11/2023.</Foot>
@@ -567,16 +569,16 @@ export const slides: Slide[] = [
   {
     id: "numeros",
     notes:
-      "Y los números salen. Pensad en un banco en el plan Escala, con nuestros 13.816 usuarios: nos paga 35.000 euros al mes. Los costes: la IA es el más grande, unos 15.100 euros al mes, contando 3 conversaciones al día por usuario a poco más de 1 céntimo cada una. Mantenimiento: 30 horas al mes a 40 euros la hora, 1.200 euros. Y el alojamiento en Vercel y Render, unos 24 euros. En total, unos 16.340 euros. Nos quedan unos 18.660 euros al mes: un margen operativo del 53 por ciento. Y con un solo banco en el plan Piloto ya cubrimos todos los costes.",
+      "Y los números salen. Con nuestro SOM, un banco con 13.816 usuarios nos paga 1.500 euros de base y 2,40 euros por usuario: unos 34.700 euros al mes. Los costes: la IA es el más grande, unos 15.100 euros al mes, contando 3 conversaciones al día por usuario a poco más de 1 céntimo cada una. Mantenimiento: 30 horas al mes a 40 euros la hora, 1.200 euros. Y el alojamiento en Vercel y Render, unos 24 euros. En total, unos 16.340 euros. Nos quedan unos 18.320 euros al mes: un margen operativo del 53 por ciento. Y la cuota base ya cubre nuestros costes fijos: cada usuario nuevo nos deja 1,31 euros de margen al mes.",
     render: () => {
       const rows = [
-        { t: "Ingresos sin IVA", d: "Un banco en el plan Escala, con 13.816 usuarios", v: "35.000 €" },
+        { t: "Ingresos sin IVA", d: "Base 1.500 € + 13.816 usuarios × 2,40 €", v: "34.658 €" },
         { t: "IA para conversar", d: "3 conversaciones al día · 0,0136 $ cada una", v: "− 15.117 €" },
         { t: "Mantenimiento", d: "30 horas al mes a 40 €/hora", v: "− 1.200 €" },
         { t: "Infraestructura", d: "Vercel y Render", v: "− 24 €" },
-        { t: "Resultado operativo", d: "Lo que nos queda cada mes", v: "18.659 €", accent: true },
+        { t: "Resultado operativo", d: "Lo que nos queda cada mes", v: "18.318 €", accent: true },
       ];
-      const W = 1664, ia = Math.round((W * 15116.55) / 35000), otros = Math.round((W * 1224.14) / 35000);
+      const W = 1664, ia = Math.round((W * 15116.55) / 34658.4), otros = Math.round((W * 1224.14) / 34658.4);
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
           <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
@@ -590,7 +592,7 @@ export const slides: Slide[] = [
           <BarH o={5} width={otros} height={64} color="#A3B18F" className="absolute top-[330px]" style={{ left: 128 + ia }} />
           <BarH o={6} width={W - ia - otros} height={64} color={ACCENT} className="absolute top-[330px]" style={{ left: 128 + ia + otros }} />
           <Fade o={6} className="absolute left-[128px] top-[406px]">
-            <p className="flex items-center gap-[10px] text-[24px] font-bold text-suave"><i className="inline-block h-[18px] w-[18px] rounded-full" style={{ background: GREY }} />IA · 43 %</p>
+            <p className="flex items-center gap-[10px] text-[24px] font-bold text-suave"><i className="inline-block h-[18px] w-[18px] rounded-full" style={{ background: GREY }} />IA · 44 %</p>
           </Fade>
           <Fade o={7} className="absolute top-[406px]" style={{ left: 128 + ia }}>
             <p className="flex items-center gap-[10px] whitespace-nowrap text-[24px] font-bold text-suave"><i className="inline-block h-[18px] w-[18px] rounded-full bg-[#A3B18F]" />Mantenimiento e infraestructura · 3,5 %</p>
@@ -614,8 +616,8 @@ export const slides: Slide[] = [
             <p className="titular text-[72px] font-semibold leading-none">53 %</p>
           </Rise>
           <Rise o={13} className="absolute left-[1248px] top-[694px] flex h-[190px] w-[544px] flex-col justify-center gap-[6px] rounded-[20px] bg-salvia px-[36px]">
-            <p className="text-[22px] font-bold text-verde">Cubrimos todos los costes con</p>
-            <p className="titular text-[56px] font-semibold leading-none text-verde">1 banco Piloto</p>
+            <p className="text-[22px] font-bold text-verde">Cada usuario nuevo nos deja</p>
+            <p className="titular text-[56px] font-semibold leading-none text-verde">+ 1,31 € al mes</p>
           </Rise>
           <Foot n="13">Estimación del equipo, sin datos reales. IA: 1 $ ≈ 0,89 €. Costes sin IVA.</Foot>
         </div>
@@ -625,14 +627,14 @@ export const slides: Slide[] = [
   {
     id: "go-to-market",
     notes:
-      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo, y Plena inclusión agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. En números: cada banco nos paga 15.000 euros al empezar y una cuota fija cada mes, de 3.000 a 35.000 euros. Los usuarios nos llegan casi gratis por las asociaciones, y el margen es de más del 50 %.",
+      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo, y Plena inclusión agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y los usuarios nos llegan casi gratis, por las asociaciones.",
     render: () => {
       const card = "absolute top-[400px] flex h-[270px] w-[480px] flex-col gap-[10px] rounded-[20px] p-[36px]";
       const metrics = [
-        { k: "Implantación", v: "15 k€", d: "por banco, una sola vez" },
-        { k: "Cuota", v: "3–35 k€", d: "al mes, según el plan" },
+        { k: "Implantación", v: "15.000 €", d: "una vez, por banco" },
+        { k: "Cuota base", v: "1.500 €", d: "al mes, por banco" },
+        { k: "Por usuario", v: "2,40 €", d: "al mes, por usuario" },
         { k: "CAC usuarios", v: "≈ 0 €", d: "entramos por las asociaciones" },
-        { k: "Margen", v: "> 50 %", d: "después de la IA, en todos los planes" },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -667,7 +669,7 @@ export const slides: Slide[] = [
           {metrics.map((m, i) => (
             <Rise key={m.k} o={i + 10} className="absolute top-[700px] flex h-[220px] w-[254px] flex-col justify-center gap-[6px] rounded-[20px] bg-white p-[28px]" style={{ left: 720 + i * 270 }}>
               <p className="text-[22px] font-bold text-suave">{m.k}</p>
-              <p className="titular whitespace-nowrap text-[52px] font-semibold leading-none text-verde">{m.v}</p>
+              <p className="titular whitespace-nowrap text-[44px] font-semibold leading-none text-verde">{m.v}</p>
               <p className="text-[22px] leading-[1.25] text-suave">{m.d}</p>
             </Rise>
           ))}

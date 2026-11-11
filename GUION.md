@@ -20,9 +20,9 @@ Por eso hemos creado Willo. Es una app de dinero que se usa hablando, con frases
 
 ## 5 · El mercado (≈ 40 s) · CAMBIADA
 Nuestro mercado.
-**TAM, Europa:** hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 213 millones de euros al año.
-**SAM, España:** según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,8 millones al año.
-**SOM:** empezamos por las personas que ya están en asociaciones y organizaciones como AMAS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 420.000 euros al año.
+**TAM, Europa:** hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año.
+**SAM, España:** según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año.
+**SOM:** empezamos por las personas que ya están en asociaciones y organizaciones como AMAS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.
 
 ## 6 · La competencia (≈ 40 s)
 Ya hay empresas trabajando en esto. CaixaBank tiene una cuenta con persona de apoyo y una guía en lectura fácil, pero la app no te habla ni te explica cada pago. SpendAble, en Australia, es una tarjeta con app para personas con discapacidad intelectual, pero los presupuestos los pone la persona de apoyo. True Link, en Estados Unidos, protege de estafas bloqueando: decide el cuidador. Y Blue, de BBVA, habla con IA, pero no en lectura fácil ni con apoyos. Willo es el único que junta todo y deja decidir a la persona.
@@ -45,16 +45,16 @@ La clave técnica: la IA nunca calcula ni decide. ElevenLabs da la voz y la conv
 
 ## 12 · Modelo de negocio (≈ 40 s) · CAMBIADA
 ¿Quién paga? El banco, no la persona. Es un SaaS B2B2C: el banco se lo da gratis a sus clientes con discapacidad intelectual. ¿Por qué paga? Porque la Ley 11/2023 ya le obliga a ser accesible.
-Cobramos dos cosas. Una **cuota de implantación**, una sola vez, de **15.000 euros**: integrar Willo en la app del banco, con su marca, y formar a su equipo. Y una **cuota fija al mes** según su tamaño: plan **Piloto**, hasta 1.000 usuarios, 3.000 euros; **Crecimiento**, hasta 5.000, 12.000 euros; y **Escala**, hasta 15.000, 35.000 euros. Así el banco sabe siempre lo que va a pagar. Si supera el límite, pasa al plan siguiente.
+Cobramos en tres partes. Una **implantación de 15.000 euros**, una sola vez: integrar Willo en su app, con su marca, y formar a su equipo. Una **cuota base de 1.500 euros al mes**, que cubre la plataforma y el soporte. Y **2,40 euros al mes por cada usuario activo**: solo cuenta quien usa Willo ese mes. Así el banco paga según el uso real. Por ejemplo, un banco con 13.816 usuarios paga unos 34.700 euros al mes.
 
 ## 13 · Ingresos y costes (≈ 40 s) · NUEVA
-Y los números salen. Pensad en un banco en el plan Escala, con nuestros 13.816 usuarios: nos paga 35.000 euros al mes.
+Y los números salen. Con nuestro SOM, un banco con 13.816 usuarios nos paga 1.500 euros de base y 2,40 euros por usuario: unos 34.700 euros al mes.
 Los costes: la IA es el más grande, unos 15.100 euros al mes, contando 3 conversaciones al día por usuario a poco más de 1 céntimo cada una. Mantenimiento: 30 horas al mes a 40 euros la hora, 1.200 euros. Y el alojamiento en Vercel y Render, unos 24 euros. En total, unos 16.340 euros.
-Nos quedan unos **18.660 euros al mes: un margen operativo del 53 por ciento**. Y con un solo banco en el plan Piloto ya cubrimos todos los costes.
+Nos quedan unos **18.320 euros al mes: un margen operativo del 53 por ciento**. Y la cuota base ya cubre nuestros costes fijos: cada usuario nuevo nos deja 1,31 euros de margen al mes.
 
 ## 14 · Go to market (≈ 45 s) · CAMBIADA (métricas)
 ¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo, y Plena inclusión agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea.
-En números: cada banco nos paga 15.000 euros al empezar y una cuota fija cada mes, de 3.000 a 35.000 euros. Los usuarios nos llegan casi gratis por las asociaciones, y el margen es de más del 50 %.
+En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y los usuarios nos llegan casi gratis, por las asociaciones.
 
 ## 15 · Equipo (≈ 15 s)
 Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía.
@@ -69,14 +69,14 @@ Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu
 
 ## Si hay que recortar
 - **A 5 min de pitch:** quitad la 8 (lo acaban de ver en la demo), la 11 (decid solo "de 22 a 98 en lectura fácil" en la 10) y la 15 (el equipo se presenta en la portada).
-- **En la 13**, quedaos con una frase: "Un banco en el plan Escala nos paga 35.000 euros al mes y gastamos 16.000, sobre todo en IA: un margen del 53 %. Y con un solo banco en el plan Piloto ya cubrimos costes."
+- **En la 13**, quedaos con una frase: "Con 13.816 usuarios ingresamos unos 34.700 euros al mes y gastamos 16.300, sobre todo en IA: un margen del 53 %. La cuota base cubre los costes fijos, y cada usuario nuevo suma margen."
 
 ---
 
 ## Preguntas que puede hacer el jurado
 
-**¿Por qué una cuota fija y no un precio por usuario?**
-Porque un banco necesita saber cuánto va a pagar para meterlo en su presupuesto. La cuota va por planes según el número de usuarios, así que nuestros costes siempre quedan cubiertos. Por dentro, el plan Escala sale a unos 2,53 € por usuario al mes.
+**¿Por qué una cuota base y además un precio por usuario?**
+La cuota base le da al banco un coste mínimo previsible y a nosotros nos cubre los costes fijos (mantenimiento e infraestructura, unos 1.224 € al mes). El precio por usuario sigue el uso real, igual que nuestro coste principal, la IA. Así nunca perdemos dinero con un banco que crece.
 
 **¿Los precios llevan IVA?**
 No. En B2B se habla siempre sin IVA.
@@ -85,16 +85,16 @@ No. En B2B se habla siempre sin IVA.
 Son las personas que ya van a asociaciones. Plena inclusión apoya a unas 150.000; 13.816 es menos de 1 de cada 10, y el 8,75 % de las 157.895 de España. Es una hipótesis del equipo.
 
 **¿Y el TAM de 7 millones?**
-Es una estimación publicada en *European Psychiatry* (2020): entre el 1 y el 2 % de la población. Usamos Europa porque la Directiva (UE) 2019/882 obliga a todos los bancos de la UE. Los euros de TAM y SAM están calculados al precio por usuario del plan Escala.
+Es una estimación publicada en *European Psychiatry* (2020): entre el 1 y el 2 % de la población. Usamos Europa porque la Directiva (UE) 2019/882 obliga a todos los bancos de la UE. Los euros de TAM y SAM están calculados a 2,40 € por usuario al mes.
 
 **La IA es el 92 % de los costes. ¿Qué pasa si se usa más?**
-Cada usuario nos cuesta unos 1,09 € al mes en IA (3 conversaciones al día). Cada plan tiene un límite de usuarios: si el banco lo supera, pasa al plan siguiente. Y el coste por conversación de los modelos baja cada año.
+Cada usuario nos cuesta unos 1,09 € al mes en IA (3 conversaciones al día) y nos paga 2,40 €. Si un usuario usara mucho más, lo cubriríamos con un límite de uso razonable en el contrato. Y el coste por conversación de los modelos baja cada año.
 
 **¿Qué incluye la implantación?**
 Integrar Willo en la app del banco (esa pantalla ya está hecha en la demo), adaptarlo a su marca y formar a su equipo.
 
 **¿Cuándo sois rentables?**
-Los costes fijos son unos 1.224 € al mes. Un banco en el plan Piloto, aunque llegue a los 1.000 usuarios, deja unos 680 € al mes después de pagar la IA y los costes fijos. Con un solo banco ya cubrimos costes.
+Los costes fijos son unos 1.224 € al mes, y la cuota base de un solo banco (1.500 €) ya los cubre. A partir de ahí, cada usuario deja 1,31 € de margen al mes (2,40 € − 1,09 € de IA).
 
 **¿Dónde está alojada la app?**
 El backend, en Render; la parte web, en Vercel. Hoy son unos 24 € al mes; con más uso habrá que subir de plan, pero el margen seguiría por encima del 50 %.
@@ -106,15 +106,15 @@ El backend, en Render; la parte web, en Vercel. Hoy son unos 24 € al mes; con 
 | Concepto | Cifra |
 |---|---|
 | Implantación | 15.000 € por banco, una sola vez (sin IVA) |
-| Planes (cuota fija al mes, sin IVA) | Piloto, hasta 1.000 usuarios: 3.000 € · Crecimiento, hasta 5.000: 12.000 € · Escala, hasta 15.000: 35.000 € · más: a medida |
-| Ingresos SOM | 35.000 €/mes (un banco en Escala, 13.816 usuarios) · 420.000 €/año |
-| IA | 15.116,55 €/mes (1.243.440 conversaciones × 0,0136 $, 1 $ ≈ 0,89 €) |
+| Cuota base | 1.500 € al mes por banco (sin IVA) |
+| Por usuario activo | 2,40 € al mes (sin IVA) |
+| Ingresos SOM | 34.658,40 €/mes (1.500 + 13.816 × 2,40) · ≈ 416.000 €/año |
+| IA | 15.116,55 €/mes (1.243.440 conversaciones × 0,0136 $, 1 $ ≈ 0,89 €) · ≈ 1,09 € por usuario |
 | Mantenimiento | 1.200 €/mes (30 h × 40 €) |
 | Infraestructura | 24,14 €/mes (Vercel 20 $ + Render 7 $) |
 | Costes totales | 16.340,69 €/mes |
-| Resultado operativo | 18.659,31 €/mes · margen 53,3 % |
-| Margen a plena carga | Piloto 64 % · Crecimiento 54 % · Escala 53 % (antes de costes fijos) |
-| Ingresos al año | TAM ≈ 213 M€ · SAM ≈ 4,8 M€ · SOM ≈ 420.000 € |
-| Precio por usuario (interno) | ≈ 2,53 €/mes en Escala |
+| Resultado operativo | 18.317,71 €/mes · margen 52,9 % |
+| Margen por usuario | 1,31 € al mes (2,40 € − 1,09 €) |
+| Ingresos al año | TAM ≈ 200 M€ · SAM ≈ 4,5 M€ (a 2,40 €/usuario) · SOM ≈ 416.000 € |
 
 Fuentes: *European Psychiatry* (2020), "Are we training psychiatrists to develop skills in intellectual disability psychiatry?"; IMSERSO (2024); Plena inclusión España; Ley 11/2023; Directiva (UE) 2019/882.
