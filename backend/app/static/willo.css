@@ -290,3 +290,23 @@ label.etiqueta { display: block; }   /* si no, su margin-top no separa los campo
   color: var(--verde-oscuro); background: var(--blanco); border: 2px solid var(--verde-oscuro); border-radius: 50%; }
 .ajustes span { display: grid; place-items: center; line-height: 0; }
 .ajustes svg { width: 28px; height: 28px; display: block; }
+
+
+/* Pantalla 1: meter dinero en una hucha (sale de "Para tus cosas") */
+.tarjeta.hucha { display: flex; flex-direction: column; gap: 16px; }
+.hucha-fila { display: flex; align-items: center; gap: 20px; padding-right: 20px; }
+.hucha-fila > div { flex: 1; min-width: 0; }
+.meter { display: flex; flex-direction: column; gap: 12px; }
+.meter-pregunta { font-size: 20px; font-weight: 700; }
+.campo-euros { display: flex; align-items: center; gap: 10px; font: 700 28px/1 Helvetica, Arial, sans-serif; }
+.campo-euros input {
+  flex: 1; min-width: 0; min-height: 72px; padding: 0 16px;
+  border: 3px solid var(--verde-oscuro); border-radius: 20px;
+  background: var(--blanco); color: var(--texto); font: inherit;
+}
+.campo-euros input:focus-visible { outline: 4px solid var(--aviso-borde); outline-offset: 3px; }
+.campo-euros input[aria-invalid="true"] { border-color: var(--aviso-borde); }
+.meter-error { background: var(--aviso-fondo); border: 3px solid var(--aviso-borde); border-radius: 16px;
+               padding: 12px 16px; color: var(--aviso-texto); font-size: 20px; }
+.meter-error p + p { margin-top: 6px; }
+.meter .botones { margin-top: 4px; }

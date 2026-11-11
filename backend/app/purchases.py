@@ -91,5 +91,6 @@ def pagadas_este_mes(persona: dict[str, Any], hucha: str = "mis_cosas") -> list[
     """Lo que Javi ya ha pagado este mes con el dinero de sus cosas. Lo más nuevo, primero."""
     mes = hoy().isoformat()[:7]
     movs = [m for m in persona["movimientos"]
-            if m["tipo"] == "gasto" and m["hucha"] == hucha and m["fecha"][:7] == mes]
+            if m["tipo"] == "gasto" and m["hucha"] == hucha and m["fecha"][:7] == mes
+            and not m.get("meta")]  # meter dinero en una hucha no es una compra
     return [{"concepto": m["concepto"], "importe": m["importe"], "fecha": m["fecha"]} for m in reversed(movs)]
