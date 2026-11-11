@@ -180,6 +180,13 @@ class ListaContactos(BaseModel):
     contactos: list[Contacto] = Field(max_length=2000)
 
 
+class Confianza(BaseModel):
+    """La persona de confianza que elige Javi en su perfil."""
+    nombre: str = Field(min_length=1, max_length=60, examples=["Marta"])
+    telefono: str | None = Field(default=None, max_length=30, examples=["+34 600 000 102"])
+    relacion: str | None = Field(default=None, max_length=40, examples=["amiga"])
+
+
 class Texto(BaseModel):
     texto: str
 
@@ -537,6 +544,17 @@ def pausa_para_pensar(persona_id: str, pausa: Pausa):
 
 
 # ---------- Círculo de apoyo ----------
+
+@app.post("/api/personas/{persona_id}/confianza")
+def elegir_confianza(persona_id: str, c: Confianza):
+    """Perfil de Javi: elige su persona de confianza (de su círculo o nueva). A ella le llegan los avisos."""
+    p = _persona(persona_id)
+    if not c.nombre.strip():
+        raise HTTPException(422, "Escribe el nombre")
+    m = support.elegir_confianza(p, c.nombre, c.telefono, c.relacion)
+    return {"persona_de_confianza": m,
+            "texto_lectura_facil": f"Ahora tu persona de confianza es {m['nombre']}. Le llegarán los avisos."}
+
 
 @app.get("/api/personas/{persona_id}/circulo")
 def circulo(persona_id: str):
