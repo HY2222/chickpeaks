@@ -47,7 +47,7 @@ function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: s
       <p className={`${small ? "text-[24px]" : "text-[26px]"} font-bold opacity-80`}>{r.k} · {r.t}</p>
       <p className={`titular whitespace-nowrap ${small ? "text-[48px]" : "text-[56px]"} font-semibold leading-[1.05]`}>{r.n}</p>
       <p className={`${small ? "text-[22px]" : "text-[26px]"} font-bold`}>{r.e}</p>
-      <p className={`mt-[6px] ${small ? "text-[20px]" : "text-[23px]"} leading-[1.25] opacity-80`}>{r.d}</p>
+      <p className={`mt-[6px] ${small ? "text-[20px]" : "text-[23px]"} leading-[1.25] opacity-90`}>{r.d}</p>
     </div>
   );
 }
@@ -201,17 +201,17 @@ export const slides: Slide[] = [
             </h2>
           </div>
           {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
-          <Rise o={3} className="absolute left-[600px] top-[40px] h-[1000px] w-[1000px] rounded-full bg-salvia text-verde">
-            <Circulo r={rows[0]} top={40} w={620} />
+          <Rise o={3} className="absolute left-[760px] top-[80px] h-[920px] w-[920px] rounded-full bg-salvia text-verde">
+            <Circulo r={rows[0]} top={36} w={580} />
           </Rise>
-          <Rise o={4} className="absolute left-[755px] top-[319px] h-[690px] w-[690px] rounded-full bg-salvia-media text-texto">
-            <Circulo r={rows[1]} top={34} w={520} />
+          <Rise o={4} className="absolute left-[900px] top-[332px] h-[640px] w-[640px] rounded-full bg-salvia-media text-texto">
+            <Circulo r={rows[1]} top={30} w={480} />
           </Rise>
-          <Rise o={5} className="absolute left-[905px] top-[588px] h-[390px] w-[390px] rounded-full bg-verde text-fondo">
-            <Circulo r={rows[2]} top={56} w={300} small />
+          <Rise o={5} className="absolute left-[1040px] top-[584px] h-[360px] w-[360px] rounded-full bg-verde text-fondo">
+            <Circulo r={rows[2]} top={50} w={280} small />
           </Rise>
           {/* Columna izquierda: lo que significan las cifras, sin repetirlas. */}
-          <Rise o={6} className="absolute left-[128px] top-[300px] w-[440px]">
+          <Rise o={6} className="absolute left-[128px] top-[330px] w-[500px]">
             <div className="flex gap-[10px]">
               {Array.from({ length: 10 }, (_, i) => (
                 <svg key={i} viewBox="0 0 24 40" className={`h-[52px] w-[32px] ${i ? "fill-salvia-media" : "fill-verde"}`} aria-hidden>
@@ -223,11 +223,11 @@ export const slides: Slide[] = [
             <p className="titular mt-[20px] text-[60px] font-semibold leading-[1.05] text-verde">1 de cada 10</p>
             <p className="mt-[10px] text-[26px] leading-[1.3]">Nos basta con llegar a menos de 1 de cada 10 personas que ya apoya Plena inclusión.</p>
           </Rise>
-          <Rise o={7} className="absolute left-[128px] top-[640px] w-[420px] border-l-[6px] border-verde pl-[24px]">
+          <Rise o={7} className="absolute left-[128px] top-[660px] w-[500px] border-l-[6px] border-verde pl-[24px]">
             <p className="text-[28px] font-bold leading-[1.2]">Una ley para toda la UE</p>
             <p className="mt-[8px] text-[24px] leading-[1.3] text-suave">La directiva europea de accesibilidad obliga a todos los bancos.</p>
           </Rise>
-          <p className="absolute bottom-[130px] left-[128px] w-[430px] text-[18px] leading-[1.35] text-suave">
+          <p className="absolute bottom-[130px] left-[128px] w-[500px] text-[18px] leading-[1.35] text-suave">
             Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).
           </p>
           <Foot n="05" />
