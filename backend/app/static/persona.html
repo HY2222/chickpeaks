@@ -376,7 +376,7 @@ const DIBUJOS = [
 const dibujoDe = concepto => DIBUJOS.find(([palabras]) => palabras.test(concepto.toLowerCase()))?.[1] ?? "bolsa";
 
 // Lo que Javi ha preguntado (lo usan las pantallas 2, 3 y 4).
-const estado = {pregunta: null, respuesta: null};
+const estado = {pregunta: null, respuesta: null, pensadas: []};
 const icono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[n]}</svg>`;
 const pintarIconos = (raiz = document) => raiz.querySelectorAll("[data-icono]").forEach(e => e.innerHTML = icono(e.dataset.icono));
 
@@ -516,6 +516,7 @@ AL_ENTRAR["2"] = async () => {
   estado.callado = false;
   $("p2-error").hidden = true;
   estado.pregunta = estado.respuesta = null;
+  estado.pensadas = [];   // conversación nueva: Noa empieza sin compras pensadas
   $("p2-oido").textContent = "…";
   $("p2-micro").classList.add("activo");
   try {
@@ -535,9 +536,14 @@ AL_ENTRAR["2"] = async () => {
       // Herramienta de Noa que corre en esta pantalla: así Noa y la pantalla usan
       // las mismas cifras. Las cuentas las hace el backend, no la IA.
       clientTools: {
-        evaluar_compra: async ({importe, concepto}) => {
+        // Memoria de la conversación: las compras que Javi ya ha consultado se mandan en "antes" y el
+        // backend las resta primero. sumar = false (lo decide Noa): "en vez de" lo anterior, no "además".
+        evaluar_compra: async ({importe, concepto, sumar}) => {
           estado.pregunta = {texto: $("p2-oido").textContent, importe: Number(importe), concepto: concepto || "esto"};
-          estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto, hucha: "mis_cosas"});
+          if (sumar === false) estado.pensadas = [];
+          estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto,
+                                                           hucha: "mis_cosas", antes: estado.pensadas});
+          estado.pensadas = [...estado.pensadas, {concepto: estado.pregunta.concepto, importe: Number(importe)}];
           estado.dichoNoa = null;
           estado.esperandoNoa = true;   // la próxima frase de Noa es la explicación de esta compra
           return JSON.stringify(estado.respuesta);
@@ -772,7 +778,8 @@ AL_ENTRAR["3"] = async () => {
   $("p3-picto").dataset.icono = /entrada/i.test(q.concepto) ? "entrada" : "bolsa";
   pintarIconos(document.querySelector("[data-pantalla=\"3\"]"));
 
-  const frases = [`Este mes te quedan ${euros(r.quedan_antes)}.`];
+  const frases = [r.pensado_antes ? `Con lo que has pensado antes, te quedan ${euros(r.quedan_antes)}.`
+                                  : `Este mes te quedan ${euros(r.quedan_antes)}.`];
   if (r.alcanza) {
     frases.push(`Si compras ${corto}, te quedan ${euros(r.quedan_despues)}.`);
   } else {
@@ -797,7 +804,7 @@ AL_ENTRAR["3"] = async () => {
   // Escala de las barras: lo que tiene la hucha cada mes.
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
   const total = h?.limite_mensual || r.quedan_antes;
-  $("p3-ahora-texto").textContent = `Ahora: ${euros(r.quedan_antes)}`;
+  $("p3-ahora-texto").textContent = `${r.pensado_antes ? "Con lo de antes" : "Ahora"}: ${euros(r.quedan_antes)}`;
   $("p3-despues-texto").textContent = `Después: ${euros(Math.max(r.quedan_despues, 0))}`;
   $("p3-ahora-barra").style.width = pct(r.quedan_antes, total);
   $("p3-despues-barra").style.width = pct(r.quedan_despues, total);

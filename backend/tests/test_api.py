@@ -177,3 +177,20 @@ def test_raiz_lleva_a_la_demo_y_las_pantallas_no_se_guardan_en_cache(client):
     assert r.status_code in (302, 307) and r.headers["location"] == "/demo/banco"
     for ruta in ("/demo", "/demo/apoyo", "/demo/banco"):
         assert client.get(ruta).headers["cache-control"] == "no-cache"
+
+
+def test_evaluar_compra_recuerda_lo_pensado_en_la_conversacion(client):
+    url = "/api/personas/javi/evaluar_compra"
+    primera = client.post(url, json={"importe": 45, "concepto": "unos zapatos"}).json()
+    assert (primera["quedan_antes"], primera["quedan_despues"]) == (210, 165)
+    # "Y otros zapatos de 45 €": se resta primero lo de antes.
+    otra = client.post(url, json={"importe": 45, "concepto": "otros zapatos",
+                                  "antes": [{"concepto": "unos zapatos", "importe": 45}]}).json()
+    assert (otra["pensado_antes"], otra["quedan_antes"], otra["quedan_despues"]) == (45, 165, 120)
+    assert "te quedan 120 €" in otra["texto_lectura_facil"]
+    # Lo pensado no es un gasto: el dinero de la hucha no cambia.
+    assert client.post(url, json={"importe": 1, "concepto": "x"}).json()["quedan_antes"] == 210
+    # Si con lo de antes ya no llega, se dice cuánto falta.
+    falta = client.post(url, json={"importe": 100, "concepto": "un abrigo",
+                                   "antes": [{"concepto": "unos zapatos", "importe": 150}]}).json()
+    assert not falta["alcanza"] and "Te faltan 40 €" in falta["texto_lectura_facil"]

@@ -71,14 +71,26 @@ def buscar_hucha(persona: dict[str, Any], hucha_id: str | None) -> dict[str, Any
 
 
 def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
-                   hucha_id: str | None = None) -> dict[str, Any]:
-    """Devuelve las cifras y un texto en lectura fácil. No recomienda nada."""
+                   hucha_id: str | None = None, antes: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Devuelve las cifras y un texto en lectura fácil. No recomienda nada.
+
+    `antes`: lo que ya ha pensado comprar en esta conversación ({concepto, importe}). Se resta
+    primero, así "y otros zapatos de 45 €" no vuelve a contar desde el dinero de la hucha.
+    """
     h = buscar_hucha(persona, hucha_id)
-    quedan_despues = round(h["quedan"] - importe, 2)
+    antes = antes or []
+    pensado = round(sum(a["importe"] for a in antes), 2)
+    quedan_antes = round(h["quedan"] - pensado, 2)
+    quedan_despues = round(quedan_antes - importe, 2)
     alcanza = quedan_despues >= 0
     frases = [f"En la hucha de {nombre_en_frase(h)} te quedan {euros(h['quedan'])}."]
+    if antes:
+        cosas = " y ".join(f"{a['concepto']} ({euros(a['importe'])})" for a in antes)
+        frases.append(f"Antes has pensado en {cosas}.")
+        frases.append(f"Con eso, te quedarían {euros(quedan_antes)}.")
     if alcanza:
-        frases.append(f"Si compras {concepto}, te quedan {euros(quedan_despues)}.")
+        tambien = " también" if antes else ""
+        frases.append(f"Si compras{tambien} {concepto}, te quedan {euros(quedan_despues)}.")
     else:
         falta = round(-quedan_despues, 2)
         frases.append(f"{concepto[:1].upper() + concepto[1:]} cuesta {euros(importe)}.")
@@ -95,7 +107,8 @@ def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
     return {
         "hucha": h["id"],
         "hucha_nombre": h["nombre"],
-        "quedan_antes": h["quedan"],
+        "quedan_antes": quedan_antes,
+        "pensado_antes": pensado,
         "importe": importe,
         "quedan_despues": quedan_despues,
         "alcanza": alcanza,
