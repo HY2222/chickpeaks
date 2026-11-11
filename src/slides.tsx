@@ -58,7 +58,7 @@ export const slides: Slide[] = [
           <p className="text-[32px] leading-[1.35] text-suave">Para personas con discapacidad intelectual. Su asistente se llama Noa.</p>
         </Fade>
         <Fade delay={2.4} className="absolute bottom-[64px] left-[128px] w-[1664px] text-center">
-          <p className="text-[24px] text-suave">Equipo Chickpeaks</p>
+          <p className="text-[24px] text-suave">Equipo ChickPEAKS</p>
         </Fade>
       </div>
     ),
@@ -673,7 +673,7 @@ export const slides: Slide[] = [
           <Words text="Nunca compra. Nunca paga. Nunca bloquea." delay={2.1} />
         </p>
         <Foot dark center>
-          Equipo Chickpeaks · [correo de contacto]
+          Equipo ChickPEAKS · [correo de contacto]
         </Foot>
       </div>
     ),
