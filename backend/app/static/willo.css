@@ -267,4 +267,5 @@ h1, h2, h3, p { margin: 0; }
 /* Icono de ajustes arriba a la derecha del inicio: botón grande, fácil de tocar */
 .ajustes { margin-left: auto; display: grid; place-items: center; width: 56px; height: 56px; flex: none;
   color: var(--verde-oscuro); background: var(--blanco); border: 2px solid var(--verde-oscuro); border-radius: 50%; }
-.ajustes svg { width: 28px; height: 28px; }
+.ajustes span { display: grid; place-items: center; line-height: 0; }
+.ajustes svg { width: 28px; height: 28px; display: block; }
