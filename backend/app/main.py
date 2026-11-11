@@ -181,10 +181,15 @@ class ListaContactos(BaseModel):
 
 
 class Confianza(BaseModel):
-    """La persona de confianza que elige Javi en su perfil."""
+    """Una persona de confianza que añade Javi en su perfil (nueva o de su círculo)."""
     nombre: str = Field(min_length=1, max_length=60, examples=["Marta"])
     telefono: str | None = Field(default=None, max_length=30, examples=["+34 600 000 102"])
     relacion: str | None = Field(default=None, max_length=40, examples=["amiga"])
+
+
+class SeleccionConfianza(BaseModel):
+    """Las personas de confianza de Javi: ids de su círculo. Al menos una."""
+    ids: list[str] = Field(max_length=50, examples=[["ana", "marta"]])
 
 
 class Texto(BaseModel):
@@ -545,15 +550,43 @@ def pausa_para_pensar(persona_id: str, pausa: Pausa):
 
 # ---------- Círculo de apoyo ----------
 
+def _texto_confianza(nombres: list[str]) -> str:
+    quien = " y ".join(nombres)
+    return f"Tus personas de confianza son {quien}. Les llegarán los avisos." if len(nombres) > 1         else f"Tu persona de confianza es {quien}. Le llegarán los avisos."
+
+
 @app.post("/api/personas/{persona_id}/confianza")
-def elegir_confianza(persona_id: str, c: Confianza):
-    """Perfil de Javi: elige su persona de confianza (de su círculo o nueva). A ella le llegan los avisos."""
+def anadir_confianza(persona_id: str, c: Confianza):
+    """Perfil de Javi: añade una persona de confianza (nueva o de su círculo). Las demás siguen."""
     p = _persona(persona_id)
     if not c.nombre.strip():
         raise HTTPException(422, "Escribe el nombre")
-    m = support.elegir_confianza(p, c.nombre, c.telefono, c.relacion)
-    return {"persona_de_confianza": m,
-            "texto_lectura_facil": f"Ahora tu persona de confianza es {m['nombre']}. Le llegarán los avisos."}
+    m = support.anadir_confianza(p, c.nombre, c.telefono, c.relacion)
+    nombres = [x["nombre"] for x in support.con_permiso(p, "recibir_avisos_estafa")]
+    return {"persona_de_confianza": m, "personas_de_confianza": nombres,
+            "texto_lectura_facil": _texto_confianza(nombres)}
+
+
+@app.put("/api/personas/{persona_id}/confianza")
+def fijar_confianza(persona_id: str, s: SeleccionConfianza):
+    """Perfil de Javi: marca o desmarca personas de su círculo. A las marcadas les llegan los avisos."""
+    p = _persona(persona_id)
+    try:
+        elegidas = support.fijar_confianza(p, s.ids)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    except KeyError as e:
+        raise HTTPException(404, f"No están en tu círculo: {e.args[0]}")
+    nombres = [m["nombre"] for m in elegidas]
+    return {"personas_de_confianza": nombres, "texto_lectura_facil": _texto_confianza(nombres)}
+
+
+@app.post("/api/personas/{persona_id}/confianza/reiniciar")
+def reiniciar_confianza(persona_id: str):
+    """Demo: el círculo vuelve a ser el de los datos de ejemplo (solo Ana). Lo llama la pantalla al recargarse."""
+    _persona(persona_id)
+    store.reiniciar_circulo(persona_id)
+    return {"circulo": support.describir(_persona(persona_id))}
 
 
 @app.get("/api/personas/{persona_id}/circulo")

@@ -70,6 +70,12 @@ class Store:
         movs.sort(key=lambda m: m["fecha"])
         return movs
 
+    def reiniciar_circulo(self, persona_id: str) -> None:
+        """Demo: el círculo de apoyo vuelve a ser el de seed.json. Lo demás (dinero, avisos) no cambia."""
+        seed = json.loads(SEED_PATH.read_text(encoding="utf-8"))
+        inicial = next(p for p in seed["personas"] if p["id"] == persona_id)
+        self.personas[persona_id]["circulo_apoyo"] = copy.deepcopy(inicial["circulo_apoyo"])
+
     def persona(self, persona_id: str) -> dict[str, Any] | None:
         return self.personas.get(persona_id)
 

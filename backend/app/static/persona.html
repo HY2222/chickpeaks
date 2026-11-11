@@ -17,7 +17,7 @@
 <!-- 1 · Inicio de Javi -->
 <section class="pantalla" data-pantalla="1">
   <header class="cabecera">
-    <a class="picto" href="#15" id="p1-perfil" aria-label="Mi persona de confianza"><span data-icono="persona"></span></a>
+    <a class="picto" href="#15" id="p1-perfil" aria-label="Mis personas de confianza"><span data-icono="persona"></span></a>
     <div>
       <h1 class="titulo">Hola, Javi</h1>
       <p class="suave" id="p1-fecha"></p>
@@ -279,14 +279,15 @@
 <!-- 15 · Perfil: Javi elige su persona de confianza (le llegan los avisos). Se abre tocando su icono. -->
 <section class="pantalla" data-pantalla="15" hidden>
   <a class="volver" href="#1">← Volver</a>
-  <h1 class="titulo">Mi persona de confianza</h1>
+  <h1 class="titulo">Mis personas de confianza</h1>
   <p style="font-size:20px">Le llegan tus avisos: posibles estafas y pagos que no se pueden.</p>
   <div class="tarjeta fila" id="p15-ahora" aria-live="polite">
     <span class="picto" data-icono="persona"></span>
     <div><p class="nombre" id="p15-nombre"></p><p class="suave" id="p15-relacion" style="margin-top:4px"></p></div>
   </div>
 
-  <h2 class="titulo-seccion">Elegir a otra persona</h2>
+  <h2 class="titulo-seccion">¿Quién recibe tus avisos?</h2>
+  <p class="suave" style="font-size:18px">Puedes elegir a varias personas. Toca para marcar o quitar.</p>
   <div class="botones" id="p15-circulo"></div>
   <form id="p15-form" class="tarjeta" autocomplete="off" novalidate>
     <label class="etiqueta" for="p15-nueva">Alguien nuevo: ¿cómo se llama?</label>
@@ -295,7 +296,7 @@
     <input class="campo" id="p15-telefono" type="tel" inputmode="tel" maxlength="30" placeholder="Por ejemplo: 600 000 102">
     <p class="suave" id="p15-mensaje" role="status" hidden style="margin-top:16px"></p>
     <div class="botones" style="margin-top:24px">
-      <button class="boton" type="submit">Elegir a esta persona</button>
+      <button class="boton" type="submit">Añadir a esta persona</button>
     </div>
   </form>
   <div class="botones"><a class="boton secundario" href="#1">Listo</a></div>
@@ -440,7 +441,7 @@ window.addEventListener("hashchange", mostrar);
 // "Este mes te quedan" = lo que queda en la hucha "Para tus cosas" (id mis_cosas, la misma que usa evaluar_compra).
 AL_ENTRAR["1"] = async () => {
   const d = await api("presupuesto");
-  const fecha = new Date(d.fecha + "T12:00");
+  const fecha = new Date();   // la fecha de hoy de verdad, la del móvil
   const texto = fecha.toLocaleDateString("es-ES", {weekday: "long", day: "numeric", month: "long"});
   $("p1-fecha").textContent = texto[0].toUpperCase() + texto.slice(1);
   $("p1-dia-fin").textContent = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
@@ -917,8 +918,9 @@ AL_ENTRAR["4"] = async () => {
   if (!pago) { location.hash = "#1"; return; }   // abierto sin haber pagado nada
   $("p4-pagado").textContent = "Pago confirmado";
   $("p4-donde").textContent = `${euros(pago.importe)} · ${queCompra(pago.concepto)}. El banco ha visto tu pago.`;
-  $("p4-nota").textContent = pago.avisados.includes(confianza)
-    ? `${confianza} ve este pago porque tú lo elegiste.`
+  const ven = pago.avisados.filter(n => confianzas.includes(n));
+  $("p4-nota").textContent = ven.length
+    ? `${ven.join(" y ")} ${ven.length > 1 ? "ven" : "ve"} este pago porque tú lo elegiste.`
     : "Nadie más ve este pago.";
   const h = (await api("presupuesto")).huchas.find(x => x.id === "mis_cosas");
   $("p4-quedan").textContent = `${euros(h.quedan)} este mes`;
@@ -1278,41 +1280,51 @@ const diaCorto = iso => new Date(iso + "T12:00").toLocaleDateString("es-ES", {da
 // ---------- 15 · Mi persona de confianza ----------
 // La elige Javi tocando su icono. A ella le llegan los avisos (estafas, pagos que no se pueden), y su
 // nombre sale en los botones "Avisar a…" y "Hablar con…". El backend decide los permisos.
-let confianza = "Ana";
+let confianza = "Ana";      // sus nombres para los textos: "Ana" o "Ana y Marta"
+let confianzas = ["Ana"];   // la lista
+const esDeConfianza = m => m.permisos?.includes("recibir_avisos_estafa");
 async function cargarConfianza() {
   const circulo = await api("circulo").catch(() => []);
-  const m = circulo.find(x => x.confianza) ?? circulo.find(x => x.nivel >= 2) ?? null;
-  confianza = m?.nombre ?? "tu persona de apoyo";
+  confianzas = circulo.filter(esDeConfianza).map(m => m.nombre);
+  confianza = confianzas.join(" y ") || "tu persona de apoyo";
   $("p7-pregunta").textContent = `¿Quieres hablarlo con ${confianza}?`;
   $("p7-ana").textContent = `Hablar con ${confianza}`;
   $("p8-pregunta").textContent = `¿Quieres hablar con ${confianza} antes?`;
   $("p8-ana").textContent = `Avisar a ${confianza}`;
-  return {circulo, m};
+  return circulo;
 }
 
 AL_ENTRAR["15"] = async () => {
-  const {circulo, m} = await cargarConfianza();
-  $("p15-nombre").textContent = m ? m.nombre : "Todavía no has elegido a nadie";
-  $("p15-relacion").textContent = m?.relacion ? mayuscula(m.relacion) : "";
-  // Las personas de su círculo, para elegir con un toque. La que ya es de confianza sale marcada.
+  const circulo = await cargarConfianza();
+  const elegidas = circulo.filter(esDeConfianza);
+  $("p15-nombre").textContent = elegidas.length ? confianza : "Todavía no has elegido a nadie";
+  $("p15-relacion").textContent = elegidas.map(m => mayuscula(m.relacion || "")).filter(Boolean).join(" · ");
+  // Su círculo: cada persona se marca o se desmarca con un toque. Puede haber varias.
   $("p15-circulo").innerHTML = circulo.map(x => `
-    <button class="boton secundario" type="button" data-nombre="${esc(x.nombre)}" aria-pressed="${x === m}">
-      ${x === m ? "✓ " : ""}${esc(x.nombre)}${x.relacion ? ` (${esc(x.relacion)})` : ""}</button>`).join("");
-  const elegir = async (nombre, telefono) => {
-    try {
-      const r = await post("confianza", {nombre, telefono: telefono || null});
-      $("p15-mensaje").textContent = r.texto_lectura_facil;
-      $("p15-mensaje").hidden = false;
-      $("p15-nueva").value = $("p15-telefono").value = "";
-      await AL_ENTRAR["15"]();
-    } catch (e) { popup(e.message); }
+    <button class="boton secundario" type="button" data-id="${esc(x.id)}" aria-pressed="${esDeConfianza(x)}">
+      ${esDeConfianza(x) ? "✓ " : ""}${esc(x.nombre)}${x.relacion ? ` (${esc(x.relacion)})` : ""}</button>`).join("");
+  const listo = async r => {
+    $("p15-mensaje").textContent = r.texto_lectura_facil;
+    $("p15-mensaje").hidden = false;
+    await AL_ENTRAR["15"]();
   };
-  $("p15-circulo").querySelectorAll("button").forEach(b => b.onclick = () => elegir(b.dataset.nombre));
-  $("p15-form").onsubmit = e => {
+  $("p15-circulo").querySelectorAll("button").forEach(b => b.onclick = async () => {
+    const marcadas = new Set(elegidas.map(m => m.id));
+    marcadas.has(b.dataset.id) ? marcadas.delete(b.dataset.id) : marcadas.add(b.dataset.id);
+    if (!marcadas.size) return popup("Elige al menos a una persona. Si no, nadie sabrá si te pasa algo.", "Aviso");
+    try { await listo(await api("confianza", {method: "PUT", headers: {"Content-Type": "application/json"},
+                                               body: JSON.stringify({ids: [...marcadas]})})); }
+    catch (e) { popup(e.message); }
+  });
+  $("p15-form").onsubmit = async e => {
     e.preventDefault();
     const nombre = $("p15-nueva").value.trim();
     if (!nombre) { $("p15-mensaje").textContent = "Escribe cómo se llama."; $("p15-mensaje").hidden = false; return; }
-    elegir(nombre, $("p15-telefono").value.trim());
+    try {
+      const r = await post("confianza", {nombre, telefono: $("p15-telefono").value.trim() || null});
+      $("p15-nueva").value = $("p15-telefono").value = "";
+      await listo(r);
+    } catch (e2) { popup(e2.message); }
   };
 };
 
@@ -1398,6 +1410,8 @@ AL_ENTRAR["12"] = async () => {
 };
 
 pintarIconos();
+// Demo: cada vez que se abre o recarga la página, las personas añadidas se borran y queda solo Ana.
+await post("confianza/reiniciar", {}).catch(() => {});
 mostrar();
 cargarConfianza();
 </script>
