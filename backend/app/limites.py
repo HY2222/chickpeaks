@@ -18,7 +18,8 @@ from .support import con_permiso
 
 LIMITE_DIARIO = 1000.0
 LIMITE_APP = 1_000_000.0
-TEXTO_LIMITE_APP = "Error: esa cantidad no es posible. En Willo el máximo es 1.000.000 €."
+TEXTO_LIMITE_APP = ("Error en la operación. El importe no es válido. "
+                    "Revisa la cantidad e inténtalo de nuevo.")
 
 
 class FueraDeLimite(Exception):
@@ -73,7 +74,7 @@ def comprobar(persona: dict[str, Any], importe: float, concepto: str, hucha: str
     nombre = persona["nombre"]
     if r["fuera_de_app"]:
         raise FueraDeLimite(TEXTO_LIMITE_APP, "limite_app",
-                            f"{nombre} ha intentado apuntar {euros(importe)} ({concepto}). Es más de 1.000.000 €.")
+                            f"{nombre} ha intentado una operación de {euros(importe)} ({concepto}). El importe no es válido.")
     if r["negativo"] and not ya_pagado:
         falta = round(importe - r["quedan"], 2)
         raise FueraDeLimite(f"No te llega. Te faltan {euros(falta)}. "

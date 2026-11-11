@@ -63,7 +63,7 @@ async def datos_no_validos(request: Request, e: RequestValidationError):
         p = store.persona(request.path_params.get("persona_id", ""))
         nombre = p["nombre"] if p else "La persona"
         return _bloqueado(request, 422, "limite_app", limites.TEXTO_LIMITE_APP,
-                          f"{nombre} ha intentado usar {easyread.euros(absurdo['input'])}. Es más de 1.000.000 €.")
+                          f"{nombre} ha intentado una operación de {easyread.euros(absurdo['input'])}. El importe no es válido.")
     from fastapi.exception_handlers import request_validation_exception_handler
     return await request_validation_exception_handler(request, e)
 
