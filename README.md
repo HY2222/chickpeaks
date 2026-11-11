@@ -4,8 +4,8 @@ Willo es una app con asistente de voz en **lectura fácil** para que las persona
 
 - **La persona** pregunta a Noa por voz: «¿Puedo comprarme las zapatillas?». Noa responde: «En tu hucha de mis cosas te quedan 120 €. Si compras las zapatillas, te quedan 40 €. Tú decides.» La IA explica y nunca recomienda. **Las cuentas las hace el código, no el modelo.**
 - **Su decisión queda registrada** como constancia de su voluntad, y solo se comparte si ella quiere.
-- **Escudo antiestafas** con reglas explicables. Avisa al círculo de apoyo (con consentimiento previo) y **nunca bloquea**.
-- **Círculo de apoyo** en niveles N0 a N4 en vez de «control parental».
+- **Escudo antiestafas** con reglas explicables. Noa avisa y la persona elige si llama a su persona de apoyo. **Nunca bloquea**: Willo avisa, la persona decide.
+- **Círculo de apoyo** en 3 niveles (Solo yo, Acompañar y Medida judicial) en vez de «control parental».
 - **Persona de apoyo**: registra gastos dictando (ElevenLabs Scribe) y descarga en un clic el **informe anual para el juzgado** en PDF.
 - **Perfil de menores** (ejemplo: Lucía, 14 años) con metas de ahorro sobre el mismo motor.
 
@@ -100,13 +100,25 @@ cd backend && python -m pytest -q
 
 ## Círculo de apoyo
 
-| Nivel | Qué permite | Quién lo da |
+Para la persona solo hay una pregunta: **¿quieres que alguien te acompañe con tu dinero?**
+
+| Nivel | Qué significa | Quién lo da |
 |---|---|---|
-| N0 · Por defecto | Solo la persona usa la app y decide | — |
-| N1 · Compartir | Ver las decisiones que ella comparte. Se puede retirar | La persona |
-| N2 · Apoyo | Avisos de posible estafa (con consentimiento) y «pausa para pensar» que activa ella. Nunca bloqueo | La persona |
-| N3 · Guardador de hecho | Registrar gastos y preparar la rendición de cuentas | La ley |
-| N4 · Poder preventivo o curatela | Solo lo que diga el documento | Escritura o resolución judicial |
+| Solo yo | Nadie más ve el dinero de la persona. | — |
+| Acompañar | La persona de apoyo ve los pagos, y la persona puede llamarla con un toque cuando Noa detecta algo raro. Se puede retirar cuando quiera. | La persona |
+| Medida judicial | Solo aparece si hay una sentencia. Hace lo que diga la sentencia y genera el informe de cuentas para el juez. | Resolución judicial |
+
+«Acompañar» junta los antiguos «Ver» y «Apoyar»; «Medida judicial» junta «Guardar» y «Representar». En el código (`support.py`) los niveles siguen siendo N0 a N4: Solo yo = N0, Acompañar = N1-N2 y Medida judicial = N3-N4.
+
+### Cuando Noa ve algo raro
+
+> Noa: «Cuidado. Este pago se parece a un engaño. ¿Quieres hablar con Ana antes de pagar?»
+> **[Llamar a Ana]** **[Sigo yo]**
+
+- **Llamar a Ana**: se abre la llamada y Ana ve el pago para poder ayudar.
+- **Sigo yo**: Ana no se entera y la persona decide sola. Para que un estafador no la presione, Noa le explica en lectura fácil por qué parece una estafa («Nadie del banco te pide dinero por teléfono») y le propone esperar: «¿Esperamos 10 minutos antes de pagar?». Se lo puede saltar: **el pago nunca se bloquea**.
+
+Willo avisa, la persona decide.
 
 ## API principal
 
@@ -141,7 +153,7 @@ backend/tests/    tests
 
 ## Principios
 
-- Apoyo, no sustitución: la app nunca decide por la persona.
+- Apoyo, no sustitución: la app nunca decide por la persona. Willo avisa, la persona decide.
 - Límites del dinero (`backend/app/limites.py`): ninguna hucha puede quedar en negativo; más de 1.000 € en un día (gastado o recibido) se avisa siempre al círculo de apoyo; más de 1.000.000 € es un error y no se apunta.
 - No detectamos emociones por la voz y la voz nunca sirve como firma.
 - Pictogramas de [ARASAAC](https://arasaac.org) solo para la demo (licencia no comercial), citando la fuente.
