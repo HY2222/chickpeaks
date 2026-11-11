@@ -22,7 +22,7 @@ Por eso hemos creado Willo. Es una app de dinero que se usa hablando, con frases
 Nuestro mercado.
 **TAM, Europa:** hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año.
 **SAM, España:** según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año.
-**SOM:** empezamos por las personas que ya están en asociaciones y organizaciones como AMAS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.
+**SOM:** empezamos por las personas que ya están en asociaciones y organizaciones como AMÁS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.
 
 ## 6 · La competencia (≈ 40 s)
 Ya hay empresas trabajando en esto. CaixaBank tiene una cuenta con persona de apoyo y una guía en lectura fácil, pero la app no te habla ni te explica cada pago. SpendAble, en Australia, es una tarjeta con app para personas con discapacidad intelectual, pero los presupuestos los pone la persona de apoyo. True Link, en Estados Unidos, protege de estafas bloqueando: decide el cuidador. Y Blue, de BBVA, habla con IA, pero no en lectura fácil ni con apoyos. Willo es el único que junta todo y deja decidir a la persona.
@@ -53,17 +53,14 @@ Los costes: la IA es el más grande, unos 15.100 euros al mes, contando 3 conver
 Nos quedan unos **18.320 euros al mes: un margen operativo del 53 por ciento**. Y la cuota base ya cubre nuestros costes fijos: cada usuario nuevo nos deja 1,31 euros de margen al mes.
 
 ## 14 · Go to market (≈ 45 s) · CAMBIADA (métricas)
-¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo. Y ese es nuestro canal: Plena inclusión agrupa unas 950 asociaciones que apoyan a 150.000 personas. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea.
+¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMÁS ya ha validado Willo y quiere que sus usuarios prueben la demo. Y ese es nuestro canal: Plena inclusión agrupa unas 950 asociaciones que apoyan a 150.000 personas. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea.
 En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y captar usuarios nos cuesta casi cero, porque nos llegan por las asociaciones.
 
 ## 15 · Equipo (≈ 15 s)
-Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía.
+Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.
 
-## 16 · Objetivo (≈ 25 s)
-Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Ya tenemos la demo; en los próximos meses, los primeros usuarios con AMAS y Plena inclusión; en 2027, el piloto con un banco; y después, más bancos y Europa.
-
-## 17 · Cierre (≈ 5 s)
-Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.
+## 16 · Cierre (≈ 10 s) · CAMBIADA
+Lo que os pedimos hoy: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.
 
 ---
 

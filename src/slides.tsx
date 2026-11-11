@@ -40,6 +40,16 @@ const T72 = "titular text-[72px] font-semibold leading-[1.1]";
 const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 
 /* ---------- Diapositivas ---------- */
+// Cifras dentro de los rectángulos del mercado (TAM, SAM, SOM): personas y euros al año.
+function Cifra({ r, className }: { r: { n: string; e: string }; className: string }) {
+  return (
+    <div className={`absolute text-right ${className}`}>
+      <p className="titular whitespace-nowrap text-[36px] font-semibold leading-[1.1]">{r.n}</p>
+      <p className="whitespace-nowrap text-[22px] font-bold opacity-80">{r.e}</p>
+    </div>
+  );
+}
+
 export const slides: Slide[] = [
   {
     id: "portada",
@@ -174,7 +184,7 @@ export const slides: Slide[] = [
   {
     id: "mercado",
     notes:
-      "Nuestro mercado. TAM, Europa: hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año. SAM, España: según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año. SOM: empezamos por las personas que ya están en asociaciones y organizaciones como AMAS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.",
+      "Nuestro mercado. TAM, Europa: hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año. SAM, España: según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año. SOM: empezamos por las personas que ya están en asociaciones y organizaciones como AMÁS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.",
     render: () => {
       const rows = [
         { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "de personas con discapacidad intelectual. La misma ley en toda la UE.", e: "≈ 200 M€ al año" },
@@ -192,12 +202,15 @@ export const slides: Slide[] = [
           {/* Rectángulos uno dentro de otro, como en la plantilla de START. */}
           <Rise o={3} className="absolute left-[128px] top-[400px] h-[520px] w-[760px] rounded-[32px] bg-salvia">
             <p className="absolute left-[40px] top-[32px] text-[40px] font-bold text-verde">TAM</p>
+            <Cifra r={rows[0]} className="right-[40px] top-[14px] text-verde" />
           </Rise>
           <Rise o={4} className="absolute left-[288px] top-[490px] h-[400px] w-[570px] rounded-[28px] bg-salvia-media">
             <p className="absolute left-[36px] top-[28px] text-[40px] font-bold text-verde">SAM</p>
+            <Cifra r={rows[1]} className="right-[36px] top-[12px] text-verde" />
           </Rise>
           <Rise o={5} className="absolute left-[478px] top-[580px] h-[280px] w-[350px] rounded-[24px] bg-verde">
             <p className="absolute left-[32px] top-[24px] text-[40px] font-bold text-fondo">SOM</p>
+            <Cifra r={rows[2]} className="left-[32px] bottom-[28px] text-fondo !text-left" />
           </Rise>
           <div className="absolute left-[968px] top-[390px] flex w-[824px] flex-col gap-[22px]">
             {rows.map((r, i) => (
@@ -691,7 +704,7 @@ export const slides: Slide[] = [
   {
     id: "go-to-market",
     notes:
-      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo. Y ese es nuestro canal: Plena inclusión agrupa unas 950 asociaciones que apoyan a 150.000 personas. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y captar usuarios nos cuesta casi cero, porque nos llegan por las asociaciones.",
+      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMÁS ya ha validado Willo y quiere que sus usuarios prueben la demo. Y ese es nuestro canal: Plena inclusión agrupa unas 950 asociaciones que apoyan a 150.000 personas. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y captar usuarios nos cuesta casi cero, porque nos llegan por las asociaciones.",
     render: () => {
       const card = "absolute top-[400px] flex h-[270px] w-[480px] flex-col gap-[10px] rounded-[20px] p-[36px]";
       const metrics = [
@@ -711,7 +724,7 @@ export const slides: Slide[] = [
           <Rise o={4} className={`${card} left-[128px] bg-white`}>
             <p className="text-[22px] font-bold text-suave">Paso 1 · Validar</p>
             <h3 className="text-[36px] font-bold leading-[1.15]">Con las asociaciones</h3>
-            <p className="text-[24px] leading-[1.3] text-suave">AMAS ya ha validado Willo y quiere colaborar para que personas con discapacidad intelectual prueben la demo.</p>
+            <p className="text-[24px] leading-[1.3] text-suave">AMÁS ya ha validado Willo y quiere colaborar para que personas con discapacidad intelectual prueben la demo.</p>
           </Rise>
           <DrawArrow o={5} className="absolute left-[624px] top-[521px]" />
           <Rise o={6} className={`${card} left-[720px] bg-verde text-fondo`}>
@@ -745,14 +758,14 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía.",
+      "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.",
     render: () => {
       const team = [
         { n: "Inés", r: "Arquitecta de ML" },
         { n: "Jiawen", r: "Analista de Datos" },
-        { n: "He Ye", r: "Informática y ADE" },
+        { n: "He", r: "Informática y ADE" },
         { n: "Nolan", r: "Empresa y Tecnología" },
-        { n: "XingYi", r: "Telecomunicación" },
+        { n: "Xingyi", r: "Telecomunicación" },
         { n: "Anqi", r: "Economía" },
       ];
       return (
@@ -777,48 +790,9 @@ export const slides: Slide[] = [
     },
   },
   {
-    id: "objetivo",
-    notes:
-      "Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Esto es lo que viene: ya tenemos la demo; en los próximos meses, los primeros usuarios con AMAS y Plena inclusión; en 2027, el piloto con un banco; y después, más bancos y Europa.",
-    render: () => {
-      const steps = [
-        { w: "Hoy", t: "Demo que funciona" },
-        { w: "Próximos meses", t: "Primeros usuarios con AMAS y Plena inclusión" },
-        { w: "2027", t: "Piloto con un banco", accent: true },
-        { w: "Después", t: "Más bancos y Europa" },
-      ];
-      return (
-        <div className="absolute inset-0 bg-fondo text-texto">
-          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
-            <Label>Nuestro objetivo</Label>
-            <h2 className={T80}>
-              <Words text="Un piloto con un banco en 2027." />
-            </h2>
-          </div>
-          <Rise o={4} className="absolute left-[128px] top-[380px] flex w-[1664px] items-center gap-[48px] rounded-[24px] bg-verde px-[48px] py-[36px] text-fondo">
-            <p className="w-[360px] text-[28px] font-bold leading-[1.2] text-salvia">Lo que os pedimos hoy</p>
-            <p className="titular text-[52px] font-semibold leading-[1.1]">Contactos en bancos y mentoría para el piloto.</p>
-          </Rise>
-          <Fade o={6} className="absolute left-[128px] top-[640px]">
-            <p className="text-[28px] font-bold text-verde">Qué pasa después</p>
-          </Fade>
-          <BarH o={7} round width={1664} height={8} color={GREY} className="absolute left-[128px] top-[716px]" />
-          {steps.map((st, i) => (
-            <Rise key={st.w} o={i + 8} className="absolute top-[700px] flex w-[400px] flex-col gap-[16px]" style={{ left: 128 + i * 421 }}>
-              <span className={`block h-[40px] w-[40px] rounded-full border-[6px] border-fondo ${st.accent ? "bg-verde" : "bg-salvia-media"}`} />
-              <p className={`text-[26px] font-bold ${st.accent ? "text-verde" : "text-suave"}`}>{st.w}</p>
-              <p className={`text-[32px] font-bold leading-[1.2] ${st.accent ? "text-verde" : ""}`}>{st.t}</p>
-            </Rise>
-          ))}
-          <Foot n="17" />
-        </div>
-      );
-    },
-  },
-  {
     id: "cierre",
     dark: true,
-    notes: "Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.",
+    notes: "Lo que os pedimos hoy: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.",
     render: () => (
       <div className="absolute inset-0 bg-noche text-crema">
         {/* "willo" vuelve a formarse aquí con las partículas de la capa de App. */}
@@ -828,8 +802,11 @@ export const slides: Slide[] = [
         <p className="absolute left-[128px] top-[790px] w-[1664px] text-center text-[40px] leading-[1.3] text-crema/75">
           <Words text="Nunca compra. Nunca paga. Nunca bloquea." delay={2.1} />
         </p>
+        <p className="absolute left-[128px] top-[880px] w-[1664px] text-center text-[36px] font-semibold leading-[1.3] text-salvia">
+          <Words text="Lo que os pedimos hoy: contactos en bancos y mentoría para el piloto." delay={2.6} />
+        </p>
         <Foot dark center>
-          Equipo ChickPEAKS · [correo de contacto]
+          Equipo ChickPEAKS
         </Foot>
       </div>
     ),
