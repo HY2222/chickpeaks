@@ -137,6 +137,11 @@ h1, h2, h3, p { margin: 0; }
 .popup { width: min(420px, calc(100vw - 32px)); margin: auto; box-sizing: border-box; }
 .popup::backdrop { background: rgb(0 0 0 / .45); }
 .popup[open] { animation: aparecer .2s ease-out; }
+/* "Ver más" (personas de confianza): botón centrado, del ancho de su texto. */
+.ver-mas { align-self: center; width: auto; min-height: 56px; padding: 0 32px; }
+/* Ventana con más burbujas: con scroll si no caben. */
+.lista-popup { border: 0; max-height: calc(100vh - 64px); overflow-y: auto; }
+.lista-popup .lista { margin: 16px 0 20px; }
 .popup-texto { margin: 12px 0 20px; font-size: 20px; line-height: 1.4; }
 
 /* ---------- Micrófono de Noa (pantalla 2) ---------- */
@@ -261,6 +266,7 @@ h1, h2, h3, p { margin: 0; }
                 display: flex; flex-direction: column; gap: 6px; font-size: 20px; }
 
 /* Campos de texto (crear una hucha): grandes y claros */
+label.etiqueta { display: block; }   /* si no, su margin-top no separa los campos del formulario */
 .campo { display: block; width: 100%; box-sizing: border-box; margin-top: 8px; padding: 16px;
   font: inherit; font-size: 22px; color: var(--texto); background: var(--blanco);
   border: 2px solid var(--verde-oscuro); border-radius: 16px; }
