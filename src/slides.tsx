@@ -561,7 +561,7 @@ export const slides: Slide[] = [
               <p className="text-[26px] leading-[1.3] text-suave">La persona no paga nada. El banco paga según el uso real.</p>
             </Fade>
           </div>
-          <Foot n="12">Precios sin IVA. Propuesta del equipo, pendiente de validar con bancos. Ley 11/2023.</Foot>
+          <Foot n="12">Precios sin IVA, pendientes de validar con bancos. Mismo modelo que FinCell y Crassula: alta + cuota base + uso.</Foot>
         </div>
       );
     },
@@ -619,7 +619,7 @@ export const slides: Slide[] = [
             <p className="text-[22px] font-bold text-verde">Cada usuario nuevo nos deja</p>
             <p className="titular text-[56px] font-semibold leading-none text-verde">+ 1,31 € al mes</p>
           </Rise>
-          <Foot n="13">Estimación del equipo, sin datos reales. IA: 1 $ ≈ 0,89 €. Costes sin IVA.</Foot>
+          <Foot n="13">Estimación del equipo, sin datos reales. Precios pendientes de validar con bancos. IA: 1 $ ≈ 0,89 €.</Foot>
         </div>
       );
     },

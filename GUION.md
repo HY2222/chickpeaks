@@ -78,6 +78,9 @@ Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu
 **¿Por qué una cuota base y además un precio por usuario?**
 La cuota base le da al banco un coste mínimo previsible y a nosotros nos cubre los costes fijos (mantenimiento e infraestructura, unos 1.224 € al mes). El precio por usuario sigue el uso real, igual que nuestro coste principal, la IA. Así nunca perdemos dinero con un banco que crece.
 
+**¿De dónde salen los precios?**
+Son una propuesta nuestra, pero siguen el mercado. FinCell (app de banca de marca blanca) cobra igual: alta, cuota fija y una cuota por usuario activo, desde 1.000 € al mes. Crassula cobra 20.000 € de alta y 8.000 € al mes, y Synctera, de 5.000 a 25.000 $ de alta: nuestros 15.000 € están en medio. Un asistente de IA para bancos en AWS cobra unos 0,35 $ por conversación; nosotros, unos 0,03 €.
+
 **¿Cuánto os cuesta conseguir un banco?**
 Ese es el CAC (coste de adquisición de cliente) que más importa, porque quien paga es el banco. Todavía no lo sabemos: por eso pedimos contactos en bancos y mentoría. Lo que sí es casi gratis es conseguir usuarios, porque nos llegan por las asociaciones.
 
@@ -119,5 +122,7 @@ El backend, en Render; la parte web, en Vercel. Hoy son unos 24 € al mes; con 
 | Resultado operativo | 18.317,71 €/mes · margen 52,9 % |
 | Margen por usuario | 1,31 € al mes (2,40 € − 1,09 €) |
 | Ingresos al año | TAM ≈ 200 M€ · SAM ≈ 4,5 M€ (a 2,40 €/usuario) · SOM ≈ 416.000 € |
+
+Fuentes de precios: FinCell (Software Advice), Crassula (crassula.io/prices), Synctera (CostBench), BankAssist (AWS Marketplace).
 
 Fuentes: *European Psychiatry* (2020), "Are we training psychiatrists to develop skills in intellectual disability psychiatry?"; IMSERSO (2024); Plena inclusión España; Ley 11/2023; Directiva (UE) 2019/882.
