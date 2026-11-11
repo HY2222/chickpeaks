@@ -81,31 +81,49 @@ def cambiar_nivel(persona: dict[str, Any], miembro_id: str, nivel: int) -> dict[
     return m
 
 
-def elegir_confianza(persona: dict[str, Any], nombre: str, telefono: str | None = None,
-                     relacion: str | None = None) -> dict[str, Any]:
-    """La persona elige su persona de confianza: alguien de su círculo o alguien nuevo.
+# Personas de confianza: las que reciben los avisos (posibles estafas, pagos que no se pueden,
+# más de 1.000 € en un día). Son las que tienen el permiso "recibir_avisos_estafa". Puede haber varias.
 
-    Esa persona recibe los avisos (posibles estafas, pagos que no se pueden): nivel Apoyo (2) como
-    mínimo y con consentimiento. La anterior, si la había dado la propia persona con nivel 0-2, deja
-    de recibirlos (nivel 0). Un apoyo legal (N3-N4) no se toca: eso no se cambia desde la app.
-    """
+def _marcar(m: dict[str, Any], elegida: bool) -> None:
+    if elegida:
+        m["nivel"] = max(m["nivel"], 2)            # Apoyo como mínimo
+        m["consiente_avisos_estafa"] = True
+    else:
+        m["consiente_avisos_estafa"] = False
+        if m["otorgado_por"] == "persona" and m["nivel"] <= 2:
+            m["nivel"] = 0                         # la dio la persona: la quita. N3-N4 no se tocan
+
+
+def anadir_confianza(persona: dict[str, Any], nombre: str, telefono: str | None = None,
+                     relacion: str | None = None) -> dict[str, Any]:
+    """Añade a alguien (nuevo o de su círculo) a sus personas de confianza. Las demás siguen igual."""
     circulo = persona["circulo_apoyo"]
-    elegido = next((m for m in circulo if m["nombre"].strip().lower() == nombre.strip().lower()), None)
-    if elegido is None:
-        base = "".join(c if c.isalnum() else "_" for c in nombre.strip().lower()).strip("_") or "confianza"
-        ids, id_, n = {m["id"] for m in circulo}, base, 2
+    nombre = " ".join(nombre.split())
+    m = next((x for x in circulo if x["nombre"].lower() == nombre.lower()), None)
+    if m is None:
+        base = "".join(c if c.isalnum() else "_" for c in nombre.lower()).strip("_") or "confianza"
+        ids, id_, n = {x["id"] for x in circulo}, base, 2
         while id_ in ids:
             id_, n = f"{base}_{n}", n + 1
-        elegido = {"id": id_, "nombre": nombre.strip(), "relacion": (relacion or "persona de confianza").strip(),
-                   "nivel": 2, "otorgado_por": "persona", "consiente_avisos_estafa": True}
-        circulo.append(elegido)
+        m = {"id": id_, "nombre": nombre[:1].upper() + nombre[1:],   # "marta" → "Marta"
+             "relacion": (relacion or "persona de confianza").strip(), "nivel": 2,
+             "otorgado_por": "persona", "consiente_avisos_estafa": True}
+        circulo.append(m)
     if telefono:
-        elegido["telefono"] = telefono.strip()
+        m["telefono"] = telefono.strip()
+    _marcar(m, True)
+    return m
+
+
+def fijar_confianza(persona: dict[str, Any], ids: list[str]) -> list[dict[str, Any]]:
+    """Las personas de confianza son exactamente estas (ids de su círculo). Al menos una."""
+    circulo = persona["circulo_apoyo"]
+    elegidas = set(ids)
+    if not elegidas:
+        raise ValueError("Elige al menos a una persona.")
+    desconocidas = elegidas - {m["id"] for m in circulo}
+    if desconocidas:
+        raise KeyError(", ".join(sorted(desconocidas)))
     for m in circulo:
-        if m.get("confianza") and m is not elegido and m["otorgado_por"] == "persona" and m["nivel"] <= 2:
-            m["nivel"] = 0
-        m["confianza"] = m is elegido
-    if elegido["nivel"] < 2:
-        elegido["nivel"] = 2
-    elegido["consiente_avisos_estafa"] = True
-    return elegido
+        _marcar(m, m["id"] in elegidas)
+    return [m for m in circulo if m["id"] in elegidas]

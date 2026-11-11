@@ -33,7 +33,7 @@ class FueraDeLimite(Exception):
 
 def avisar_bloqueo(persona: dict[str, Any], texto: str) -> list[str]:
     """Un pago que no se ha podido apuntar: se avisa al círculo (quien ve sus decisiones). Devuelve a quién."""
-    miembros = con_permiso(persona, "ver_decisiones")
+    miembros = con_permiso(persona, "recibir_avisos_estafa")   # sus personas de confianza
     if not miembros:
         return []
     return avisar(persona, miembros, "pago_no_permitido",
@@ -83,10 +83,10 @@ def comprobar(persona: dict[str, Any], importe: float, concepto: str, hucha: str
                             f"le faltan {euros(falta)}.")
     if not r["pasa_limite_diario"]:
         return []
-    miembros = con_permiso(persona, "ver_decisiones")
+    miembros = con_permiso(persona, "recibir_avisos_estafa")   # sus personas de confianza
     if not miembros:
         raise FueraDeLimite(f"Hoy pasarías de {euros(LIMITE_DIARIO)}. Para eso tiene que saberlo "
-                            "una persona de tu círculo de apoyo, y no tienes a nadie.", "limite_diario")
+                            "una persona de confianza, y no tienes a nadie.", "limite_diario")
     verbo = "recibir" if tipo == "ingreso" else "gastar"
     total = euros(round(r["movido_hoy"] + importe, 2))
     aviso = avisar(persona, miembros, "limite_diario",
