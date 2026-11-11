@@ -792,7 +792,7 @@ export const slides: Slide[] = [
   {
     id: "cierre",
     dark: true,
-    notes: "Lo que os pedimos hoy: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.",
+    notes: "Nuestro objetivo: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.",
     render: () => (
       <div className="absolute inset-0 bg-noche text-crema">
         {/* "willo" vuelve a formarse aquí con las partículas de la capa de App. */}
@@ -803,7 +803,7 @@ export const slides: Slide[] = [
           <Words text="Nunca compra. Nunca paga. Nunca bloquea." delay={2.1} />
         </p>
         <p className="absolute left-[128px] top-[880px] w-[1664px] text-center text-[36px] font-semibold leading-[1.3] text-salvia">
-          <Words text="Lo que os pedimos hoy: contactos en bancos y mentoría para el piloto." delay={2.6} />
+          <Words text="Nuestro objetivo: contactos en bancos y mentoría para el piloto." delay={2.6} />
         </p>
         <Foot dark center>
           Equipo ChickPEAKS

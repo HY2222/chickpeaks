@@ -60,7 +60,7 @@ En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base
 Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.
 
 ## 16 · Cierre (≈ 10 s) · CAMBIADA
-Lo que os pedimos hoy: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.
+Nuestro objetivo: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.
 
 ---
 
