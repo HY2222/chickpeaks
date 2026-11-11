@@ -544,7 +544,6 @@ function prepararMeter(tarjeta, meta, tienes) {
     input.setAttribute("aria-invalid", "true");
   };
   abrir.onclick = () => {
-    $("p1-hucha-hecho").hidden = true;
     abrir.hidden = true; form.hidden = false; error.hidden = true;
     input.value = ""; input.removeAttribute("aria-invalid"); input.focus();
   };
@@ -563,10 +562,7 @@ function prepararMeter(tarjeta, meta, tienes) {
       const datos = await r.json();
       if (!r.ok) return fallo([typeof datos.detail === "string" ? datos.detail : "No se ha podido meter el dinero"]);
       await AL_ENTRAR["1"](true);   // vuelve a pintar el inicio: baja "Este mes te quedan" y sube la hucha
-      const hecho = $("p1-hucha-hecho");
-      hecho.innerHTML = datos.texto_lectura_facil.split(/(?<=\.)\s+/).map(f => `<p>${esc(sinPunto(f))}</p>`).join("");
-      hecho.hidden = false;
-      hecho.scrollIntoView({block: "nearest"});
+      $("p1-huchas").querySelector(`[data-meta="${CSS.escape(meta.id)}"]`)?.scrollIntoView({block: "nearest"});
     } catch {
       fallo(["No se ha podido meter el dinero", "Prueba otra vez"]);
     } finally {

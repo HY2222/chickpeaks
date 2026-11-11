@@ -308,6 +308,5 @@ label.etiqueta { display: block; }   /* si no, su margin-top no separa los campo
 .campo-euros input[aria-invalid="true"] { border-color: var(--aviso-borde); }
 .meter-error { background: var(--aviso-fondo); border: 3px solid var(--aviso-borde); border-radius: 16px;
                padding: 12px 16px; color: var(--aviso-texto); font-size: 20px; }
-.meter-error p + p, .hucha-hecho p + p { margin-top: 6px; }
-.hucha-hecho { font-size: 20px; margin-bottom: 16px; }
+.meter-error p + p { margin-top: 6px; }
 .meter .botones { margin-top: 4px; }
