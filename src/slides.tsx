@@ -44,7 +44,8 @@ const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: string; e: string; d: string }; top: number; w: number; small?: boolean }) {
   return (
     <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center text-center" style={{ top, width: w }}>
-      <p className={`whitespace-nowrap font-bold uppercase ${small ? "text-[20px] tracking-[0.04em]" : "text-[22px] tracking-[0.08em]"}`}><span className="text-[28px] font-black">{r.k}</span> <span className="opacity-70">· {r.t}</span></p>
+      <p className="text-[30px] font-black leading-[1.1] tracking-[0.08em]">{r.k}</p>
+      <p className={`whitespace-nowrap font-bold uppercase opacity-70 ${small ? "text-[18px] tracking-[0.04em]" : "text-[20px] tracking-[0.08em]"}`}>{r.t}</p>
       <p className={`titular whitespace-nowrap ${small ? "text-[64px]" : "text-[76px]"} font-semibold leading-[1.05]`}>{r.n}</p>
       <p className={`${small ? "text-[20px]" : "text-[22px]"} opacity-80`}>{r.d}</p>
       <p className={`mt-[6px] ${small ? "text-[24px]" : "text-[28px]"} font-bold`}>{r.e}</p>
@@ -202,13 +203,13 @@ export const slides: Slide[] = [
           </div>
           {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
           <Rise o={3} className="absolute left-[760px] top-[80px] h-[920px] w-[920px] rounded-full bg-salvia text-verde">
-            <Circulo r={rows[0]} top={40} w={580} />
+            <Circulo r={rows[0]} top={26} w={580} />
           </Rise>
           <Rise o={4} className="absolute left-[900px] top-[332px] h-[640px] w-[640px] rounded-full bg-salvia-media text-texto">
-            <Circulo r={rows[1]} top={34} w={480} />
+            <Circulo r={rows[1]} top={20} w={480} />
           </Rise>
           <Rise o={5} className="absolute left-[1040px] top-[584px] h-[360px] w-[360px] rounded-full bg-verde text-fondo">
-            <Circulo r={rows[2]} top={78} w={300} small />
+            <Circulo r={rows[2]} top={58} w={300} small />
           </Rise>
           {/* Columna izquierda: lo que significan las cifras, sin repetirlas. */}
           <Rise o={6} className="absolute left-[128px] top-[380px] w-[520px]">
