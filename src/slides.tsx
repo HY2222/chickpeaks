@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
-import { at, BarH, BarV, Count, DrawArrow, Emphasis, Fade, MockupIn, Rise, Words } from "./components/Anim";
+import { at, BarH, Count, DrawArrow, Emphasis, Fade, MockupIn, Rise, Words } from "./components/Anim";
 
 const img = (name: string) => `${import.meta.env.BASE_URL}screens/${name}`;
 
@@ -359,41 +359,63 @@ export const slides: Slide[] = [
   {
     id: "circulo",
     notes:
-      "En vez de un control parental, Willo tiene un círculo de apoyo. Javi elige quién le apoya y cuánto, con nombres fáciles: Solo yo, Ver, Apoyar, Guardar y Representar. Ver y Apoyar los da y los quita Javi. Ana, su hermana, está en Guardar: recibe avisos de estafa al momento y saca el informe anual para el juez. Esto sigue la Ley 8/2021: apoyar a la persona, no sustituirla.",
+      "En vez de un control parental, Willo tiene un círculo de apoyo, y para Javi solo hay una pregunta: ¿quieres que alguien te acompañe con tu dinero? Hay tres niveles. Solo yo: nadie más ve su dinero. Acompañar: su hermana Ana ve los pagos, y Javi puede llamarla con un toque cuando Noa detecta algo raro. Y Medida judicial, que solo aparece si hay una sentencia: hace lo que diga la sentencia y genera el informe de cuentas para el juez. Cuando algo parece un engaño, Noa avisa y Javi elige: llamar a Ana, o seguir él solo. Si sigue solo, Ana no se entera; Noa le explica por qué parece una estafa y le propone esperar 10 minutos, pero puede saltárselo. El pago nunca se bloquea. Willo avisa, Javi decide. Esto sigue la Ley 8/2021: apoyar a la persona, no sustituirla.",
     render: () => {
-      const steps = [
-        { name: "Solo yo", d: "Nadie más ve su dinero.", h: 60 },
-        { name: "Ver", d: "Ve sus pagos.", h: 110 },
-        { name: "Apoyar", d: "Recibe avisos de estafa.", h: 160 },
-        { name: "Guardar", d: "Lleva las cuentas para el juez.", h: 210, ana: true },
-        { name: "Representar", d: "Solo lo que diga la sentencia.", h: 260 },
+      const niveles = [
+        { t: "Solo yo", d: "Nadie más ve el dinero de Javi." },
+        { t: "Acompañar", d: "Ana ve los pagos, y Javi la llama con un toque si Noa ve algo raro.", ana: true },
+        { t: "Medida judicial", d: "Solo si hay una sentencia. Hace lo que diga y genera el informe para el juez." },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
-          <div className="absolute left-[128px] top-[128px] flex w-[1300px] flex-col gap-[32px]">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[28px]">
             <Label>El círculo de apoyo</Label>
-            <h2 className={T72}>
-              <Words text="Javi elige quién le apoya, y hasta dónde." />
+            <h2 className={T80}>
+              <Words text="Willo avisa, Javi decide." />
             </h2>
+            <Fade o={3}>
+              <p className="text-[30px] leading-[1.3] text-suave">Para Javi solo hay una pregunta: ¿quieres que alguien te acompañe con tu dinero?</p>
+            </Fade>
           </div>
-          {steps.map((s, i) => (
-            <div key={s.name} className="absolute top-[480px] flex h-[440px] w-[320px] flex-col justify-end gap-[24px]" style={{ left: 128 + i * 336 }}>
-              {/* Escalones como barras: el nivel de Ana en acento, el resto en gris. */}
-              <div className="relative" style={{ height: s.h }}>
-                <BarV o={i + 4} width={320} height={s.h} color={s.ana ? ACCENT : "#DDE3D6"} className="absolute inset-0" />
-                {s.ana && (
-                  <Fade delay={at(10)} className="absolute left-[24px] top-[24px]">
-                    <p className="text-[32px] font-bold text-fondo">Ana</p>
-                  </Fade>
-                )}
-              </div>
-              <Fade o={i + 4} className="h-[124px]">
-                <h3 className={`text-[36px] font-bold ${s.ana ? "text-verde" : ""}`}>{s.name}</h3>
-                <p className="mt-[8px] text-[26px] leading-[1.3] text-suave">{s.d}</p>
-              </Fade>
+          {/* Los tres niveles */}
+          <div className="absolute left-[128px] top-[430px] flex w-[860px] flex-col gap-[18px]">
+            {niveles.map((n, i) => (
+              <Rise key={n.t} o={i + 4}
+                className={`flex items-center gap-[28px] rounded-[20px] px-[32px] py-[26px] ${n.ana ? "bg-verde text-fondo" : "bg-white"}`}>
+                <span className={`grid h-[56px] w-[56px] flex-none place-items-center rounded-full text-[26px] font-bold ${n.ana ? "bg-fondo text-verde" : "bg-salvia text-verde"}`}>{i + 1}</span>
+                <div className="flex-1">
+                  <h3 className="flex items-center gap-[14px] text-[34px] font-bold leading-[1.15]">
+                    {n.t}
+                    {n.ana && <span className="rounded-full bg-fondo px-[14px] py-[2px] text-[20px] font-bold text-verde">Ana</span>}
+                  </h3>
+                  <p className={`mt-[6px] text-[24px] leading-[1.3] ${n.ana ? "text-salvia" : "text-suave"}`}>{n.d}</p>
+                </div>
+              </Rise>
+            ))}
+          </div>
+          {/* El aviso: Javi decide si llama a Ana */}
+          <Rise o={7} className="absolute left-[1060px] top-[430px] w-[732px] rounded-[28px] bg-white p-[36px] shadow-[0_2px_10px_rgba(30,42,27,0.08)]">
+            <div className="flex items-start gap-[18px]">
+              <span className="grid h-[56px] w-[56px] flex-none place-items-center rounded-full bg-verde text-[24px] font-bold text-fondo">N</span>
+              <p className="rounded-[20px] rounded-tl-[6px] bg-salvia px-[24px] py-[18px] text-[28px] leading-[1.3]">
+                Cuidado. Este pago se parece a un engaño. ¿Quieres hablar con Ana antes de pagar?
+              </p>
             </div>
-          ))}
-          <Foot n="09">Cada nivel incluye el anterior. Ninguno puede bloquear un pago. Basado en la Ley 8/2021.</Foot>
+            <div className="mt-[28px] grid grid-cols-2 gap-[16px]">
+              <span className="flex items-center justify-center gap-[10px] rounded-full bg-verde py-[18px] text-[26px] font-bold text-fondo">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+                </svg>
+                Llamar a Ana
+              </span>
+              <span className="flex items-center justify-center rounded-full border-[3px] border-verde py-[15px] text-[26px] font-bold text-verde">Sigo yo</span>
+            </div>
+            <div className="mt-[20px] grid grid-cols-2 gap-[16px] text-[21px] leading-[1.35] text-suave">
+              <Fade o={9}><p>Se abre la llamada y Ana ve el pago para poder ayudarle.</p></Fade>
+              <Fade o={10}><p>Ana no se entera. Noa explica por qué parece un engaño y propone esperar 10 minutos.</p></Fade>
+            </div>
+          </Rise>
+          <Foot n="09">El pago nunca se bloquea. Basado en la Ley 8/2021: apoyar a la persona, no sustituirla.</Foot>
         </div>
       );
     },
