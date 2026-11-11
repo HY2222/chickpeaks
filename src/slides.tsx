@@ -446,6 +446,75 @@ export const slides: Slide[] = [
     },
   },
   {
+    id: "lectura-facil",
+    notes:
+      "¿Cómo sabemos que Noa explica fácil? Lo medimos. El índice Fernández-Huerta mide lo fácil que es leer un texto en español, de 0 a 100; de 80 para arriba es fácil. En nuestros tres ejemplos, una carta falsa de la Seguridad Social pasa de 22, muy difícil, a 98 con Noa. La multa, de 44 a 87. Y la factura de la luz, de 26 a 100. Son papeles escritos por el equipo al estilo de los reales, y lo hemos medido con nuestros propios scripts.",
+    render: () => {
+      const X0 = 700, X1 = 1792, x = (v: number) => X0 + ((X1 - X0) * v) / 100;
+      const rows = [
+        { t: "Carta falsa de la Seguridad Social", a: 22, b: 98 },
+        { t: "Multa de aparcamiento", a: 44, b: 87 },
+        { t: "Factura de la luz", a: 26, b: 100 },
+      ];
+      const Y = (i: number) => 540 + i * 120;
+      return (
+        <div className="absolute inset-0 bg-fondo text-texto">
+          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[28px]">
+            <Label>Lectura fácil, medida</Label>
+            <h2 className={T72}>
+              <Words text="Con Noa, papeles difíciles se vuelven fáciles de leer." />
+            </h2>
+            <Fade o={4}>
+              <p className="text-[28px] leading-[1.3] text-suave">
+                Índice Fernández-Huerta: mide lo fácil que es leer un texto en español, de 0 a 100. <b className="text-verde">De 80 para arriba, es fácil.</b>
+              </p>
+            </Fade>
+          </div>
+          <svg className="absolute inset-0" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+            {/* Zona «fácil»: de 80 a 100 */}
+            <motion.rect x={x(80)} y={470} width={x(100) - x(80)} height={380} rx={16} fill="#D3DFC8"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: at(5) }} />
+            <motion.text x={(x(80) + x(100)) / 2} y={834} textAnchor="middle" fontSize="22" fontWeight="700" fill={ACCENT}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: at(5) }}>Fácil (80+)</motion.text>
+            {/* Eje */}
+            <line x1={X0} x2={X1} y1={880} y2={880} stroke="#C4CEBB" strokeWidth="2" />
+            {[0, 25, 50, 80, 100].map((v) => (
+              <g key={v}>
+                <line x1={x(v)} x2={x(v)} y1={872} y2={888} stroke="#A3B18F" strokeWidth="2" />
+                <text x={x(v)} y={918} textAnchor="middle" fontSize="22" fill="#4A5745">{v}</text>
+              </g>
+            ))}
+            {rows.map((r, i) => (
+              <g key={r.t}>
+                <line x1={X0} x2={X1} y1={Y(i)} y2={Y(i)} stroke="#E3E9DC" strokeWidth="2" />
+                <motion.line x1={x(r.a)} x2={x(r.b)} y1={Y(i)} y2={Y(i)} stroke={ACCENT} strokeWidth="6" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, delay: at(7 + i * 2), ease: "easeOut" }} />
+                <motion.circle cx={x(r.a)} cy={Y(i)} r={14} fill="#A3B18F" style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                  initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.3, delay: at(6 + i * 2) }} />
+                <motion.text x={x(r.a)} y={Y(i) - 28} textAnchor="middle" fontSize="28" fontWeight="700" fill="#4A5745"
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: at(6 + i * 2) }}>{r.a}</motion.text>
+                <motion.circle cx={x(r.b)} cy={Y(i)} r={20} fill={ACCENT} style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                  initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.3, delay: at(8 + i * 2) }} />
+                <motion.text x={x(r.b)} y={Y(i) - 34} textAnchor="middle" fontSize="36" fontWeight="800" fill={ACCENT}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: at(8 + i * 2) }}>{r.b}</motion.text>
+              </g>
+            ))}
+          </svg>
+          {rows.map((r, i) => (
+            <Fade key={r.t} o={6 + i * 2} className="absolute left-[128px] w-[540px]" style={{ top: Y(i) - 18 }}>
+              <p className="whitespace-nowrap text-[28px] font-bold leading-[1.15]">{r.t}</p>
+            </Fade>
+          ))}
+          <Fade o={12} className="absolute left-[128px] top-[860px] flex w-[460px] flex-col gap-[10px] text-[22px] text-suave">
+            <span className="flex items-center gap-[10px]"><i className="inline-block h-[20px] w-[20px] rounded-full bg-salvia-media" /> El papel original</span>
+            <span className="flex items-center gap-[10px]"><i className="inline-block h-[20px] w-[20px] rounded-full bg-verde" /> Lo que dice Noa</span>
+          </Fade>
+          <Foot n="11">En nuestros 3 ejemplos: papeles escritos por el equipo al estilo de los reales. Medido con nuestros scripts.</Foot>
+        </div>
+      );
+    },
+  },
+  {
     id: "negocio",
     notes:
       "¿Quién paga? El banco. Es un modelo B2B2C basado en SaaS: el banco paga una suscripción mensual, por tramos según el número de usuarios, y ofrece Willo gratis a sus clientes con discapacidad intelectual. Así quitamos la barrera económica a quien más lo necesita. La Ley 11/2023 le da el motivo: sus servicios tienen que ser accesibles. Precio objetivo: unos 2 euros al mes por usuario; con nuestro SOM, unos 330.000 euros al año. En el futuro, servicios extra: personalización, integración con sus sistemas y analítica agregada.",
@@ -483,7 +552,7 @@ export const slides: Slide[] = [
               <p className="text-[26px] leading-[1.3] text-suave">Con el SOM (13.816 usuarios): ≈ 330.000 € al año.</p>
             </Fade>
           </div>
-          <Foot n="11">Precio: propuesta del equipo, pendiente de validar con bancos.</Foot>
+          <Foot n="12">Precio: propuesta del equipo, pendiente de validar con bancos.</Foot>
         </div>
       );
     },
@@ -537,7 +606,7 @@ export const slides: Slide[] = [
               <p className="text-[22px] leading-[1.25] text-suave">{m.d}</p>
             </Rise>
           ))}
-          <Foot n="12">Métricas: objetivos del equipo, aún sin datos reales. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
+          <Foot n="13">Métricas: objetivos del equipo, aún sin datos reales. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
         </div>
       );
     },
@@ -615,7 +684,7 @@ export const slides: Slide[] = [
               </Rise>
             ))}
           </div>
-          <Foot n="13" />
+          <Foot n="14" />
         </div>
       );
     },
@@ -654,7 +723,7 @@ export const slides: Slide[] = [
               <p className={`text-[32px] font-bold leading-[1.2] ${st.accent ? "text-verde" : ""}`}>{st.t}</p>
             </Rise>
           ))}
-          <Foot n="14" />
+          <Foot n="15" />
         </div>
       );
     },
