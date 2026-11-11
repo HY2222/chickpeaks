@@ -44,10 +44,10 @@ const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: string; e: string; d: string }; top: number; w: number; small?: boolean }) {
   return (
     <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center text-center" style={{ top, width: w }}>
-      <p className={`${small ? "text-[24px]" : "text-[26px]"} font-bold opacity-80`}>{r.k} · {r.t}</p>
-      <p className={`titular whitespace-nowrap ${small ? "text-[48px]" : "text-[56px]"} font-semibold leading-[1.05]`}>{r.n}</p>
-      <p className={`${small ? "text-[22px]" : "text-[26px]"} font-bold`}>{r.e}</p>
-      <p className={`mt-[6px] ${small ? "text-[20px]" : "text-[23px]"} leading-[1.25] opacity-90`}>{r.d}</p>
+      <p className="text-[22px] font-bold uppercase tracking-[0.08em] opacity-70">{r.k} · {r.t}</p>
+      <p className={`titular whitespace-nowrap ${small ? "text-[64px]" : "text-[76px]"} font-semibold leading-[1.05]`}>{r.n}</p>
+      <p className={`${small ? "text-[20px]" : "text-[22px]"} opacity-80`}>{r.d}</p>
+      <p className={`mt-[6px] ${small ? "text-[24px]" : "text-[28px]"} font-bold`}>{r.e}</p>
     </div>
   );
 }
@@ -189,9 +189,9 @@ export const slides: Slide[] = [
       "Nuestro mercado. TAM, Europa: hay casi 7 millones de personas con discapacidad intelectual, y la directiva europea de accesibilidad obliga a todos los bancos de la UE. Son unos 200 millones de euros al año. SAM, España: según el IMSERSO, 157.895 personas con discapacidad intelectual o del desarrollo reconocida; unos 4,5 millones al año. SOM: empezamos por las personas que ya están en asociaciones y organizaciones como AMÁS o Plena inclusión. Plena inclusión apoya a 150.000 personas; queremos llegar a 13.816, menos de 1 de cada 10. Eso son unos 416.000 euros al año.",
     render: () => {
       const rows = [
-        { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "de personas con discapacidad intelectual. La misma ley en toda la UE.", e: "≈ 200 M€ al año" },
-        { k: "SAM", t: "España", n: "157.895", d: "personas con discapacidad intelectual o del desarrollo reconocida.", e: "≈ 4,5 M€ al año" },
-        { k: "SOM", t: "Organizaciones", n: "13.816", d: "personas que ya van a asociaciones (Plena inclusión apoya a 150.000).", e: "≈ 416.000 € al año", accent: true },
+        { k: "TAM", t: "Europa", n: "≈ 7 millones", d: "personas con discapacidad intelectual", e: "≈ 200 M€ al año" },
+        { k: "SAM", t: "España", n: "157.895", d: "con discapacidad reconocida", e: "≈ 4,5 M€ al año" },
+        { k: "SOM", t: "Organizaciones", n: "13.816", d: "personas en asociaciones", e: "≈ 416.000 € al año", accent: true },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -202,30 +202,26 @@ export const slides: Slide[] = [
           </div>
           {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
           <Rise o={3} className="absolute left-[760px] top-[80px] h-[920px] w-[920px] rounded-full bg-salvia text-verde">
-            <Circulo r={rows[0]} top={36} w={580} />
+            <Circulo r={rows[0]} top={40} w={580} />
           </Rise>
           <Rise o={4} className="absolute left-[900px] top-[332px] h-[640px] w-[640px] rounded-full bg-salvia-media text-texto">
-            <Circulo r={rows[1]} top={30} w={480} />
+            <Circulo r={rows[1]} top={34} w={480} />
           </Rise>
           <Rise o={5} className="absolute left-[1040px] top-[584px] h-[360px] w-[360px] rounded-full bg-verde text-fondo">
-            <Circulo r={rows[2]} top={50} w={280} small />
+            <Circulo r={rows[2]} top={78} w={300} small />
           </Rise>
           {/* Columna izquierda: lo que significan las cifras, sin repetirlas. */}
-          <Rise o={6} className="absolute left-[128px] top-[330px] w-[500px]">
+          <Rise o={6} className="absolute left-[128px] top-[380px] w-[520px]">
             <div className="flex gap-[10px]">
               {Array.from({ length: 10 }, (_, i) => (
-                <svg key={i} viewBox="0 0 24 40" className={`h-[52px] w-[32px] ${i ? "fill-salvia-media" : "fill-verde"}`} aria-hidden>
+                <svg key={i} viewBox="0 0 24 40" className={`h-[72px] w-[42px] ${i ? "fill-salvia-media" : "fill-verde"}`} aria-hidden>
                   <circle cx="12" cy="7" r="6" />
                   <rect x="2" y="15" width="20" height="25" rx="9" />
                 </svg>
               ))}
             </div>
-            <p className="titular mt-[20px] text-[60px] font-semibold leading-[1.05] text-verde">1 de cada 10</p>
-            <p className="mt-[10px] text-[26px] leading-[1.3]">Nos basta con llegar a menos de 1 de cada 10 personas que ya apoya Plena inclusión.</p>
-          </Rise>
-          <Rise o={7} className="absolute left-[128px] top-[660px] w-[500px] border-l-[6px] border-verde pl-[24px]">
-            <p className="text-[28px] font-bold leading-[1.2]">Una ley para toda la UE</p>
-            <p className="mt-[8px] text-[24px] leading-[1.3] text-suave">La directiva europea de accesibilidad obliga a todos los bancos.</p>
+            <p className="titular mt-[28px] text-[88px] font-semibold leading-[1] text-verde">1 de cada 10</p>
+            <p className="mt-[16px] text-[28px] leading-[1.3] text-suave">Nos basta con llegar al menos a 1 de cada 10 personas que ya apoya Plena inclusión.</p>
           </Rise>
           <p className="absolute bottom-[130px] left-[128px] w-[500px] text-[18px] leading-[1.35] text-suave">
             Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).
