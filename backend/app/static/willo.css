@@ -44,6 +44,7 @@ h1, h2, h3, p { margin: 0; }
 .suave { color: var(--texto-suave); }
 .etiqueta { font-size: 18px; color: var(--texto-suave); }   /* "Noa ha oído:", "Noa dice:"… */
 .cifra { font-size: 56px; font-weight: 700; color: var(--verde-oscuro); line-height: 1.1; }
+.cifra .centimos { font-size: .55em; }
 .verde { color: var(--verde-oscuro); }
 .negrita { font-weight: 700; }
 .frases p + p { margin-top: 6px; }  /* una idea por frase, cada una en su línea */
