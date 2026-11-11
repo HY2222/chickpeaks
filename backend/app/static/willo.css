@@ -133,6 +133,12 @@ h1, h2, h3, p { margin: 0; }
 }
 .caja-aviso .titulo-aviso svg { width: 34px; height: 34px; flex: none; color: var(--aviso-texto); stroke-width: 1.5; }
 
+/* Popup de aviso (pago que no se puede): en medio de la pantalla, con el fondo oscurecido. */
+.popup { width: min(420px, calc(100vw - 32px)); margin: auto; box-sizing: border-box; }
+.popup::backdrop { background: rgb(0 0 0 / .45); }
+.popup[open] { animation: aparecer .2s ease-out; }
+.popup-texto { margin: 12px 0 20px; font-size: 20px; line-height: 1.4; }
+
 /* ---------- Micrófono de Noa (pantalla 2) ---------- */
 .centrado { text-align: center; }
 .microfono {
@@ -162,7 +168,7 @@ h1, h2, h3, p { margin: 0; }
 .noa-dice { transition: opacity .25s ease-in; }
 .noa-dice.saliendo { opacity: 0; }
 @keyframes aparecer { from { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .noa-dice p { animation: none; } .noa-dice { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .noa-dice p, .popup[open] { animation: none; } .noa-dice { transition: none; } }
 .transcripcion { font-size: 24px; font-weight: 700; line-height: 1.35; margin-top: 12px; }
 
 /* ---------- Respuesta de Noa (pantallas 3 y 7) ---------- */
@@ -261,12 +267,12 @@ h1, h2, h3, p { margin: 0; }
 .campo:focus-visible { outline: 3px solid var(--verde-oscuro); outline-offset: 2px; }
 
 /* Lista desplegable (huchas del inicio): todo el título es un botón grande */
-/* Igual que .boton.secundario (letra, color, borde y alto), con la flecha a la derecha. */
-.desplegable { display: flex; align-items: center; justify-content: space-between; width: 100%;
+/* Igual que .boton.secundario (letra, color, borde, alto y texto centrado), con la flecha a la derecha. */
+.desplegable { position: relative; display: flex; align-items: center; justify-content: center; width: 100%;
   box-sizing: border-box; min-height: 72px; padding: 0 20px; font: 700 22px/1.2 Helvetica, Arial, sans-serif;
   color: var(--verde-oscuro); background: var(--blanco); border: 3px solid var(--verde-oscuro);
-  border-radius: 20px; cursor: pointer; text-align: left; }
-.desplegable .flecha { font-size: 28px; transition: transform .15s; }
+  border-radius: 20px; cursor: pointer; text-align: center; }
+.desplegable .flecha { position: absolute; right: 20px; font-size: 28px; transition: transform .15s; }
 .desplegable[aria-expanded="true"] .flecha { transform: rotate(180deg); }
 
 /* Grupos de botones para elegir una opción (voz de Noa). El elegido va en verde. */

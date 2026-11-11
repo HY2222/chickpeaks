@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=4">
+<link rel="stylesheet" href="/static/willo.css?v=5">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -310,6 +310,13 @@
 <!-- Igual, en la pantalla 5: hace como si Javi hubiera hecho la foto (sin abrir la cámara). -->
 <button class="escondido" id="simular-foto" aria-label="Simular foto (demo)" hidden></button>
 
+<!-- Popup de aviso: un pago que no se puede (no llega, cantidad imposible) o que pasa de 1.000 € hoy -->
+<dialog class="caja-aviso popup" id="popup" aria-labelledby="popup-titulo">
+  <p class="titulo-aviso" id="popup-titulo"><span data-icono="aviso"></span><span id="popup-titulo-texto"></span></p>
+  <p class="popup-texto" id="popup-texto"></p>
+  <form method="dialog"><button class="boton aviso">Entendido</button></form>
+</dialog>
+
 <script type="module">
 const P = "javi";
 const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(async x => {
@@ -319,6 +326,14 @@ const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(async x => {
 });
 const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
 const $ = id => document.getElementById(id);
+// Popup de aviso (en vez de alert): se ve como la app y Noa lo lee. Se cumple al pulsar "Entendido".
+function popup(texto, titulo = "No se puede") {
+  $("popup-titulo-texto").textContent = titulo;
+  $("popup-texto").textContent = texto;
+  if (!$("popup").open) $("popup").showModal();
+  if (!conv) decir(texto);
+  return new Promise(ok => $("popup").addEventListener("close", ok, {once: true}));
+}
 // En pantalla, cada frase va en su línea: sin punto final (inés, 8 nov). Noa sí los usa al hablar.
 const sinPunto = s => s.replace(/\.\s*$/, "");
 // Como el backend: "4.800 €", "12,50 €", "90 €".
@@ -549,6 +564,7 @@ AL_ENTRAR["2"] = async () => {
             estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto,
                                                              hucha: "mis_cosas", antes: estado.pensadas});
           } catch (e) {
+            popup(e.message);   // también en pantalla
             return JSON.stringify({error: true, texto_lectura_facil: e.message});   // Noa lo dice; no se apunta nada
           }
           estado.pensadas = [...estado.pensadas, {concepto: estado.pregunta.concepto, importe: Number(importe)}];
@@ -855,7 +871,7 @@ $("simular-pago").onclick = async () => {
         concepto: q.concepto, importe: q.importe, decision: "comprar",
         palabras_persona: `Pagado con tarjeta: ${sinArticulo(q.concepto.trim())}`, compartir: true, pagado: true,
       });
-    } catch (e) { alert(e.message); return; }   // sin saldo o cantidad imposible: no se apunta
+    } catch (e) { popup(e.message); return; }   // sin saldo o cantidad imposible: no se apunta
     avisados = r.avisados;
   } else {
     avisados = (await api("avisos")).filter(a => a.tipo === "decision").map(a => a.para_nombre);
@@ -1216,7 +1232,7 @@ $("p8-enviar-igual").onclick = async () => {
   try {
     await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true}, true);
     location.hash = "#1";
-  } catch (e) { alert(e.message); }
+  } catch (e) { popup(e.message); }
 };
 
 // ---------- 12 · Mis compras ----------
@@ -1295,14 +1311,14 @@ AL_ENTRAR["12"] = async () => {
         const x = c.pendientes.find(p => p.id === b.dataset.pagar);
         const r = await post("evaluar_compra", {importe: x.importe, concepto: x.concepto, hucha: x.hucha});
         if (!r.alcanza) {
-          alert(`No te llega para ${x.concepto}. Te faltan ${euros(-r.quedan_despues)}. No se puede apuntar.`);
+          await popup(`No te llega para ${x.concepto}. Te faltan ${euros(-r.quedan_despues)}. No se puede apuntar.`);
         } else if (confirm(`¿Ya has pagado ${x.concepto}? Son ${euros(x.importe)}.\nTe quedan ${euros(r.quedan_despues)}.`)) {
           const pagado = await post(`compras/${b.dataset.pagar}/pagada`, {});
-          if (pagado.avisados_limite?.length) alert(pagado.texto_lectura_facil);   // pasa de 1.000 € hoy
+          if (pagado.avisados_limite?.length) await popup(pagado.texto_lectura_facil, "Aviso");   // pasa de 1.000 € hoy
         }
       }
       else await api(`compras/${b.dataset.quitar}`, {method: "DELETE"});
-    } catch (e) { alert(e.message); }   // la frase del backend (p. ej. ya no estaba en la lista)
+    } catch (e) { await popup(e.message); }   // la frase del backend (p. ej. ya no estaba en la lista)
     AL_ENTRAR["12"]();
   });
 };

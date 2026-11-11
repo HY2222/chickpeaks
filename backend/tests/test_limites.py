@@ -57,3 +57,14 @@ def test_sin_nadie_en_el_circulo_no_se_puede_pasar_de_1000(client):
         assert False, "tenía que dar FueraDeLimite"
     except limites.FueraDeLimite as e:
         assert e.codigo == "limite_diario"
+
+
+def test_pago_rechazado_avisa_a_ana_al_momento(client):
+    r = client.post(f"{URL}/decisiones", json={"concepto": "una tele", "importe": 500,
+                                               "decision": "comprar", "pagado": True}).json()
+    assert r["avisados"] == ["Ana"] and "Se lo he dicho a Ana" in r["texto_lectura_facil"]
+    yate = client.post(f"{URL}/evaluar_compra", json={"importe": 5_000_000, "concepto": "un yate"}).json()
+    assert yate["avisados"] == ["Ana"]
+    avisos = client.get(f"{URL}/avisos?para=ana&tipo=pago_no_permitido").json()
+    assert len(avisos) == 2
+    assert "le faltan 290 €" in avisos[1]["texto"] and "1.000.000 €" in avisos[0]["texto"]
