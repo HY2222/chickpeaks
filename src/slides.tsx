@@ -623,11 +623,11 @@ export const slides: Slide[] = [
   {
     id: "objetivo",
     notes:
-      "Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Esto es lo que viene: ya tenemos la demo; en los próximos meses, los 100 primeros usuarios con Plena inclusión; en 2027, el piloto con un banco; y después, más bancos y Europa.",
+      "Nuestro objetivo: un piloto con un banco en 2027. Para llegar, hoy os pedimos dos cosas: contactos en bancos y mentoría para preparar ese piloto. Esto es lo que viene: ya tenemos la demo; en los próximos meses, los 100 primeros usuarios con AMAS; en 2027, el piloto con un banco; y después, más bancos y Europa.",
     render: () => {
       const steps = [
         { w: "Hoy", t: "Demo que funciona" },
-        { w: "Próximos meses", t: "100 primeros usuarios con Plena inclusión" },
+        { w: "Próximos meses", t: "100 primeros usuarios con AMAS" },
         { w: "2027", t: "Piloto con un banco", accent: true },
         { w: "Después", t: "Más bancos y Europa" },
       ];
