@@ -40,12 +40,14 @@ const T72 = "titular text-[72px] font-semibold leading-[1.1]";
 const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 
 /* ---------- Diapositivas ---------- */
-// Cifras dentro de los rectángulos del mercado (TAM, SAM, SOM): personas y euros al año.
-function Cifra({ r, className }: { r: { n: string; e: string }; className: string }) {
+// Texto de cada círculo del mercado (TAM, SAM, SOM): todo lo que antes iba en la columna derecha.
+function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: string; e: string; d: string }; top: number; w: number; small?: boolean }) {
   return (
-    <div className={`absolute text-right ${className}`}>
-      <p className="titular whitespace-nowrap text-[36px] font-semibold leading-[1.1]">{r.n}</p>
-      <p className="whitespace-nowrap text-[22px] font-bold opacity-80">{r.e}</p>
+    <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center text-center" style={{ top, width: w }}>
+      <p className={`${small ? "text-[22px]" : "text-[24px]"} font-bold opacity-80`}>{r.k} · {r.t}</p>
+      <p className={`titular whitespace-nowrap ${small ? "text-[44px]" : "text-[50px]"} font-semibold leading-[1.05]`}>{r.n}</p>
+      <p className={`${small ? "text-[20px]" : "text-[24px]"} font-bold`}>{r.e}</p>
+      <p className={`mt-[6px] ${small ? "text-[18px]" : "text-[21px]"} leading-[1.25] opacity-80`}>{r.d}</p>
     </div>
   );
 }
@@ -193,40 +195,26 @@ export const slides: Slide[] = [
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
-          <div className="absolute left-[128px] top-[128px] flex w-[1664px] flex-col gap-[32px]">
+          <div className="absolute left-[128px] top-[128px] flex w-[680px] flex-col gap-[32px]">
             <Label>El mercado</Label>
             <h2 className={T72}>
               <Words text="7 millones en Europa. Empezamos por 13.816." />
             </h2>
           </div>
-          {/* Rectángulos uno dentro de otro, como en la plantilla de START. */}
-          <Rise o={3} className="absolute left-[128px] top-[400px] h-[520px] w-[760px] rounded-[32px] bg-salvia">
-            <p className="absolute left-[40px] top-[32px] text-[40px] font-bold text-verde">TAM</p>
-            <Cifra r={rows[0]} className="right-[40px] top-[14px] text-verde" />
+          {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
+          <Rise o={3} className="absolute left-[892px] top-[90px] h-[900px] w-[900px] rounded-full bg-salvia text-verde">
+            <Circulo r={rows[0]} top={34} w={560} />
           </Rise>
-          <Rise o={4} className="absolute left-[288px] top-[490px] h-[400px] w-[570px] rounded-[28px] bg-salvia-media">
-            <p className="absolute left-[36px] top-[28px] text-[40px] font-bold text-verde">SAM</p>
-            <Cifra r={rows[1]} className="right-[36px] top-[12px] text-verde" />
+          <Rise o={4} className="absolute left-[1032px] top-[342px] h-[620px] w-[620px] rounded-full bg-salvia-media text-texto">
+            <Circulo r={rows[1]} top={30} w={470} />
           </Rise>
-          <Rise o={5} className="absolute left-[478px] top-[580px] h-[280px] w-[350px] rounded-[24px] bg-verde">
-            <p className="absolute left-[32px] top-[24px] text-[40px] font-bold text-fondo">SOM</p>
-            <Cifra r={rows[2]} className="left-[32px] bottom-[28px] text-fondo !text-left" />
+          <Rise o={5} className="absolute left-[1167px] top-[584px] h-[350px] w-[350px] rounded-full bg-verde text-fondo">
+            <Circulo r={rows[2]} top={50} w={270} small />
           </Rise>
-          <div className="absolute left-[968px] top-[390px] flex w-[824px] flex-col gap-[22px]">
-            {rows.map((r, i) => (
-              <Rise key={r.k} o={i + 6} className={i ? "border-t-2 border-salvia pt-[24px]" : ""}>
-                <p className={`text-[24px] font-bold ${r.accent ? "text-verde" : "text-suave"}`}>
-                  {r.k} · {r.t}
-                </p>
-                <p className="mt-[4px] flex items-baseline justify-between gap-[24px]">
-                  <span className={`titular whitespace-nowrap text-[56px] font-semibold leading-[1.05] ${r.accent ? "text-verde" : ""}`}>{r.n}</span>
-                  <span className="whitespace-nowrap text-[28px] font-bold text-verde">{r.e}</span>
-                </p>
-                <p className="mt-[4px] text-[26px] leading-[1.3] text-suave">{r.d}</p>
-              </Rise>
-            ))}
-          </div>
-          <Foot n="05">Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).</Foot>
+          <p className="absolute bottom-[130px] left-[128px] w-[680px] text-[22px] leading-[1.35] text-suave">
+            Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).
+          </p>
+          <Foot n="05" />
         </div>
       );
     },
