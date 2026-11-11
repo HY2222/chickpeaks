@@ -275,7 +275,7 @@ label.etiqueta { display: block; }   /* si no, su margin-top no separa los campo
 /* Lista desplegable (huchas del inicio): todo el título es un botón grande */
 /* Igual que .boton.secundario (letra, color, borde, alto y texto centrado), con la flecha a la derecha. */
 .desplegable { position: relative; display: flex; align-items: center; justify-content: center; width: 100%;
-  box-sizing: border-box; min-height: 72px; padding: 0 20px; font: 700 22px/1.2 Helvetica, Arial, sans-serif;
+  box-sizing: border-box; min-height: 72px; padding: 0 48px;   /* 48: sitio para la flecha */ font: 700 22px/1.2 Helvetica, Arial, sans-serif;
   color: var(--verde-oscuro); background: var(--blanco); border: 3px solid var(--verde-oscuro);
   border-radius: 20px; cursor: pointer; text-align: center; }
 .desplegable .flecha { position: absolute; right: 20px; font-size: 28px; transition: transform .15s; }
