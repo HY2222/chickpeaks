@@ -64,10 +64,17 @@ def _miembro(p: dict, miembro_id: str) -> dict:
 
 # ---------- Modelos ----------
 
+class CompraPensada(BaseModel):
+    concepto: str = Field(max_length=120, examples=["los zapatos"])
+    importe: float = Field(gt=0, examples=[45])
+
+
 class Compra(BaseModel):
     importe: float = Field(gt=0, examples=[80])
     concepto: str = Field(examples=["las zapatillas"])
     hucha: str | None = Field(default=None, description="id de la hucha; por defecto mis_cosas")
+    antes: list[CompraPensada] = Field(default=[], max_length=20,
+                                       description="Lo que ya ha pensado comprar en esta conversación. Se resta primero.")
 
 
 class Decision(BaseModel):
@@ -190,7 +197,8 @@ def evaluar_compra(persona_id: str, compra: Compra):
     """Herramienta de Noa: ¿puedo comprarlo? Da cifras, no recomienda."""
     p = _persona(persona_id)
     try:
-        r = budget.evaluar_compra(p, compra.importe, compra.concepto, compra.hucha)
+        r = budget.evaluar_compra(p, compra.importe, compra.concepto, compra.hucha,
+                                  [a.model_dump() for a in compra.antes])
     except KeyError:
         raise HTTPException(400, f"No existe la hucha {compra.hucha}")
     pausa = p.get("pausa_para_pensar")
