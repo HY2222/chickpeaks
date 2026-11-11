@@ -67,4 +67,4 @@ def test_pago_rechazado_avisa_a_ana_al_momento(client):
     assert yate["avisados"] == ["Ana"]
     avisos = client.get(f"{URL}/avisos?para=ana&tipo=pago_no_permitido").json()
     assert len(avisos) == 2
-    assert "le faltan 290 €" in avisos[1]["texto"] and "1.000.000 €" in avisos[0]["texto"]
+    assert "le faltan 290 €" in avisos[1]["texto"] and "El importe no es válido" in avisos[0]["texto"]
