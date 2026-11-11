@@ -53,8 +53,8 @@ Los costes: la IA es el más grande, unos 15.100 euros al mes, contando 3 conver
 Nos quedan unos **18.320 euros al mes: un margen operativo del 53 por ciento**. Y la cuota base ya cubre nuestros costes fijos: cada usuario nuevo nos deja 1,31 euros de margen al mes.
 
 ## 14 · Go to market (≈ 45 s) · CAMBIADA (métricas)
-¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo, y Plena inclusión agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea.
-En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y los usuarios nos llegan casi gratis, por las asociaciones.
+¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo. Y ese es nuestro canal: Plena inclusión agrupa unas 950 asociaciones que apoyan a 150.000 personas. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea.
+En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y captar usuarios nos cuesta casi cero, porque nos llegan por las asociaciones.
 
 ## 15 · Equipo (≈ 15 s)
 Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He Ye, de Informática y ADE; Nolan, de Empresa y Tecnología; XingYi, de Telecomunicación; y Anqi, de Economía.
@@ -77,6 +77,9 @@ Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu
 
 **¿Por qué una cuota base y además un precio por usuario?**
 La cuota base le da al banco un coste mínimo previsible y a nosotros nos cubre los costes fijos (mantenimiento e infraestructura, unos 1.224 € al mes). El precio por usuario sigue el uso real, igual que nuestro coste principal, la IA. Así nunca perdemos dinero con un banco que crece.
+
+**¿Cuánto os cuesta conseguir un banco?**
+Ese es el CAC (coste de adquisición de cliente) que más importa, porque quien paga es el banco. Todavía no lo sabemos: por eso pedimos contactos en bancos y mentoría. Lo que sí es casi gratis es conseguir usuarios, porque nos llegan por las asociaciones.
 
 **¿Los precios llevan IVA?**
 No. En B2B se habla siempre sin IVA.

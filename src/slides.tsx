@@ -627,14 +627,14 @@ export const slides: Slide[] = [
   {
     id: "go-to-market",
     notes:
-      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo, y Plena inclusión agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y los usuarios nos llegan casi gratis, por las asociaciones.",
+      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. AMAS ya ha validado Willo y quiere que sus usuarios prueben la demo. Y ese es nuestro canal: Plena inclusión agrupa unas 950 asociaciones que apoyan a 150.000 personas. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y captar usuarios nos cuesta casi cero, porque nos llegan por las asociaciones.",
     render: () => {
       const card = "absolute top-[400px] flex h-[270px] w-[480px] flex-col gap-[10px] rounded-[20px] p-[36px]";
       const metrics = [
         { k: "Implantación", v: "15.000 €", d: "una vez, por banco" },
         { k: "Cuota base", v: "1.500 €", d: "al mes, por banco" },
         { k: "Por usuario", v: "2,40 €", d: "al mes, por usuario" },
-        { k: "CAC usuarios", v: "≈ 0 €", d: "entramos por las asociaciones" },
+        { k: "Captar usuarios", v: "≈ 0 €", d: "entramos por las asociaciones" },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -662,9 +662,9 @@ export const slides: Slide[] = [
             <p className="text-[24px] leading-[1.3]">La ley viene de una directiva europea: toda la UE tiene la misma obligación.</p>
           </Rise>
           <Rise o={9} className="absolute left-[128px] top-[700px] flex h-[220px] w-[560px] flex-col justify-center gap-[10px] rounded-[20px] border-2 border-verde p-[32px]">
-            <p className="text-[22px] font-bold text-verde">Los 100 primeros usuarios</p>
-            <p className="titular text-[38px] font-semibold leading-[1.1]">10 asociaciones × 10 personas</p>
-            <p className="text-[24px] leading-[1.3] text-suave">Con AMAS y Plena inclusión, antes del piloto.</p>
+            <p className="text-[22px] font-bold text-verde">Nuestro canal</p>
+            <p className="titular text-[38px] font-semibold leading-[1.1]">950 asociaciones<br />150.000 personas</p>
+            <p className="text-[24px] leading-[1.3] text-suave">Las que agrupa Plena inclusión en España.</p>
           </Rise>
           {metrics.map((m, i) => (
             <Rise key={m.k} o={i + 10} className="absolute top-[700px] flex h-[220px] w-[254px] flex-col justify-center gap-[6px] rounded-[20px] bg-white p-[28px]" style={{ left: 720 + i * 270 }}>
@@ -673,7 +673,7 @@ export const slides: Slide[] = [
               <p className="text-[22px] leading-[1.25] text-suave">{m.d}</p>
             </Rise>
           ))}
-          <Foot n="14">Métricas: objetivos del equipo, aún sin datos reales. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
+          <Foot n="14">Precios: propuesta del equipo, pendiente de validar con bancos. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
         </div>
       );
     },
