@@ -491,9 +491,9 @@ export const slides: Slide[] = [
   {
     id: "go-to-market",
     notes:
-      "¿Cómo llegamos? Paso 1: validamos con Plena inclusión, que agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. Las métricas aún son objetivos: 2 euros al mes por usuario, coste de captación casi cero porque entramos por las asociaciones, y que menos del 3 % lo deje cada mes.",
+      "¿Cómo llegamos? Paso 1: entramos por las asociaciones. Organizaciones como AMAS ya han validado Willo y quieren colaborar con nosotros para que personas con discapacidad intelectual prueben la demo. Y Plena inclusión agrupa unas 950 asociaciones. Así conseguimos los 100 primeros usuarios: 10 asociaciones, 10 personas cada una. Paso 2: un piloto con un banco, con Willo dentro de su app; esa pantalla ya está hecha. Paso 3: más bancos y Europa, porque la ley viene de una directiva europea. Las métricas aún son objetivos: 2 euros al mes por usuario, coste de captación casi cero porque entramos por las asociaciones, y que menos del 3 % lo deje cada mes.",
     render: () => {
-      const card = "absolute top-[400px] flex h-[250px] w-[480px] flex-col gap-[10px] rounded-[20px] p-[36px]";
+      const card = "absolute top-[400px] flex h-[270px] w-[480px] flex-col gap-[10px] rounded-[20px] p-[36px]";
       const metrics = [
         { k: "ARPU", v: "2 €", d: "al mes por usuario" },
         { k: "CAC", v: "≈ 0 €", d: "entramos por las asociaciones" },
@@ -510,28 +510,28 @@ export const slides: Slide[] = [
           </div>
           <Rise o={4} className={`${card} left-[128px] bg-white`}>
             <p className="text-[22px] font-bold text-suave">Paso 1 · Validar</p>
-            <h3 className="text-[36px] font-bold leading-[1.15]">Con Plena inclusión</h3>
-            <p className="text-[24px] leading-[1.3] text-suave">Unas 950 asociaciones. Prueban Willo y validan la lectura fácil.</p>
+            <h3 className="text-[36px] font-bold leading-[1.15]">Con las asociaciones</h3>
+            <p className="text-[24px] leading-[1.3] text-suave">AMAS ya ha validado Willo y quiere colaborar para que personas con discapacidad intelectual prueben la demo.</p>
           </Rise>
-          <DrawArrow o={5} className="absolute left-[624px] top-[511px]" />
+          <DrawArrow o={5} className="absolute left-[624px] top-[521px]" />
           <Rise o={6} className={`${card} left-[720px] bg-verde text-fondo`}>
             <p className="text-[22px] font-bold text-salvia">Paso 2 · Piloto</p>
             <h3 className="text-[36px] font-bold leading-[1.15]">Con un banco</h3>
             <p className="text-[24px] leading-[1.3] text-salvia">Willo va dentro de la app del banco. Esa pantalla ya está hecha.</p>
           </Rise>
-          <DrawArrow o={7} className="absolute left-[1216px] top-[511px]" />
+          <DrawArrow o={7} className="absolute left-[1216px] top-[521px]" />
           <Rise o={8} className={`${card} left-[1312px] bg-salvia`}>
             <p className="text-[22px] font-bold text-verde">Paso 3 · Crecer</p>
             <h3 className="text-[36px] font-bold leading-[1.15]">Más bancos y Europa</h3>
             <p className="text-[24px] leading-[1.3]">La ley viene de una directiva europea: toda la UE tiene la misma obligación.</p>
           </Rise>
-          <Rise o={9} className="absolute left-[128px] top-[690px] flex h-[230px] w-[560px] flex-col justify-center gap-[10px] rounded-[20px] border-2 border-verde p-[36px]">
+          <Rise o={9} className="absolute left-[128px] top-[700px] flex h-[220px] w-[560px] flex-col justify-center gap-[10px] rounded-[20px] border-2 border-verde p-[32px]">
             <p className="text-[22px] font-bold text-verde">Los 100 primeros usuarios</p>
             <p className="titular text-[38px] font-semibold leading-[1.1]">10 asociaciones × 10 personas</p>
-            <p className="text-[24px] leading-[1.3] text-suave">Con Plena inclusión, antes del piloto con el banco.</p>
+            <p className="text-[24px] leading-[1.3] text-suave">Con AMAS y Plena inclusión, antes del piloto.</p>
           </Rise>
           {metrics.map((m, i) => (
-            <Rise key={m.k} o={i + 10} className="absolute top-[690px] flex h-[230px] w-[254px] flex-col justify-center gap-[6px] rounded-[20px] bg-white p-[28px]" style={{ left: 720 + i * 270 }}>
+            <Rise key={m.k} o={i + 10} className="absolute top-[700px] flex h-[220px] w-[254px] flex-col justify-center gap-[6px] rounded-[20px] bg-white p-[28px]" style={{ left: 720 + i * 270 }}>
               <p className="text-[22px] font-bold text-suave">{m.k}</p>
               <p className="titular whitespace-nowrap text-[52px] font-semibold leading-none text-verde">{m.v}</p>
               <p className="text-[22px] leading-[1.25] text-suave">{m.d}</p>
