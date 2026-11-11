@@ -79,3 +79,33 @@ def cambiar_nivel(persona: dict[str, Any], miembro_id: str, nivel: int) -> dict[
         raise ValueError("La persona puede dar los niveles 0, 1 o 2.")
     m["nivel"] = nivel
     return m
+
+
+def elegir_confianza(persona: dict[str, Any], nombre: str, telefono: str | None = None,
+                     relacion: str | None = None) -> dict[str, Any]:
+    """La persona elige su persona de confianza: alguien de su círculo o alguien nuevo.
+
+    Esa persona recibe los avisos (posibles estafas, pagos que no se pueden): nivel Apoyo (2) como
+    mínimo y con consentimiento. La anterior, si la había dado la propia persona con nivel 0-2, deja
+    de recibirlos (nivel 0). Un apoyo legal (N3-N4) no se toca: eso no se cambia desde la app.
+    """
+    circulo = persona["circulo_apoyo"]
+    elegido = next((m for m in circulo if m["nombre"].strip().lower() == nombre.strip().lower()), None)
+    if elegido is None:
+        base = "".join(c if c.isalnum() else "_" for c in nombre.strip().lower()).strip("_") or "confianza"
+        ids, id_, n = {m["id"] for m in circulo}, base, 2
+        while id_ in ids:
+            id_, n = f"{base}_{n}", n + 1
+        elegido = {"id": id_, "nombre": nombre.strip(), "relacion": (relacion or "persona de confianza").strip(),
+                   "nivel": 2, "otorgado_por": "persona", "consiente_avisos_estafa": True}
+        circulo.append(elegido)
+    if telefono:
+        elegido["telefono"] = telefono.strip()
+    for m in circulo:
+        if m.get("confianza") and m is not elegido and m["otorgado_por"] == "persona" and m["nivel"] <= 2:
+            m["nivel"] = 0
+        m["confianza"] = m is elegido
+    if elegido["nivel"] < 2:
+        elegido["nivel"] = 2
+    elegido["consiente_avisos_estafa"] = True
+    return elegido
