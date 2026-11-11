@@ -425,6 +425,44 @@ export const slides: Slide[] = [
     },
   },
   {
+    id: "ana",
+    notes:
+      "Y este es el móvil de Ana, con la app Willo Apoyo. Ana solo ve lo que Javi decide compartir. Cuando Javi pide hablar con ella por un Bizum raro, le llega este aviso: a quién, cuánto y por qué parece un engaño. Y un botón para llamar a Javi. Lo que no tiene es un botón para bloquear el pago: Javi decide y ella le apoya. Al final del año ve un resumen de cada aviso y de lo que decidió Javi, sin esconderlo ni juzgarlo.",
+    render: () => (
+      <div className="absolute inset-0 bg-fondo text-texto">
+        <div className="absolute left-[1040px] top-0 h-[1080px] w-[880px] bg-salvia" />
+        <div className="absolute left-[128px] top-[128px] flex w-[780px] flex-col gap-[40px]">
+          <Label>El móvil de Ana</Label>
+          <h2 className={`${T80} w-[640px]`}>
+            <Words text="Ana acompaña. No decide." />
+          </h2>
+        </div>
+        <div className="absolute left-[128px] top-[470px] flex w-[780px] flex-col gap-[34px]">
+          {[
+            { t: "Solo ve lo que Javi comparte", d: "Sus pagos y sus decisiones, si él quiere." },
+            { t: "Le llega un aviso si Javi lo pide", d: "A quién, cuánto y por qué parece un engaño." },
+            { t: "No puede bloquear pagos", d: "Puede llamar a Javi y hablarlo con él." },
+          ].map((p, i) => (
+            <Rise key={p.t} o={6 + i} className="flex items-start gap-[24px]">
+              <span className="mt-[10px] h-[18px] w-[18px] shrink-0 rounded-full bg-verde" />
+              <div>
+                <p className="text-[32px] font-bold leading-[1.2]">{p.t}</p>
+                <p className="mt-[6px] text-[26px] leading-[1.3] text-suave">{p.d}</p>
+              </div>
+            </Rise>
+          ))}
+        </div>
+        <Rise o={3} className="absolute left-[1092px] top-[170px]">
+          <img src={img("09-ana-aviso.png")} alt="Móvil de Ana: aviso de posible estafa con el botón Llamar a Javi" className="h-[780px] w-[360px] rounded-[31px] object-contain shadow-[0_20px_60px_rgba(14,20,13,0.12)]" />
+        </Rise>
+        <Rise o={5} className="absolute left-[1488px] top-[170px]">
+          <img src={img("11-ana-estafas.png")} alt="Móvil de Ana: resumen de los avisos de estafa y lo que decidió Javi" className="h-[780px] w-[360px] rounded-[31px] object-contain shadow-[0_20px_60px_rgba(14,20,13,0.12)]" />
+        </Rise>
+        <Foot n="10">Pantallas reales de la demo, tras el Bizum de Carlos.</Foot>
+      </div>
+    ),
+  },
+  {
     id: "tecnologia",
     notes:
       "La clave técnica: la IA nunca calcula ni decide. ElevenLabs da la voz y la conversación de Noa, y el dictado con Scribe. Nuestro backend en FastAPI hace todas las cuentas y las reglas antiestafa. Claude lee los documentos y lo escribe en lectura fácil. Y al final decide Javi. Es una PWA desplegada en Render, sin tienda de apps.",
@@ -466,7 +504,7 @@ export const slides: Slide[] = [
           <Fade o={12} className="absolute left-[128px] top-[860px] w-[1664px]">
             <p className="text-[28px] leading-[1.3] text-suave">Se instala desde el navegador, sin tienda de apps. Se guardan los datos, nunca las fotos.</p>
           </Fade>
-          <Foot n="10" />
+          <Foot n="11" />
         </div>
       );
     },
@@ -535,7 +573,7 @@ export const slides: Slide[] = [
             <span className="flex items-center gap-[10px]"><i className="inline-block h-[20px] w-[20px] rounded-full bg-salvia-media" /> El papel original</span>
             <span className="flex items-center gap-[10px]"><i className="inline-block h-[20px] w-[20px] rounded-full bg-verde" /> Lo que dice Noa</span>
           </Fade>
-          <Foot n="11">En nuestros 3 ejemplos: papeles escritos por el equipo al estilo de los reales. Medido con nuestros scripts.</Foot>
+          <Foot n="12">En nuestros 3 ejemplos: papeles escritos por el equipo al estilo de los reales. Medido con nuestros scripts.</Foot>
         </div>
       );
     },
@@ -587,7 +625,7 @@ export const slides: Slide[] = [
               <p className="text-[26px] leading-[1.3] text-suave">La persona no paga nada. El banco paga según el uso real.</p>
             </Fade>
           </div>
-          <Foot n="12">Precios sin IVA, pendientes de validar con bancos. Mismo modelo que FinCell y Crassula: alta + cuota base + uso.</Foot>
+          <Foot n="13">Precios sin IVA, pendientes de validar con bancos. Mismo modelo que FinCell y Crassula: alta + cuota base + uso.</Foot>
         </div>
       );
     },
@@ -645,7 +683,7 @@ export const slides: Slide[] = [
             <p className="text-[22px] font-bold text-verde">Cada usuario nuevo nos deja</p>
             <p className="titular text-[56px] font-semibold leading-none text-verde">+ 1,31 € al mes</p>
           </Rise>
-          <Foot n="13">Estimación del equipo, sin datos reales. Precios pendientes de validar con bancos. IA: 1 $ ≈ 0,89 €.</Foot>
+          <Foot n="14">Estimación del equipo, sin datos reales. Precios pendientes de validar con bancos. IA: 1 $ ≈ 0,89 €.</Foot>
         </div>
       );
     },
@@ -699,7 +737,7 @@ export const slides: Slide[] = [
               <p className="text-[22px] leading-[1.25] text-suave">{m.d}</p>
             </Rise>
           ))}
-          <Foot n="14">Precios: propuesta del equipo, pendiente de validar con bancos. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
+          <Foot n="15">Precios: propuesta del equipo, pendiente de validar con bancos. Fuentes: Plena inclusión España; Directiva (UE) 2019/882.</Foot>
         </div>
       );
     },
@@ -733,7 +771,7 @@ export const slides: Slide[] = [
               </Rise>
             ))}
           </div>
-          <Foot n="15" />
+          <Foot n="16" />
         </div>
       );
     },
@@ -772,7 +810,7 @@ export const slides: Slide[] = [
               <p className={`text-[32px] font-bold leading-[1.2] ${st.accent ? "text-verde" : ""}`}>{st.t}</p>
             </Rise>
           ))}
-          <Foot n="16" />
+          <Foot n="17" />
         </div>
       );
     },
