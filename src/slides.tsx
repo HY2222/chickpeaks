@@ -210,7 +210,24 @@ export const slides: Slide[] = [
           <Rise o={5} className="absolute left-[905px] top-[588px] h-[390px] w-[390px] rounded-full bg-verde text-fondo">
             <Circulo r={rows[2]} top={56} w={300} small />
           </Rise>
-          <p className="absolute bottom-[130px] left-[128px] w-[540px] text-[22px] leading-[1.35] text-suave">
+          {/* Columna izquierda: lo que significan las cifras, sin repetirlas. */}
+          <Rise o={6} className="absolute left-[128px] top-[300px] w-[440px]">
+            <div className="flex gap-[10px]">
+              {Array.from({ length: 10 }, (_, i) => (
+                <svg key={i} viewBox="0 0 24 40" className={`h-[52px] w-[32px] ${i ? "fill-salvia-media" : "fill-verde"}`} aria-hidden>
+                  <circle cx="12" cy="7" r="6" />
+                  <rect x="2" y="15" width="20" height="25" rx="9" />
+                </svg>
+              ))}
+            </div>
+            <p className="titular mt-[20px] text-[60px] font-semibold leading-[1.05] text-verde">1 de cada 10</p>
+            <p className="mt-[10px] text-[26px] leading-[1.3]">Nos basta con llegar a menos de 1 de cada 10 personas que ya apoya Plena inclusión.</p>
+          </Rise>
+          <Rise o={7} className="absolute left-[128px] top-[640px] w-[420px] border-l-[6px] border-verde pl-[24px]">
+            <p className="text-[28px] font-bold leading-[1.2]">Una ley para toda la UE</p>
+            <p className="mt-[8px] text-[24px] leading-[1.3] text-suave">La directiva europea de accesibilidad obliga a todos los bancos.</p>
+          </Rise>
+          <p className="absolute bottom-[130px] left-[128px] w-[430px] text-[18px] leading-[1.35] text-suave">
             Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).
           </p>
           <Foot n="05" />
