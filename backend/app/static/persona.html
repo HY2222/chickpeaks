@@ -786,11 +786,13 @@ AL_ENTRAR["3"] = async () => {
     frases.length = 0;
     frases.push(...cifrasEnNumeros(estado.dichoNoa)
       .replace(/\[[^\]]*\]/g, "")
+      .replace(/\s+([,.:;!?])/g, "$1")   // sin la marca de tono no queda "Vale , las…"
+      .replace(/\s{2,}/g, " ")
       .split(/(?<=[.!?])\s+/)
       .map(f => f.trim())
       .filter(f => f && !/^tú decides\.?$/i.test(f)));  // "Tú decides." ya sale en grande
   }
-  pintarFrases(frases.map(sinPunto));
+  pintarFrases(frases);   // con su puntuación (puntos, comas, dos puntos), tal como habla Noa
 
   // Escala de las barras: lo que tiene la hucha cada mes.
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);
@@ -1051,7 +1053,7 @@ AL_ENTRAR["7"] = async () => {
 
   // La pregunta "¿Quieres hablarlo con Ana?" ya es el título de abajo: no se repite.
   const frases = frasesDe(r.texto_lectura_facil).filter(f => !/^¿Quieres hablarlo con/.test(f));
-  $("p7-frases").innerHTML = frases.map(f => `<p>${esc(sinPunto(f))}</p>`).join("");
+  $("p7-frases").innerHTML = frases.map(f => `<p>${esc(f)}</p>`).join("");   // con su puntuación
 
   // Barras "antes / después" solo si las cuentas cambian algo.
   const hayCuentas = r.quedan_antes != null && r.quedan_despues != null && r.quedan_antes !== r.quedan_despues;
