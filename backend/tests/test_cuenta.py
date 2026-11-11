@@ -31,3 +31,18 @@ def test_el_banco_y_willo_dicen_lo_mismo_del_ahorro(client):
     assert c["saldo"] == c["total"] - c["ahorro"]
     informe = client.get("/api/personas/javi/informe_anual/resumen").json()
     assert c["total"] == informe["saldo_final"]
+
+
+def test_crear_hucha_nueva(client):
+    r = client.post("/api/personas/javi/metas", json={"nombre": "Bici", "importe": 120})
+    assert r.status_code == 200
+    m = r.json()
+    assert m["nombre"] == "Bici" and m["ahorrado"] == 0 and m["importe"] == 120
+    assert m["aporte_mensual"] == 20 and m["meses_restantes"] == 6
+    nombres = [x["nombre"] for x in client.get("/api/personas/javi/metas").json()]
+    assert nombres[-1] == "Bici"
+    # Mismo nombre otra vez: no se duplica
+    assert client.post("/api/personas/javi/metas", json={"nombre": "bici", "importe": 50}).status_code == 409
+    # Un importe que no tiene sentido no se acepta
+    assert client.post("/api/personas/javi/metas", json={"nombre": "Nada", "importe": 0}).status_code == 422
+    assert client.post("/api/personas/javi/metas", json={"nombre": "  ", "importe": 10}).status_code == 400
