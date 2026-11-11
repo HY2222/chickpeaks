@@ -44,12 +44,12 @@ export const slides: Slide[] = [
   {
     id: "portada",
     notes:
-      "Hola. Somos el equipo de Willo. Willo es una app de dinero para personas con discapacidad intelectual. Se usa hablando, en lectura fácil. Su lema: tu voluntad, tu dinero.",
+      "Hola. Somos el equipo de Willo. Willo es el modo fácil de tu banco, para personas con discapacidad intelectual. Se usa hablando, en lectura fácil. Su lema: tu voluntad, tu dinero.",
     render: () => (
       <div className="absolute inset-0 bg-fondo text-texto">
         {/* "willo" en partículas: lo pinta la capa de App, que acompaña toda la presentación. */}
         <Fade o={1} className="absolute left-[128px] top-[128px]">
-          <Label>Una app de dinero accesible y por voz</Label>
+          <Label>El modo fácil de tu banco, por voz</Label>
         </Fade>
         <Rise delay={1.6} className="absolute left-[128px] top-[700px] w-[1664px] text-center">
           <p className="titular text-[64px] italic leading-[1.1] text-suave">Tu voluntad, tu dinero.</p>
