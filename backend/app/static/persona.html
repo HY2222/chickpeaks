@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=2">
+<link rel="stylesheet" href="/static/willo.css?v=3">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -576,16 +576,19 @@ AL_ENTRAR["2"] = async () => {
         },
       },
       onMessage: m => {
-        if (m.source === "user") oido(m.message);
-        else if (m.source === "ai" && estado.esperandoNoa) {
+        if (m.source === "user") {
+          estado.nuevoAsunto = true;   // Javi habla otra vez: lo próximo que diga Noa sustituye a lo anterior
+          oido(m.message);
+        } else if (m.source === "ai" && estado.esperandoNoa) {
           // Noa explica la compra → pantalla 3 con lo que ha dicho ella, palabra por palabra.
-          estado.esperandoNoa = false;
+          estado.esperandoNoa = estado.nuevoAsunto = false;
           estado.dichoNoa = m.message;
           if (location.hash === "#3") AL_ENTRAR["3"](); else location.hash = "#3";
         } else if (m.source === "ai" && location.hash === "#3" && estado.dichoNoa
                    && !estado.dichoNoa.endsWith(m.message)) {
-          // Noa sigue hablando (o su respuesta llega en trozos): se añade debajo, no se pierde.
-          estado.dichoNoa += " " + m.message;
+          // Asunto nuevo: se borra lo anterior. Si no, Noa sigue (o su respuesta llega en trozos): se añade debajo.
+          estado.dichoNoa = estado.nuevoAsunto ? m.message : `${estado.dichoNoa} ${m.message}`;
+          estado.nuevoAsunto = false;
           AL_ENTRAR["3"]();
         }
       },
@@ -732,6 +735,30 @@ async function decir(texto) {
   }
 }
 
+// Pinta lo que dice Noa tocando lo mínimo. Si lo nuevo sigue a lo que ya hay, solo se añaden
+// las frases nuevas (aparecen con un fundido). Si es otro asunto, lo anterior se desvanece y se cambia.
+// Solo se anima la opacidad (la hace la tarjeta gráfica): no gasta batería.
+let pintado = 0;
+function pintarFrases(textos) {
+  const caja = $("p3-frases"), yo = ++pintado;
+  const hay = [...caja.children].map(p => p.textContent);
+  // Mientras se desvanece lo anterior, todo lo que llega va al texto nuevo.
+  const sigue = !caja.classList.contains("saliendo") && hay.every((t, i) => t === textos[i]);
+  const poner = desde => caja.append(...textos.slice(desde).map(t => {
+    const p = document.createElement("p");
+    p.textContent = t;   // textContent: lo que dice Noa nunca entra como HTML
+    return p;
+  }));
+  if (sigue) return poner(hay.length);
+  caja.classList.add("saliendo");
+  setTimeout(() => {
+    if (yo !== pintado) return;   // ya ha llegado otro texto: lo pinta esa llamada
+    caja.replaceChildren();
+    caja.classList.remove("saliendo");
+    poner(0);
+  }, 250);
+}
+
 AL_ENTRAR["3"] = async () => {
   if (!estado.respuesta) {
     // Si se abre /demo#3 directamente, se usa la pregunta del guion.
@@ -763,7 +790,7 @@ AL_ENTRAR["3"] = async () => {
       .map(f => f.trim())
       .filter(f => f && !/^tú decides\.?$/i.test(f)));  // "Tú decides." ya sale en grande
   }
-  $("p3-frases").innerHTML = frases.map(f => `<p>${sinPunto(f.replace(/[<>&]/g, ""))}</p>`).join("");
+  pintarFrases(frases.map(sinPunto));
 
   // Escala de las barras: lo que tiene la hucha cada mes.
   const h = (await api("presupuesto")).huchas.find(x => x.id === r.hucha);

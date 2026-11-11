@@ -156,6 +156,13 @@ h1, h2, h3, p { margin: 0; }
   50%      { box-shadow: 0 0 0 18px rgba(163, 177, 143, 0); }
 }
 @media (prefers-reduced-motion: reduce) { .microfono.activo { animation: none; } }
+/* Lo que dice Noa: cada frase nueva aparece y, al cambiar de asunto, lo anterior se desvanece.
+   Solo opacidad (la anima la tarjeta gráfica, sin recalcular la página). */
+.noa-dice p { animation: aparecer .3s ease-out both; }
+.noa-dice { transition: opacity .25s ease-in; }
+.noa-dice.saliendo { opacity: 0; }
+@keyframes aparecer { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .noa-dice p { animation: none; } .noa-dice { transition: none; } }
 .transcripcion { font-size: 24px; font-weight: 700; line-height: 1.35; margin-top: 12px; }
 
 /* ---------- Respuesta de Noa (pantallas 3 y 7) ---------- */
