@@ -80,6 +80,12 @@ class Decision(BaseModel):
                          "Si es false, se apunta en 'Quiero comprar' y el dinero no baja todavía.")
 
 
+class NuevaMeta(BaseModel):
+    nombre: str = Field(min_length=1, max_length=40, examples=["Zapatillas"])
+    importe: float = Field(gt=0, le=100000, examples=[80])
+    aporte_mensual: float = Field(default=0, ge=0, description="Lo que quiere guardar cada mes (opcional)")
+
+
 class Pago(BaseModel):
     destinatario: str = Field(examples=["Marcos"])
     importe: float = Field(gt=0, examples=[200])
@@ -133,6 +139,12 @@ class ListaContactos(BaseModel):
 
 class Texto(BaseModel):
     texto: str
+
+
+class Decir(Texto):
+    """Lo que elige quien usa la app en "Voz de Noa". Por defecto, la voz de siempre."""
+    voz: Literal["femenina", "masculina"] = "femenina"
+    velocidad: float | None = Field(default=None, ge=0.7, le=1.2, description="ElevenLabs acepta de 0,7 a 1,2")
 
 
 # ---------- Persona ----------
@@ -431,6 +443,23 @@ def metas(persona_id: str):
     return [budget.progreso_meta(m) for m in _persona(persona_id).get("metas", [])]
 
 
+@app.post("/api/personas/{persona_id}/metas", dependencies=[Depends(token_herramientas)])
+def crear_meta(persona_id: str, nueva: NuevaMeta):
+    """Herramienta de Noa: crea una hucha de ahorro. Empieza con 0 €; no mueve dinero.
+    Si ya hay una con ese nombre, la actualiza (la pantalla y el agente pueden pedirla los dos)."""
+    p = _persona(persona_id)
+    nombre = nueva.nombre.strip()
+    nombre = nombre[0].upper() + nombre[1:]
+    mid = "_".join(nombre.lower().split())
+    metas = p.setdefault("metas", [])
+    meta = next((m for m in metas if m["id"] == mid), None)
+    if meta is None:
+        meta = {"id": mid, "nombre": nombre, "ahorrado": 0.0}
+        metas.append(meta)
+    meta.update(importe=nueva.importe, aporte_mensual=nueva.aporte_mensual)
+    return budget.progreso_meta(meta)
+
+
 @app.post("/api/personas/{persona_id}/pausa")
 def pausa_para_pensar(persona_id: str, pausa: Pausa):
     """La activa la propia persona (N2). No bloquea: solo propone esperar."""
@@ -600,11 +629,12 @@ async def signed_url():
                         params={"agent_id": agent}, headers={"xi-api-key": key})
     if r.status_code >= 400:
         raise HTTPException(502, f"ElevenLabs respondió {r.status_code}")
-    return r.json()
+    # La voz de hombre que se puede elegir en la app (un id de voz no es secreto).
+    return {**r.json(), "voz_masculina": os.getenv("ELEVENLABS_VOICE_ID_MASCULINA")}
 
 
 @app.post("/api/voz/decir")
-async def decir_con_voz_de_noa(t: Texto):
+async def decir_con_voz_de_noa(t: Decir):
     """Lee un texto con la voz de Noa (ElevenLabs). Lo usan las pantallas cuando no hay conversación de voz abierta.
 
     Si falta la clave o ElevenLabs falla, devuelve un error y la pantalla usa la voz del navegador.
@@ -616,12 +646,19 @@ async def decir_con_voz_de_noa(t: Texto):
     if not texto:
         raise HTTPException(422, "No hay texto")
     voz = os.getenv("ELEVENLABS_VOICE_ID", "dNjJKg63Fr5AXwIdkATa")  # la voz de Noa
+    if t.voz == "masculina":
+        # Sin voz de hombre en ElevenLabs todavía, la pantalla usa la de hombre del navegador.
+        voz = os.getenv("ELEVENLABS_VOICE_ID_MASCULINA")
+        if not voz:
+            raise HTTPException(503, "Falta ELEVENLABS_VOICE_ID_MASCULINA en .env")
+    cuerpo = {"text": texto, "model_id": os.getenv("ELEVENLABS_TTS_MODEL", "eleven_flash_v2_5"),
+              "language_code": "es"}
+    if t.velocidad:
+        cuerpo["voice_settings"] = {"speed": t.velocidad}
     async with httpx.AsyncClient(timeout=30) as c:
         r = await c.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voz}",
                          params={"output_format": "mp3_44100_128"},
-                         headers={"xi-api-key": key},
-                         json={"text": texto, "model_id": os.getenv("ELEVENLABS_TTS_MODEL", "eleven_flash_v2_5"),
-                               "language_code": "es"})
+                         headers={"xi-api-key": key}, json=cuerpo)
     if r.status_code >= 400:
         raise HTTPException(502, f"ElevenLabs respondió {r.status_code}")
     return Response(r.content, media_type="audio/mpeg")

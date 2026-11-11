@@ -74,6 +74,26 @@ h1, h2, h3, p { margin: 0; }
 .tarjeta .nombre { font-size: 20px; font-weight: 700; }
 .lista { display: flex; flex-direction: column; gap: 20px; }
 
+/* Sección que se abre y se cierra (Tus huchas) */
+.desplegable > summary {
+  list-style: none; cursor: pointer; min-height: 48px;
+  display: flex; align-items: center; gap: 8px;
+}
+.desplegable > summary::-webkit-details-marker { display: none; }
+.desplegable > summary::after {
+  content: ""; margin-left: auto; width: 12px; height: 12px;
+  border-right: 3px solid var(--verde-oscuro); border-bottom: 3px solid var(--verde-oscuro);
+  transform: rotate(45deg); transition: transform .2s;
+}
+.desplegable[open] > summary::after { transform: rotate(-135deg); }
+.desplegable[open] > summary { margin-bottom: 16px; }
+.desplegable > .boton { margin-top: 20px; width: 100%; }
+.desplegable .suave { font-size: 20px; font-weight: 400; }
+
+/* Botones de elegir una opción (voz y velocidad de Noa). El elegido va relleno. */
+.opciones { display: flex; gap: 8px; margin: 8px 0 20px; }
+.opciones .boton { flex: 1; min-width: 0; min-height: 56px; padding: 0 8px; font-size: 18px; }
+
 /* Tarjeta "Este mes te quedan" */
 .saldo { padding: 24px 20px; }
 .saldo .cifra { margin: 20px 0 16px; }

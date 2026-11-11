@@ -107,6 +107,36 @@
       }
     },
     {
+      "type": "webhook",
+      "name": "crear_hucha",
+      "description": "Crea una hucha de ahorro nueva para algo que la persona quiere (un viaje, unas zapatillas). Empieza con 0 euros y no mueve dinero.",
+      "api_schema": {
+        "url": "https://willo-sfh4.onrender.com/api/personas/javi/metas",
+        "method": "POST",
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "nombre": {
+              "type": "string",
+              "description": "Para qué es la hucha, sin artículo. Ej: 'Zapatillas', 'Viaje a Valencia'"
+            },
+            "importe": {
+              "type": "number",
+              "description": "Cuánto dinero quiere juntar, en euros"
+            },
+            "aporte_mensual": {
+              "type": "number",
+              "description": "Opcional: cuánto quiere guardar cada mes"
+            }
+          },
+          "required": [
+            "nombre",
+            "importe"
+          ]
+        }
+      }
+    },
+    {
       "type": "client",
       "name": "evaluar_pago",
       "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea. Si el riesgo es alto y la persona dio permiso, avisa a su círculo de apoyo y devuelve aviso_id. Es una herramienta de CLIENTE: la ejecuta la pantalla de Javi (persona.html), que llama al backend (evaluar_riesgo) y, si el riesgo no es bajo, abre la pantalla 8 con las señales.",

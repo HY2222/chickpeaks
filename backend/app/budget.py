@@ -113,13 +113,15 @@ def _dias_hasta_fin_de_mes() -> int:
 
 def progreso_meta(meta: dict[str, Any]) -> dict[str, Any]:
     falta = round(max(meta["importe"] - meta["ahorrado"], 0.0), 2)
-    meses = 0 if falta == 0 else -(-falta // meta["aporte_mensual"])
+    aporte = meta.get("aporte_mensual") or 0  # una hucha recién creada por Noa aún no tiene aporte
+    meses = 0 if falta == 0 or not aporte else -(-falta // aporte)
     frases = [f"{meta['nombre']}: tienes {euros(meta['ahorrado'])}."]
     if falta == 0:
         frases.append("Ya tienes todo el dinero.")
     else:
-        cuando = "1 mes" if meses == 1 else f"{int(meses)} meses"
-        frases += [f"Te faltan {euros(falta)}.",
-                   f"Si guardas {euros(meta['aporte_mensual'])} cada mes, lo consigues en {cuando}."]
+        frases.append(f"Te faltan {euros(falta)}.")
+        if meses:
+            cuando = "1 mes" if meses == 1 else f"{int(meses)} meses"
+            frases.append(f"Si guardas {euros(aporte)} cada mes, lo consigues en {cuando}.")
     texto = " ".join(frases)
     return {**meta, "falta": falta, "meses_restantes": int(meses), "texto_lectura_facil": texto}
