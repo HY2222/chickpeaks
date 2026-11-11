@@ -196,9 +196,8 @@ export const slides: Slide[] = [
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
           <div className="absolute left-[128px] top-[128px] flex w-[680px] flex-col gap-[32px]">
-            <Label>El mercado</Label>
             <h2 className={T72}>
-              <Words text="7 millones en Europa. Empezamos por 13.816." />
+              <Words text="El mercado" />
             </h2>
           </div>
           {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
