@@ -29,6 +29,7 @@
     <p class="cifra" id="p1-quedan">… €</p>
     <p class="suave">Hasta el día <span id="p1-dia-fin">30</span></p>
     <div class="barra"><span id="p1-barra" style="width:0"></span></div>
+    <p class="suave" id="p1-limite" style="text-align:right;font-size:16px;margin-top:6px"></p>
   </div>
 
   <!-- Lo más importante de la app: justo debajo del dinero, sin tener que bajar. -->
@@ -272,7 +273,8 @@ const $ = id => document.getElementById(id);
 // En pantalla, cada frase va en su línea: sin punto final (inés, 8 nov). Noa sí los usa al hablar.
 const sinPunto = s => s.replace(/\.\s*$/, "");
 // Como el backend: "4.800 €", "12,50 €", "90 €".
-const euros = n => `${Number(n).toLocaleString("de-DE", {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2})} €`;
+// centimos = true: "210,00 €", como lo enseña el banco. Si no, "210 €" (más fácil de leer en las frases).
+const euros = (n, centimos) => `${Number(n).toLocaleString("de-DE", {minimumFractionDigits: centimos || n % 1 ? 2 : 0, maximumFractionDigits: 2})} €`;
 // El texto que viene del backend (o de una foto) nunca se mete en la página como HTML.
 const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[c]);
 const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
@@ -356,8 +358,9 @@ AL_ENTRAR["1"] = async () => {
   const h = d.huchas.find(x => x.id === "mis_cosas") ?? d.huchas[0];
   // Un número negativo no es lectura fácil: se dice "has gastado de más" y la cifra en positivo.
   $("p1-quedan-texto").textContent = h.quedan < 0 ? "Este mes has gastado de más" : "Este mes te quedan";
-  $("p1-quedan").textContent = euros(Math.abs(h.quedan));
+  $("p1-quedan").textContent = euros(Math.abs(h.quedan), true);
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
+  $("p1-limite").textContent = euros(h.limite_mensual, true);  // lo que tiene la hucha al empezar el mes
 
   // Pagos fijos (alquiler, luz...). Pagado: verde con ✓. Por pagar: blanco con borde y el día.
   // Al tocar uno se ve el detalle en lectura fácil. Willo no paga nada: lo paga el banco solo.
