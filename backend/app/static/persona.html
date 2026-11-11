@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=6">
+<link rel="stylesheet" href="/static/willo.css?v=7">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -285,14 +285,19 @@
   <div class="lista" id="p15-ahora" aria-live="polite"></div>
   <button class="boton secundario ver-mas" type="button" id="p15-ver-mas" hidden>Ver más</button>
   <dialog class="tarjeta popup lista-popup" id="p15-todas" aria-labelledby="p15-todas-titulo">
-    <h2 class="titulo-seccion" id="p15-todas-titulo">Más personas de confianza</h2>
+    <h2 class="titulo-seccion" id="p15-todas-titulo">Tus personas de confianza</h2>
     <div class="lista" id="p15-todas-lista"></div>
     <form method="dialog"><button class="boton">Cerrar</button></form>
   </dialog>
 
-  <h2 class="titulo-seccion">¿Quién recibe tus avisos?</h2>
-  <p class="suave" style="font-size:18px">Puedes elegir a varias personas. Toca para marcar o quitar.</p>
-  <div class="botones" id="p15-circulo"></div>
+  <!-- Desplegable, como "Tus huchas": cerrado hasta que Javi lo abre. -->
+  <button class="desplegable" id="p15-circulo-boton" type="button" aria-expanded="false" aria-controls="p15-circulo-caja">
+    <span>¿Quién recibe tus avisos?</span><span class="flecha" aria-hidden="true">▾</span>
+  </button>
+  <div id="p15-circulo-caja" hidden>
+    <p class="suave" style="font-size:18px;margin-bottom:16px">Puedes elegir a varias personas. Toca para marcar o quitar.</p>
+    <div class="botones" id="p15-circulo"></div>
+  </div>
   <form id="p15-form" class="tarjeta" autocomplete="off" novalidate>
     <label class="etiqueta" for="p15-nueva">Alguien nuevo: ¿cómo se llama?</label>
     <input class="campo" id="p15-nueva" maxlength="60" placeholder="Por ejemplo: Marta" required>
@@ -1314,8 +1319,14 @@ AL_ENTRAR["15"] = async () => {
   const resto = elegidas.slice(VISIBLES);
   $("p15-ver-mas").hidden = !resto.length;
   $("p15-ver-mas").textContent = `Ver más (${resto.length})`;
-  $("p15-todas-lista").innerHTML = resto.map(burbuja).join("");
+  $("p15-todas-lista").innerHTML = elegidas.map(burbuja).join("");   // en la ventana, todas
   $("p15-ver-mas").onclick = () => $("p15-todas").showModal();
+  // Desplegable: se abre y se cierra con un toque. Sigue como estaba al marcar o quitar a alguien.
+  $("p15-circulo-boton").onclick = () => {
+    const abrir = $("p15-circulo-caja").hidden;
+    $("p15-circulo-caja").hidden = !abrir;
+    $("p15-circulo-boton").setAttribute("aria-expanded", String(abrir));
+  };
   pintarIconos($("p15-ahora"));
   pintarIconos($("p15-todas-lista"));
   // Su círculo: cada persona se marca o se desmarca con un toque. Puede haber varias.
