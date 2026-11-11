@@ -44,10 +44,10 @@ const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: string; e: string; d: string }; top: number; w: number; small?: boolean }) {
   return (
     <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center text-center" style={{ top, width: w }}>
-      <p className={`${small ? "text-[22px]" : "text-[24px]"} font-bold opacity-80`}>{r.k} · {r.t}</p>
-      <p className={`titular whitespace-nowrap ${small ? "text-[44px]" : "text-[50px]"} font-semibold leading-[1.05]`}>{r.n}</p>
-      <p className={`${small ? "text-[20px]" : "text-[24px]"} font-bold`}>{r.e}</p>
-      <p className={`mt-[6px] ${small ? "text-[18px]" : "text-[21px]"} leading-[1.25] opacity-80`}>{r.d}</p>
+      <p className={`${small ? "text-[24px]" : "text-[26px]"} font-bold opacity-80`}>{r.k} · {r.t}</p>
+      <p className={`titular whitespace-nowrap ${small ? "text-[48px]" : "text-[56px]"} font-semibold leading-[1.05]`}>{r.n}</p>
+      <p className={`${small ? "text-[22px]" : "text-[26px]"} font-bold`}>{r.e}</p>
+      <p className={`mt-[6px] ${small ? "text-[20px]" : "text-[23px]"} leading-[1.25] opacity-80`}>{r.d}</p>
     </div>
   );
 }
@@ -201,16 +201,16 @@ export const slides: Slide[] = [
             </h2>
           </div>
           {/* Círculos uno dentro de otro, con todas las cifras dentro. */}
-          <Rise o={3} className="absolute left-[892px] top-[90px] h-[900px] w-[900px] rounded-full bg-salvia text-verde">
-            <Circulo r={rows[0]} top={34} w={560} />
+          <Rise o={3} className="absolute left-[600px] top-[40px] h-[1000px] w-[1000px] rounded-full bg-salvia text-verde">
+            <Circulo r={rows[0]} top={40} w={620} />
           </Rise>
-          <Rise o={4} className="absolute left-[1032px] top-[342px] h-[620px] w-[620px] rounded-full bg-salvia-media text-texto">
-            <Circulo r={rows[1]} top={30} w={470} />
+          <Rise o={4} className="absolute left-[755px] top-[319px] h-[690px] w-[690px] rounded-full bg-salvia-media text-texto">
+            <Circulo r={rows[1]} top={34} w={520} />
           </Rise>
-          <Rise o={5} className="absolute left-[1167px] top-[584px] h-[350px] w-[350px] rounded-full bg-verde text-fondo">
-            <Circulo r={rows[2]} top={50} w={270} small />
+          <Rise o={5} className="absolute left-[905px] top-[588px] h-[390px] w-[390px] rounded-full bg-verde text-fondo">
+            <Circulo r={rows[2]} top={56} w={300} small />
           </Rise>
-          <p className="absolute bottom-[130px] left-[128px] w-[680px] text-[22px] leading-[1.35] text-suave">
+          <p className="absolute bottom-[130px] left-[128px] w-[540px] text-[22px] leading-[1.35] text-suave">
             Fuentes: European Psychiatry (2020); IMSERSO (2024); Plena inclusión. SOM: hipótesis del equipo. Ingresos sin IVA, a 2,40 € por usuario (el SOM incluye la cuota base).
           </p>
           <Foot n="05" />
