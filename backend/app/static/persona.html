@@ -273,18 +273,13 @@
   </form>
 </section>
 
-<!-- 14 · Cómo suena Noa: voz de mujer u hombre y velocidad. Se guarda en este móvil, para quien lo usa. -->
+<!-- 14 · Cómo suena Noa: velocidad. Se guarda en este móvil, para quien lo usa. -->
 <section class="pantalla" data-pantalla="14" hidden>
   <a class="volver" href="#1">← Volver</a>
   <h1 class="titulo">Ajustes</h1>
   <h2 class="titulo-seccion">La voz de Noa</h2>
   <div class="tarjeta">
-    <p class="etiqueta">¿Cómo quieres que suene?</p>
-    <div class="opciones" role="group" aria-label="Voz de Noa">
-      <button class="boton secundario" type="button" data-voz="femenina" aria-pressed="false">Voz de mujer</button>
-      <button class="boton secundario" type="button" data-voz="masculina" aria-pressed="false">Voz de hombre</button>
-    </div>
-    <p class="etiqueta" style="margin-top:24px">¿Qué velocidad?</p>
+    <p class="etiqueta">¿Qué velocidad?</p>
     <div class="opciones" role="group" aria-label="Velocidad de Noa">
       <button class="boton secundario" type="button" data-ritmo="despacio" aria-pressed="false">Más despacio</button>
       <button class="boton secundario" type="button" data-ritmo="normal" aria-pressed="false">Normal</button>
@@ -679,14 +674,13 @@ const VOZ_POR_DEFECTO = {voz: "femenina", ritmo: "normal"};
 function preferenciasVoz() {
   try {
     const p = JSON.parse(localStorage.getItem("willo_voz") || "{}");
-    return {voz: p.voz === "masculina" ? "masculina" : "femenina", ritmo: RITMOS[p.ritmo] ? p.ritmo : "normal"};
+    return {voz: "femenina", ritmo: RITMOS[p.ritmo] ? p.ritmo : "normal"};
   } catch { return {...VOZ_POR_DEFECTO}; }
 }
 function guardarPreferenciasVoz(p) { try { localStorage.setItem("willo_voz", JSON.stringify(p)); } catch { /* sin almacenamiento */ } }
 // Lo que se le cambia a Noa al abrir la conversación. Vacío si no se ha tocado nada.
 function ajustesDeVoz(voces) {
   const p = preferenciasVoz(), tts = {};
-  if (p.voz === "masculina" && voces?.masculina) tts.voiceId = voces.masculina;
   if (p.ritmo !== "normal") tts.speed = RITMOS[p.ritmo];
   return Object.keys(tts).length ? {tts} : null;
 }
@@ -1173,13 +1167,11 @@ const diaCorto = iso => new Date(iso + "T12:00").toLocaleDateString("es-ES", {da
 AL_ENTRAR["14"] = () => {
   const p = preferenciasVoz();
   const pintar = () => {
-    document.querySelectorAll("[data-voz]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.voz === p.voz)));
     document.querySelectorAll("[data-ritmo]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ritmo === p.ritmo)));
     $("p14-nota").textContent = "Vale para Noa en este móvil. Se aplica la próxima vez que hables con ella.";
   };
-  document.querySelectorAll("[data-voz]").forEach(b => b.onclick = () => { p.voz = b.dataset.voz; guardarPreferenciasVoz(p); pintar(); });
   document.querySelectorAll("[data-ritmo]").forEach(b => b.onclick = () => { p.ritmo = b.dataset.ritmo; guardarPreferenciasVoz(p); pintar(); });
-  $("p14-probar").onclick = () => decir("Hola. Soy Noa. Así suena mi voz. Si quieres, puedes cambiarla.");
+  $("p14-probar").onclick = () => decir("Hola. Soy Noa. Así suena mi voz a esta velocidad.");
   pintar();
 };
 

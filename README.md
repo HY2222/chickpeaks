@@ -27,7 +27,7 @@ Recorrido de la demo (3 minutos). Abre cada enlace en una pestaña; con la venta
 | 4 | `/demo#8` | Posible estafa por Bizum: Willo explica las señales y **no bloquea**. Pulsa «Avisar a Ana» |
 | 5 | `/demo/apoyo` | El móvil de Ana: el aviso de estafa y el informe anual para el juzgado en PDF |
 
-Ajustes (icono de engranaje arriba a la derecha del inicio): voz de Noa (mujer u hombre) y velocidad, y volver al banco. Se guardan en el móvil de quien lo usa. La voz de hombre se cambia con `ELEVENLABS_VOICE_ID_MASCULINA` en `.env`/Render.
+Ajustes (icono de engranaje arriba a la derecha del inicio): velocidad de Noa y volver al banco. Se guarda en el móvil de quien lo usa. Solo hay una voz (femenina) para gastar pocos créditos de ElevenLabs; el backend admite una voz masculina con `ELEVENLABS_VOICE_ID_MASCULINA`, pero la app no la ofrece.
 
 Para empezar de cero: `POST /api/demo/reset` en `/docs`. Si varias personas usan la web a la vez, comparten los mismos datos.
 
