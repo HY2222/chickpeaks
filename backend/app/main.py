@@ -15,7 +15,7 @@ import httpx
 from fastapi.concurrency import run_in_threadpool
 from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -633,30 +633,33 @@ def reset():
     return {"ok": True}
 
 
+# El navegador pregunta siempre si hay versión nueva: así nadie ve una pantalla vieja tras actualizar.
+SIN_CACHE = {"Cache-Control": "no-cache"}
+
+
 @app.get("/sw.js")
 def service_worker():
     """El service worker va en la raíz para que la PWA controle toda la app."""
-    return FileResponse(STATIC / "sw.js", media_type="application/javascript",
-                        headers={"Cache-Control": "no-cache"})
+    return FileResponse(STATIC / "sw.js", media_type="application/javascript", headers=SIN_CACHE)
 
 
 @app.get("/demo/banco")
 def demo_banco():
     """Pantalla 0: maqueta de la app de MyInvestor (patrocinador), con Willo dentro."""
-    return FileResponse(STATIC / "banco.html")
+    return FileResponse(STATIC / "banco.html", headers=SIN_CACHE)
 
 
 @app.get("/demo")
 def demo_persona():
-    return FileResponse(STATIC / "persona.html")
+    return FileResponse(STATIC / "persona.html", headers=SIN_CACHE)
 
 
 @app.get("/demo/apoyo")
 def demo_apoyo():
-    return FileResponse(STATIC / "apoyo.html")
+    return FileResponse(STATIC / "apoyo.html", headers=SIN_CACHE)
 
 
 @app.get("/")
 def raiz():
-    return {"app": "Willo", "lema": "Your will, your money", "docs": "/docs",
-            "demo_banco": "/demo/banco", "demo_persona": "/demo", "demo_apoyo": "/demo/apoyo"}
+    """Quien abre la dirección sin más (p. ej. el jurado) llega a la demo, no a un JSON."""
+    return RedirectResponse("/demo/banco")
