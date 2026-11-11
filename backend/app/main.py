@@ -7,6 +7,8 @@ el agente de voz de ElevenLabs (ver agent/tools.json), y las pantallas del front
 from __future__ import annotations
 
 import os
+import re
+import unicodedata
 from datetime import date, datetime
 from pathlib import Path
 from typing import Literal
@@ -119,6 +121,15 @@ class DocumentoConfirmado(BaseModel):
 
 class ResultadoEnvio(BaseModel):
     enviado: bool = Field(description="true si Javi envió el dinero, false si no")
+
+
+def easyread_sin_acentos(texto: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFD", texto.lower()) if unicodedata.category(c) != "Mn")
+
+
+class NuevaMeta(BaseModel):
+    nombre: str = Field(min_length=1, max_length=40, description="cómo la llama la persona (p. ej. «Bici»)")
+    importe: float = Field(gt=0, le=100000, description="cuánto quiere juntar")
 
 
 class Contacto(BaseModel):
@@ -429,6 +440,27 @@ def borrar_contacto(persona_id: str, telefono: str):
 def metas(persona_id: str):
     """Perfil de menores: metas de ahorro."""
     return [budget.progreso_meta(m) for m in _persona(persona_id).get("metas", [])]
+
+
+@app.post("/api/personas/{persona_id}/metas")
+def crear_meta(persona_id: str, nueva: NuevaMeta):
+    """Crea una hucha (meta de ahorro) nueva, vacía. El aporte mensual lo calcula el código: 6 meses."""
+    p = _persona(persona_id)
+    nombre = " ".join(nueva.nombre.split())
+    if not nombre:
+        raise HTTPException(400, "Ponle un nombre a la hucha")
+    metas_ = p.setdefault("metas", [])
+    if any(m["nombre"].lower() == nombre.lower() for m in metas_):
+        raise HTTPException(409, f"Ya tienes una hucha que se llama {nombre}")
+    base = re.sub(r"[^a-z0-9]+", "_", easyread_sin_acentos(nombre)).strip("_") or "hucha"
+    ids = {m["id"] for m in metas_}
+    id_, n = base, 2
+    while id_ in ids:
+        id_, n = f"{base}_{n}", n + 1
+    meta = {"id": id_, "nombre": nombre, "importe": round(nueva.importe, 2), "ahorrado": 0.0,
+            "aporte_mensual": max(1.0, round(nueva.importe / 6, 2))}
+    metas_.append(meta)
+    return budget.progreso_meta(meta)
 
 
 @app.post("/api/personas/{persona_id}/pausa")

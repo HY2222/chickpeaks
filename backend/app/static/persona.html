@@ -40,6 +40,8 @@
 
   <h2 class="titulo-seccion">Tus huchas</h2>
   <div class="lista" id="p1-huchas" aria-live="polite"></div>
+  <button class="boton secundario" id="p1-huchas-mas" type="button" aria-expanded="false" hidden></button>
+  <a class="boton secundario" href="#13" id="p1-nueva-hucha">Crear una hucha</a>
 
   <div class="botones">
     <a class="boton" href="#2">Hablar con Noa</a>
@@ -253,6 +255,23 @@
   </div>
 </section>
 
+<!-- 13 · Crear una hucha nueva (una meta de ahorro). Las cuentas, del backend. -->
+<section class="pantalla" data-pantalla="13" hidden>
+  <a class="volver" href="#1">← Volver</a>
+  <h1 class="titulo">Nueva hucha</h1>
+  <form id="p13-form" class="tarjeta" autocomplete="off" novalidate>
+    <label class="etiqueta" for="p13-nombre">¿Para qué quieres ahorrar?</label>
+    <input class="campo" id="p13-nombre" maxlength="40" placeholder="Por ejemplo: una bici" required>
+    <label class="etiqueta" for="p13-importe" style="margin-top:20px">¿Cuánto dinero quieres juntar?</label>
+    <input class="campo" id="p13-importe" type="number" inputmode="decimal" min="1" step="1" placeholder="Por ejemplo: 120" required>
+    <p class="suave" id="p13-error" role="alert" hidden style="margin-top:16px"></p>
+    <div class="botones" style="margin-top:24px">
+      <button class="boton" type="submit">Crear hucha</button>
+      <a class="boton secundario" href="#1">Ahora no</a>
+    </div>
+  </form>
+</section>
+
 <!-- Solo para la demo: botón invisible abajo a la derecha (pantallas 1, 3 y 4).
      Antes de pagar: hace como si Javi pagara en la taquilla con su tarjeta (→ pantalla 4).
      Después de pagar (pantallas 1 y 4): lleva a la foto del documento (→ pantalla 5).
@@ -387,15 +406,26 @@ AL_ENTRAR["1"] = async () => {
     ? `Mis compras (${compras.pendientes.length} sin pagar)` : "Mis compras";
 
   const metas = await api("metas").catch(() => []);
-  $("p1-huchas").innerHTML = metas.map(m => `
-    <div class="tarjeta fila" style="padding-right:40px">
-      <span class="picto" data-icono="hucha"></span>
-      <div>
-        <p class="nombre">${m.nombre}</p>
-        <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
-        <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
-      </div>
-    </div>`).join("");
+  const VISIBLES = 2;   // las demás se despliegan con "Ver todas"
+  const todas = metas.length <= VISIBLES;
+  const pintarHuchas = (abiertas) => {
+    $("p1-huchas").innerHTML = (abiertas ? metas : metas.slice(0, VISIBLES)).map(m => `
+      <div class="tarjeta fila" style="padding-right:40px">
+        <span class="picto" data-icono="hucha"></span>
+        <div>
+          <p class="nombre">${esc(m.nombre)}</p>
+          <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
+          <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
+        </div>
+      </div>`).join("");
+    pintarIconos($("p1-huchas"));
+    const b = $("p1-huchas-mas");
+    b.hidden = todas;
+    b.setAttribute("aria-expanded", String(abiertas));
+    b.textContent = abiertas ? "Ver menos huchas" : `Ver todas mis huchas (${metas.length})`;
+    b.onclick = () => pintarHuchas(!abiertas);
+  };
+  pintarHuchas(false);
   pintarIconos($("p1-huchas"));
 };
 
@@ -1065,6 +1095,27 @@ $("p8-enviar-igual").onclick = async () => {
 // Willo no paga nada: los botones solo apuntan lo que Javi ha hecho.
 const cuantosDias = n => n <= 0 ? "Se quita hoy" : n === 1 ? "Se quita mañana" : `Se quita en ${n} días`;
 const diaCorto = iso => new Date(iso + "T12:00").toLocaleDateString("es-ES", {day: "numeric", month: "long"});
+
+AL_ENTRAR["13"] = () => {
+  $("p13-nombre").value = $("p13-importe").value = "";
+  $("p13-error").hidden = true;
+  $("p13-form").onsubmit = async e => {
+    e.preventDefault();
+    const nombre = $("p13-nombre").value.trim(), importe = Number($("p13-importe").value.replace(",", "."));
+    const fallo = !nombre ? "Escribe para qué quieres ahorrar."
+      : !(importe > 0) ? "Escribe cuánto dinero quieres juntar." : "";
+    if (fallo) { $("p13-error").textContent = fallo; $("p13-error").hidden = false; return; }
+    try {
+      const ya = (await api("metas")).some(m => m.nombre.toLowerCase() === nombre.toLowerCase());
+      if (ya) { $("p13-error").textContent = "Ya tienes una hucha con ese nombre."; $("p13-error").hidden = false; return; }
+      await post("metas", {nombre, importe});
+      location.hash = "#1";
+    } catch {
+      $("p13-error").textContent = "No he podido crear la hucha. Prueba otra vez.";
+      $("p13-error").hidden = false;
+    }
+  };
+};
 
 AL_ENTRAR["12"] = async () => {
   const c = await api("compras");
