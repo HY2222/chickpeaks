@@ -66,7 +66,7 @@ export const slides: Slide[] = [
   {
     id: "javi",
     notes:
-      "Este es Javi. Tiene 34 años, trabaja en una lavandería y cobra 980 euros al mes. Quiere decidir sobre su dinero, como cualquiera. Pero la app de su banco no está hecha para él. Así que pregunta a su familia para todo, o se arriesga a que le engañen.",
+      "Este es Javi. Tiene 34 años, trabaja en una lavandería y cobra 980 euros al mes. Quiere decidir sobre su dinero, como cualquiera. Pero la app de su banco no está hecha para él. Así que pregunta a su familia para todo, o se arriesga a que le engañen. Sobre todo a su hermana Ana. Ana le ayuda con el dinero, pero no quiere decidir por él: quiere acompañarle. En la demo veréis también su móvil.",
     render: () => (
       <div className="absolute inset-0 bg-fondo text-texto">
         <Panel />
@@ -82,10 +82,18 @@ export const slides: Slide[] = [
         <Rise o={8} className="absolute left-[128px] top-[640px] w-[900px]">
           <p className="text-[36px] leading-[1.3] text-suave">Por eso depende de su familia para todo. Y está más expuesto a las estafas.</p>
         </Rise>
+        {/* Ana: la segunda persona de la demo (su móvil es /demo/apoyo). */}
+        <Rise o={10} className="absolute left-[128px] top-[790px] flex w-[900px] items-center gap-[28px] rounded-[24px] bg-white px-[32px] py-[26px]">
+          <span className="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-full bg-verde text-[34px] font-bold text-crema">A</span>
+          <div>
+            <p className="text-[30px] font-bold">Ana, su hermana</p>
+            <p className="text-[26px] leading-[1.3] text-suave">Le ayuda con el dinero. Quiere acompañarle, no decidir por él.</p>
+          </div>
+        </Rise>
         <Rise o={3} className="absolute left-[1366px] top-[120px]">
           <img src={img("01-inicio.png")} alt="Pantalla de inicio de Javi en Willo, con sus huchas" className="h-[840px] w-[388px] rounded-[31px] object-contain" />
         </Rise>
-        <Foot n="02">Javi es el protagonista de la demo. Sus datos son inventados.</Foot>
+        <Foot n="02">Javi y Ana son los protagonistas de la demo. Sus datos son inventados.</Foot>
       </div>
     ),
   },
