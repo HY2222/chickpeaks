@@ -141,6 +141,7 @@ backend/tests/    tests
 
 ## Principios
 
-- Apoyo, no sustitución: la app nunca decide ni bloquea.
+- Apoyo, no sustitución: la app nunca decide por la persona.
+- Límites del dinero (`backend/app/limites.py`): ninguna hucha puede quedar en negativo; más de 1.000 € en un día (gastado o recibido) se avisa siempre al círculo de apoyo; más de 1.000.000 € es un error y no se apunta.
 - No detectamos emociones por la voz y la voz nunca sirve como firma.
 - Pictogramas de [ARASAAC](https://arasaac.org) solo para la demo (licencia no comercial), citando la fuente.

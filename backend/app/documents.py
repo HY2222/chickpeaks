@@ -20,6 +20,7 @@ import re
 from datetime import date
 from typing import Any
 
+from . import limites
 from .easyread import euros
 
 # Para cambiar a Sonnet si Haiku lee mal: WILLO_MODELO_DOCUMENTOS=claude-sonnet-5-5 en .env
@@ -405,6 +406,7 @@ def confirmar(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any]:
             frases.append("Ya está apuntado.")
             frases.append(f"Te quedan {euros(quedan)} {en_tus_cosas}.")
             return {**base, "pictograma": "bolsa", "texto_lectura_facil": " ".join(frases)}
+        limites.comprobar(persona, importe, d["titulo"], "mis_cosas")  # sin saldo o absurdo: no se apunta
         persona["movimientos"].append({
             "fecha": hoy().isoformat(), "concepto": d["titulo"], "importe": importe,
             "tipo": "gasto", "hucha": "mis_cosas", "destinatario": d["remitente"],

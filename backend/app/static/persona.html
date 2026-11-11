@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=3">
+<link rel="stylesheet" href="/static/willo.css?v=4">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -312,7 +312,11 @@
 
 <script type="module">
 const P = "javi";
-const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => { if (!x.ok) throw new Error(r); return x.json(); });
+const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(async x => {
+  if (x.ok) return x.json();
+  const b = await x.json().catch(() => ({}));   // si el backend no lo deja (límites), trae la frase para Javi
+  throw new Error(b.texto_lectura_facil || "No he podido hacerlo. Prueba otra vez.");
+});
 const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
 const $ = id => document.getElementById(id);
 // En pantalla, cada frase va en su línea: sin punto final (inés, 8 nov). Noa sí los usa al hablar.
@@ -541,8 +545,12 @@ AL_ENTRAR["2"] = async () => {
         evaluar_compra: async ({importe, concepto, sumar}) => {
           estado.pregunta = {texto: $("p2-oido").textContent, importe: Number(importe), concepto: concepto || "esto"};
           if (sumar === false) estado.pensadas = [];
-          estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto,
-                                                           hucha: "mis_cosas", antes: estado.pensadas});
+          try {
+            estado.respuesta = await post("evaluar_compra", {importe: Number(importe), concepto: estado.pregunta.concepto,
+                                                             hucha: "mis_cosas", antes: estado.pensadas});
+          } catch (e) {
+            return JSON.stringify({error: true, texto_lectura_facil: e.message});   // Noa lo dice; no se apunta nada
+          }
           estado.pensadas = [...estado.pensadas, {concepto: estado.pregunta.concepto, importe: Number(importe)}];
           estado.dichoNoa = null;
           estado.esperandoNoa = true;   // la próxima frase de Noa es la explicación de esta compra
@@ -841,10 +849,13 @@ $("simular-pago").onclick = async () => {
   }
   let avisados = [];
   if (!yaApuntada) {
-    const r = await post("decisiones", {
-      concepto: q.concepto, importe: q.importe, decision: "comprar",
-      palabras_persona: `Pagado con tarjeta: ${sinArticulo(q.concepto.trim())}`, compartir: true, pagado: true,
-    });
+    let r;
+    try {
+      r = await post("decisiones", {
+        concepto: q.concepto, importe: q.importe, decision: "comprar",
+        palabras_persona: `Pagado con tarjeta: ${sinArticulo(q.concepto.trim())}`, compartir: true, pagado: true,
+      });
+    } catch (e) { alert(e.message); return; }   // sin saldo o cantidad imposible: no se apunta
     avisados = r.avisados;
   } else {
     avisados = (await api("avisos")).filter(a => a.tipo === "decision").map(a => a.para_nombre);
@@ -1160,12 +1171,19 @@ async function decidirBizum(decision, extra, enviado) {
   ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = true);
   callar();
   const avisoId = estado.riesgo?.aviso_id ?? estado.avisoBizum;
-  if (avisoId) await post(`avisos/${avisoId}/resultado`, {enviado});
   const b = bizumActual();
-  await post("decisiones", {
-    concepto: conceptoBizum(b), importe: b.importe, decision, ...extra,
-    pagado: Boolean(enviado),   // si lo ha enviado, el dinero ya ha salido
-  });
+  try {
+    // Primero el dinero (puede no permitirse); después el resultado del aviso.
+    await post("decisiones", {
+      concepto: conceptoBizum(b), importe: b.importe, decision, ...extra,
+      pagado: Boolean(enviado),   // si lo ha enviado, el dinero ya ha salido
+    });
+  } catch (e) {
+    // Sin saldo o cantidad imposible: no se envía. El aviso no se marca como enviado.
+    ["p8-ana", "p8-no-enviar", "p8-enviar-igual"].forEach(id => $(id).disabled = false);
+    throw e;
+  }
+  if (avisoId) await post(`avisos/${avisoId}/resultado`, {enviado});
   estado.riesgo = null;
   estado.bizum = null;
   estado.avisoBizum = null;
@@ -1195,8 +1213,10 @@ $("p8-no-enviar").onclick = async () => {
 };
 // Willo nunca bloquea: si Javi quiere, lo envía. Se apunta como gasto suyo.
 $("p8-enviar-igual").onclick = async () => {
-  await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true}, true);
-  location.hash = "#1";
+  try {
+    await decidirBizum("comprar", {palabras_persona: "Enviar igualmente", compartir: true}, true);
+    location.hash = "#1";
+  } catch (e) { alert(e.message); }
 };
 
 // ---------- 12 · Mis compras ----------
@@ -1271,17 +1291,18 @@ AL_ENTRAR["12"] = async () => {
     try {
       if (b.dataset.pagar) {
         // Antes de apuntar el pago, Javi ve cómo queda su hucha (las cuentas, del backend) y lo confirma.
-        // Si no le llega, se le dice. No se bloquea: es su dinero y su decisión.
+        // Si no le llega, no se puede apuntar: la hucha no puede quedar en negativo (limites.py).
         const x = c.pendientes.find(p => p.id === b.dataset.pagar);
         const r = await post("evaluar_compra", {importe: x.importe, concepto: x.concepto, hucha: x.hucha});
-        const como = r.alcanza ? `Te quedan ${euros(r.quedan_despues)}.`
-          : `No te llega. Te faltan ${euros(-r.quedan_despues)}. Tu hucha se queda en negativo.`;
-        if (confirm(`¿Ya has pagado ${x.concepto}? Son ${euros(x.importe)}.\n${como}`)) {
-          await post(`compras/${b.dataset.pagar}/pagada`, {});
+        if (!r.alcanza) {
+          alert(`No te llega para ${x.concepto}. Te faltan ${euros(-r.quedan_despues)}. No se puede apuntar.`);
+        } else if (confirm(`¿Ya has pagado ${x.concepto}? Son ${euros(x.importe)}.\nTe quedan ${euros(r.quedan_despues)}.`)) {
+          const pagado = await post(`compras/${b.dataset.pagar}/pagada`, {});
+          if (pagado.avisados_limite?.length) alert(pagado.texto_lectura_facil);   // pasa de 1.000 € hoy
         }
       }
       else await api(`compras/${b.dataset.quitar}`, {method: "DELETE"});
-    } catch { /* ya no estaba en la lista: se vuelve a pintar */ }
+    } catch (e) { alert(e.message); }   // la frase del backend (p. ej. ya no estaba en la lista)
     AL_ENTRAR["12"]();
   });
 };
