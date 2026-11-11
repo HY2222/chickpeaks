@@ -76,8 +76,10 @@ def _dias_hasta_fin_de_mes() -> int:
 
 def progreso_meta(meta: dict[str, Any]) -> dict[str, Any]:
     falta = round(max(meta["importe"] - meta["ahorrado"], 0.0), 2)
-    meses = 0 if falta == 0 else -(-falta // meta["aporte_mensual"])
+    aporte = meta.get("aporte_mensual") or 0  # una hucha recién creada aún no tiene aporte
+    meses = 0 if falta == 0 or not aporte else -(-falta // aporte)
     texto = (f"Para la {meta['nombre'].lower()} tienes {euros(meta['ahorrado'])}. "
-             f"Te faltan {euros(falta)}. "
-             f"Si guardas {euros(meta['aporte_mensual'])} cada mes, la tienes en {int(meses)} meses.")
+             f"Te faltan {euros(falta)}.")
+    if meses:
+        texto += f" Si guardas {euros(aporte)} cada mes, la tienes en {int(meses)} meses."
     return {**meta, "falta": falta, "meses_restantes": int(meses), "texto_lectura_facil": texto}

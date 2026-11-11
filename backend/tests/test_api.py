@@ -109,6 +109,15 @@ def test_meta_menor(client):
     assert m["falta"] == 125 and m["meses_restantes"] == 5
 
 
+def test_noa_crea_hucha(client):
+    r = client.post("/api/personas/javi/metas", json={"nombre": "zapatillas", "importe": 80}).json()
+    assert r["nombre"] == "Zapatillas" and r["ahorrado"] == 0 and r["falta"] == 80
+    # La pantalla y el agente pueden pedirla los dos: no se duplica
+    client.post("/api/personas/javi/metas", json={"nombre": "Zapatillas", "importe": 90})
+    metas = client.get("/api/personas/javi/metas").json()
+    assert [m["importe"] for m in metas if m["nombre"] == "Zapatillas"] == [90]
+
+
 def test_interpretar_gastos():
     assert interpretar("45,50 € del supermercado")["hucha"] == "comida"
     assert interpretar("He pagado 12 euros de cine")["importe"] == 12

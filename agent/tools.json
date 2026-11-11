@@ -51,6 +51,24 @@
     },
     {
       "type": "webhook",
+      "name": "crear_hucha",
+      "description": "Crea una hucha de ahorro nueva para algo que la persona quiere (un viaje, unas zapatillas). Empieza con 0 euros y no mueve dinero.",
+      "api_schema": {
+        "url": "BASE_URL/api/personas/javi/metas",
+        "method": "POST",
+        "request_body_schema": {
+          "type": "object",
+          "properties": {
+            "nombre": {"type": "string", "description": "Para qué es la hucha, sin artículo. Ej: 'Zapatillas', 'Viaje a Valencia'"},
+            "importe": {"type": "number", "description": "Cuánto dinero quiere juntar, en euros"},
+            "aporte_mensual": {"type": "number", "description": "Opcional: cuánto quiere guardar cada mes"}
+          },
+          "required": ["nombre", "importe"]
+        }
+      }
+    },
+    {
+      "type": "webhook",
       "name": "evaluar_pago",
       "description": "Escudo antiestafas. Úsala siempre que hable de enviar dinero a otra persona, Bizum, códigos, premios o alguien que le pide dinero. Nunca bloquea.",
       "api_schema": {

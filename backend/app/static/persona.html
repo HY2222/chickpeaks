@@ -30,8 +30,28 @@
     <div class="barra"><span id="p1-barra" style="width:0"></span></div>
   </div>
 
-  <h2 class="titulo-seccion">Tus huchas</h2>
-  <div class="lista" id="p1-huchas" aria-live="polite"></div>
+  <!-- Se abre y se cierra tocando "Tus huchas". -->
+  <details class="desplegable" id="p1-desplegable" open>
+    <summary class="titulo-seccion">Tus huchas <span class="suave" id="p1-cuantas"></span></summary>
+    <div class="lista" id="p1-huchas" aria-live="polite"></div>
+    <button class="boton secundario" id="p1-nueva">Nueva hucha con Noa</button>
+  </details>
+
+  <!-- Ajustes de Noa: los elige quien usa la app. Se guardan en este móvil. -->
+  <details class="desplegable" id="p1-ajustes-voz">
+    <summary class="titulo-seccion">Voz de Noa</summary>
+    <p class="etiqueta" id="p1-voz-etiqueta">Cómo suena Noa</p>
+    <div class="opciones" data-ajuste="voz" role="group" aria-labelledby="p1-voz-etiqueta">
+      <button class="boton secundario" data-valor="femenina">Mujer</button>
+      <button class="boton secundario" data-valor="masculina">Hombre</button>
+    </div>
+    <p class="etiqueta" id="p1-vel-etiqueta">Cómo de rápido habla</p>
+    <div class="opciones" data-ajuste="velocidad" role="group" aria-labelledby="p1-vel-etiqueta">
+      <button class="boton secundario" data-valor="despacio">Despacio</button>
+      <button class="boton secundario" data-valor="normal">Normal</button>
+      <button class="boton secundario" data-valor="rapido">Rápido</button>
+    </div>
+  </details>
 
   <div class="botones">
     <a class="boton" href="#2">Hablar con Noa</a>
@@ -49,6 +69,7 @@
   <div class="tarjeta" style="padding:24px 20px">
     <p class="etiqueta">Noa ha oído:</p>
     <p class="transcripcion" id="p2-oido" aria-live="polite">…</p>
+    <p class="negrita verde" id="p2-hecho" aria-live="polite" style="margin-top:16px" hidden></p>
   </div>
 
   <div class="botones" style="margin-top:0">
@@ -231,6 +252,7 @@ const api = (r, o) => fetch(`/api/personas/${P}/${r}`, o).then(x => { if (!x.ok)
 const post = (r, b) => api(r, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(b)});
 const $ = id => document.getElementById(id);
 const euros = n => `${Math.round(n * 100) / 100} €`.replace(".", ",");
+const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);  // nombres dictados por Javi
 const pct = (a, b) => `${Math.max(0, Math.min(100, b ? a / b * 100 : 0))}%`;
 
 // ---------- Pictogramas (iconos Lucide; en la versión final, ARASAAC) ----------
@@ -249,6 +271,41 @@ const ICONOS = {
 
 // Lo que Javi ha preguntado (lo usan las pantallas 2, 3 y 4).
 const estado = {pregunta: null, respuesta: null};
+
+// ---------- Ajustes de la voz de Noa (los elige quien usa la app) ----------
+// Por defecto, la voz de siempre. Se guardan en este móvil (si el navegador no deja, valen hasta cerrar).
+// Velocidad: null = la de siempre (0,9 en el navegador; la que tenga el agente en ElevenLabs).
+// ElevenLabs acepta de 0,7 a 1,2.
+const VELOCIDAD = {despacio: 0.7, normal: null, rapido: 1.15};
+const AJUSTES_POR_DEFECTO = {voz: "femenina", velocidad: "normal"};
+const ajustes = (() => {
+  try { return {...AJUSTES_POR_DEFECTO, ...JSON.parse(localStorage.getItem("willo-voz-noa"))}; }
+  catch { return {...AJUSTES_POR_DEFECTO}; }
+})();
+
+// El navegador no dice si una voz es de hombre: se busca por el nombre (macOS, Windows, Edge).
+// Si no hay ninguna, suena la de siempre. La buena será la de ElevenLabs.
+const HOMBRE = /jorge|juan|diego|pablo|ra[uú]l|[aá]lvaro|carlos|enrique|eddy|reed|rocko|male|hombre/i;
+if ("speechSynthesis" in window) speechSynthesis.getVoices();  // Chrome solo carga las voces cuando se piden
+function vozMasculina() {
+  const voces = speechSynthesis.getVoices().filter(v => v.lang.startsWith("es") && HOMBRE.test(v.name));
+  return voces.find(v => v.lang === "es-ES") ?? voces[0] ?? null;
+}
+
+function pintarAjustes() {
+  document.querySelectorAll("[data-ajuste] [data-valor]").forEach(b => {
+    const elegido = ajustes[b.parentElement.dataset.ajuste] === b.dataset.valor;
+    b.setAttribute("aria-pressed", elegido);
+    b.classList.toggle("secundario", !elegido);
+  });
+}
+document.querySelectorAll("[data-ajuste] [data-valor]").forEach(b => b.onclick = () => {
+  ajustes[b.parentElement.dataset.ajuste] = b.dataset.valor;
+  try { localStorage.setItem("willo-voz-noa", JSON.stringify(ajustes)); } catch {}
+  pintarAjustes();
+  decir("Hola, soy Noa. Así sueno ahora.");   // para que lo oiga al momento
+});
+pintarAjustes();
 const icono = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[n]}</svg>`;
 const pintarIconos = (raiz = document) => raiz.querySelectorAll("[data-icono]").forEach(e => e.innerHTML = icono(e.dataset.icono));
 
@@ -277,18 +334,14 @@ AL_ENTRAR["1"] = async () => {
   $("p1-quedan").textContent = euros(h.quedan);
   $("p1-barra").style.width = pct(h.quedan, h.limite_mensual);
 
-  let metas = await api("metas").catch(() => []);
-  if (!metas.length) {
-    // TODO: Javi todavía no tiene huchas de ahorro en backend/data/seed.json (solo Lucía).
-    // Datos falsos fijos del diseño hasta que se cuadre el seed (fase 0).
-    metas = [{nombre: "Viaje a Valencia", ahorrado: 120, importe: 300},
-             {nombre: "Móvil nuevo", ahorrado: 45, importe: 200}];
-  }
+  // Huchas de ahorro (metas). Noa puede crear más (pantalla 2 o herramienta crear_hucha del agente).
+  const metas = await api("metas").catch(() => []);
+  $("p1-cuantas").textContent = `(${metas.length})`;
   $("p1-huchas").innerHTML = metas.map(m => `
     <div class="tarjeta fila" style="padding-right:40px">
       <span class="picto" data-icono="hucha"></span>
       <div>
-        <p class="nombre">${m.nombre}</p>
+        <p class="nombre">${esc(m.nombre)}</p>
         <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
         <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
       </div>
@@ -309,8 +362,32 @@ function entenderPregunta(texto) {
   return {texto, importe: parseFloat(num[1].replace(",", ".")), concepto: cosa ? cosa[1] : "esto"};
 }
 
+// "Noa, crea una hucha para unas zapatillas de 80 euros" → {nombre: "Zapatillas", importe: 80}
+function entenderHucha(texto) {
+  if (!/hucha/i.test(texto)) return null;
+  const num = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:€|euros?)/i);
+  const cosa = texto.match(/hucha\s+(?:para|de)\s+(.+?)(?:\s+de\s+\d|\s+(?:con|que|y)\s|[?¿.,]|$)/i);
+  if (!num || !cosa) return null;   // sin nombre o sin cifra: con voz real, Noa lo pregunta
+  return {nombre: mayuscula(sinArticulo(cosa[1].trim())), importe: parseFloat(num[1].replace(",", "."))};
+}
+
+// Noa crea la hucha. Empieza con 0 €: no se mueve dinero. Si el agente ya la creó, el backend no la duplica.
+async function crearHucha(h) {
+  await post("metas", h);
+  const frase = `Ya tienes la hucha ${h.nombre}. Quieres juntar ${euros(h.importe)}.`;
+  $("p2-hecho").textContent = frase;
+  $("p2-hecho").hidden = false;
+  $("p1-desplegable").open = true;
+  if (!conv) {   // sin el agente de voz, habla el navegador y se vuelve al inicio
+    decir(frase);
+    setTimeout(() => { if (location.hash === "#2") location.hash = "#1"; }, 3500);
+  }
+}
+
 async function oido(texto) {
   $("p2-oido").textContent = `«${texto}»`;
+  const hucha = entenderHucha(texto);
+  if (hucha) return crearHucha(hucha);
   const q = entenderPregunta(texto);
   if (!q) return;
   estado.pregunta = q;
@@ -320,7 +397,9 @@ async function oido(texto) {
 // Si la voz no está lista (sin claves de ElevenLabs o sin micrófono), la demo sigue:
 // se escribe la frase del guion poco a poco, como si Noa la oyera.
 async function frasePorDefecto() {
-  const frase = "¿Puedo comprar la entrada del concierto? Cuesta 45 euros.";
+  const frase = estado.modo === "hucha"
+    ? "Noa, crea una hucha para unas zapatillas de 80 euros."
+    : "¿Puedo comprar la entrada del concierto? Cuesta 45 euros.";
   const palabras = frase.split(" ");
   for (let i = 1; i <= palabras.length; i++) {
     if (location.hash !== "#2") return;
@@ -335,19 +414,30 @@ async function pararVoz() {
   $("p2-micro").classList.remove("activo");
 }
 
+$("p1-nueva").onclick = () => { estado.modo = "hucha"; location.hash = "#2"; };
+window.addEventListener("hashchange", () => { if (location.hash !== "#2") estado.modo = null; });
+
 AL_ENTRAR["2"] = async () => {
   estado.pregunta = estado.respuesta = null;
   $("p2-oido").textContent = "…";
+  $("p2-hecho").hidden = true;
   $("p2-micro").classList.add("activo");
   try {
     const r = await fetch("/api/voz/signed-url");
     if (!r.ok) throw new Error("voz no configurada");
-    const { signed_url } = await r.json();
+    const { signed_url, voz_masculina } = await r.json();
+    // Voz y velocidad que eligió Javi. Solo se mandan si cambió algo: si no, la voz de siempre.
+    // En ElevenLabs hay que permitir estos "overrides" (agente > Security). La voz de hombre es
+    // ELEVENLABS_VOICE_ID_MASCULINA en .env; si no está, suena la voz del agente.
+    const tts = {};
+    if (ajustes.voz === "masculina" && voz_masculina) tts.voiceId = voz_masculina;
+    if (VELOCIDAD[ajustes.velocidad]) tts.speed = VELOCIDAD[ajustes.velocidad];
     await navigator.mediaDevices.getUserMedia({audio: true});
     // P1: fijad aquí la versión exacta de @elevenlabs/client que probéis.
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     conv = await Conversation.startSession({
       signedUrl: signed_url,
+      ...(Object.keys(tts).length && {overrides: {tts}}),
       onMessage: m => {
         if (m.source === "user") oido(m.message);
         else if (m.source === "ai" && estado.respuesta) location.hash = "#3"; // Noa contesta → pantalla 3
@@ -373,11 +463,13 @@ const sinArticulo = s => s.replace(/^(la|el|los|las|un|una|unos|unas)\s+/i, "");
 const mayuscula = s => s[0].toUpperCase() + s.slice(1);
 
 // Voz del navegador para "Escuchar otra vez" y para el modo demo sin ElevenLabs.
+// Si Javi eligió voz de hombre o otra velocidad (ajustes de la pantalla 1), se aplican aquí.
 function decir(texto) {
   if (!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(texto);
-  u.lang = "es-ES"; u.rate = 0.9;
+  u.lang = "es-ES"; u.rate = VELOCIDAD[ajustes.velocidad] ?? 0.9;
+  if (ajustes.voz === "masculina") u.voice = vozMasculina();
   speechSynthesis.speak(u);
 }
 
@@ -425,7 +517,8 @@ $("p3-entendido").onclick = () => { pararVoz(); if ("speechSynthesis" in window)
 // Javi paga él mismo en la taquilla. En la demo lo simula el botón invisible: apunta la compra
 // con POST /decisiones (decision "comprar"). El backend resta el gasto de la hucha y avisa a
 // quien Javi eligió (Ana). Si la compra ya estaba apuntada (p. ej. por Noa), no se apunta dos veces.
-const COMERCIO = "Entradas Concierto";  // nombre del comercio en el aviso de la tarjeta (dato de la demo)
+// El aviso enseña lo que Javi dijo que iba a comprar ("la entrada del concierto" → "Entrada del concierto").
+const queCompra = q => mayuscula(sinArticulo(q.concepto));
 
 $("simular-pago").onclick = async () => {
   // La esquina secreta sigue el guion: pantalla 4 → foto del documento (pantalla 5).
@@ -443,7 +536,7 @@ $("simular-pago").onclick = async () => {
   if (!yaApuntada) {
     const r = await post("decisiones", {
       concepto: q.concepto, importe: q.importe, decision: "comprar",
-      palabras_persona: `Pagado con tarjeta en ${COMERCIO}`, compartir: true,
+      palabras_persona: `Pagado con tarjeta: ${q.concepto}`, compartir: true,
     });
     avisados = r.avisados;
   } else {
@@ -456,7 +549,7 @@ $("simular-pago").onclick = async () => {
 AL_ENTRAR["4"] = async () => {
   const pago = estado.pago ?? {concepto: "la entrada del concierto", importe: 45, avisados: ["Ana"]};
   $("p4-pagado").textContent = `Has pagado ${euros(pago.importe)}`;
-  $("p4-donde").textContent = `en ${COMERCIO}`;
+  $("p4-donde").textContent = queCompra(pago);
   $("p4-nota").textContent = pago.avisados.includes("Ana")
     ? "Ana ve este pago porque tú lo elegiste."
     : "Nadie más ve este pago.";

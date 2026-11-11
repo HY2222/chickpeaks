@@ -53,8 +53,9 @@ cd backend && python -m pytest -q
 
 1. Crear un agente en ElevenLabs Agents y pegar el prompt de [`agent/noa_prompt.md`](agent/noa_prompt.md).
 2. Crear la voz con Voice Design (cálida, clara, ritmo pausado). No clonamos voces reales.
-3. Añadir las 4 herramientas webhook de [`agent/tools.json`](agent/tools.json), con la URL pública del backend (en local, con un túnel como ngrok).
+3. Añadir las 5 herramientas webhook de [`agent/tools.json`](agent/tools.json), con la URL pública del backend (en local, con un túnel como ngrok).
 4. Poner `ELEVENLABS_API_KEY` y `ELEVENLABS_AGENT_ID` en `.env`. El navegador pide una URL firmada a `/api/voz/signed-url`, así la clave nunca sale del servidor.
+5. Voz y velocidad a elegir (pantalla de inicio, «Voz de Noa»): crear una voz de hombre con Voice Design y poner su id en `ELEVENLABS_VOICE_ID_MASCULINA`. En el agente, pestaña **Security**, activar los overrides de **voz** y **velocidad** del TTS; si no, ElevenLabs rechaza la conversación cuando alguien cambia la voz o la velocidad.
 
 ## Productos de ElevenLabs que usamos
 

@@ -51,6 +51,22 @@
           "limite_mensual": 100.0
         }
       ],
+      "metas": [
+        {
+          "id": "viaje_a_valencia",
+          "nombre": "Viaje a Valencia",
+          "importe": 300.0,
+          "ahorrado": 120.0,
+          "aporte_mensual": 30.0
+        },
+        {
+          "id": "movil_nuevo",
+          "nombre": "Móvil nuevo",
+          "importe": 200.0,
+          "ahorrado": 45.0,
+          "aporte_mensual": 25.0
+        }
+      ],
       "gastos_recurrentes": [
         {
           "concepto": "Alquiler de la habitación",
