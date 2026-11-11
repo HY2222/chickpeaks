@@ -13,6 +13,7 @@ import unicodedata
 from datetime import date, timedelta
 from typing import Any
 
+from . import limites
 from .store import hoy
 
 DIAS_CADUCIDAD = 7
@@ -66,7 +67,12 @@ def quitar(persona: dict[str, Any], compra_id: str) -> bool:
 
 def pagar(persona: dict[str, Any], concepto: str, importe: float, hucha: str,
           compra_id: str | None = None) -> dict[str, Any]:
-    """Javi ya lo ha pagado: se apunta el gasto (el dinero baja) y sale de "Quiero comprar"."""
+    """Javi ya lo ha pagado: se apunta el gasto (el dinero baja) y sale de "Quiero comprar".
+
+    Antes, los límites (limites.py): si deja la hucha en negativo o pasa de 1.000.000 €, no se apunta
+    (FueraDeLimite). Si pasa de 1.000 € hoy, se avisa al círculo: van en mov["avisados_limite"].
+    """
+    avisados = limites.comprobar(persona, importe, concepto, hucha)
     lista = _lista(persona)
     pendiente = next((c for c in lista if c["id"] == compra_id), None) if compra_id else None
     if not pendiente:
@@ -78,7 +84,7 @@ def pagar(persona: dict[str, Any], concepto: str, importe: float, hucha: str,
     mov = {"fecha": hoy().isoformat(), "concepto": concepto[:1].upper() + concepto[1:], "importe": importe,
            "tipo": "gasto", "hucha": hucha, "destinatario": None, "registrado_por": "persona"}
     persona["movimientos"].append(mov)
-    return mov
+    return {**mov, "avisados_limite": avisados}
 
 
 def pagadas_este_mes(persona: dict[str, Any], hucha: str = "mis_cosas") -> list[dict[str, Any]]:

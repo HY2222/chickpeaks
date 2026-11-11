@@ -261,10 +261,11 @@ h1, h2, h3, p { margin: 0; }
 .campo:focus-visible { outline: 3px solid var(--verde-oscuro); outline-offset: 2px; }
 
 /* Lista desplegable (huchas del inicio): todo el título es un botón grande */
+/* Igual que .boton.secundario (letra, color, borde y alto), con la flecha a la derecha. */
 .desplegable { display: flex; align-items: center; justify-content: space-between; width: 100%;
-  box-sizing: border-box; padding: 16px 20px; font: inherit; font-size: 26px; font-weight: 700;
-  color: var(--texto); background: var(--blanco); border: 2px solid var(--verde-oscuro);
-  border-radius: 16px; cursor: pointer; text-align: left; }
+  box-sizing: border-box; min-height: 72px; padding: 0 20px; font: 700 22px/1.2 Helvetica, Arial, sans-serif;
+  color: var(--verde-oscuro); background: var(--blanco); border: 3px solid var(--verde-oscuro);
+  border-radius: 20px; cursor: pointer; text-align: left; }
 .desplegable .flecha { font-size: 28px; transition: transform .15s; }
 .desplegable[aria-expanded="true"] .flecha { transform: rotate(180deg); }
 

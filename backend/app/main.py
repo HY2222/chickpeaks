@@ -15,13 +15,15 @@ from typing import Literal
 
 import httpx
 from fastapi.concurrency import run_in_threadpool
-from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, Header, HTTPException, Request, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import budget, documents, easyread, expenses, notify, purchases, report, risk, support
+from . import budget, documents, easyread, expenses, limites, notify, purchases, report, risk, support
+from .limites import LIMITE_APP
 from .notify import avisar
 from .store import hoy, store
 
@@ -36,6 +38,21 @@ app = FastAPI(title="Willo API", version="0.1.0",
               description="Your will, your money. Demo con datos inventados.")
 app.add_middleware(CORSMiddleware, allow_origins=os.getenv("WILLO_CORS", "*").split(","),
                    allow_methods=["*"], allow_headers=["*"])
+
+@app.exception_handler(limites.FueraDeLimite)
+async def fuera_de_limite(_: Request, e: limites.FueraDeLimite):
+    """Un movimiento que no se puede apuntar (negativo, más de 1.000.000 €...). 409 con la frase para la persona."""
+    return JSONResponse(status_code=409, content={"error": e.codigo, "texto_lectura_facil": e.texto})
+
+
+@app.exception_handler(RequestValidationError)
+async def datos_no_validos(request: Request, e: RequestValidationError):
+    """Más de 1.000.000 € en cualquier cantidad: se dice "Error" en lectura fácil. Lo demás, como FastAPI."""
+    if any(err["type"] == "less_than_equal" and err["loc"][-1] == "importe" for err in e.errors()):
+        return JSONResponse(status_code=422, content={"error": "limite_app", "texto_lectura_facil": limites.TEXTO_LIMITE_APP})
+    from fastapi.exception_handlers import request_validation_exception_handler
+    return await request_validation_exception_handler(request, e)
+
 
 STATIC = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
@@ -66,11 +83,11 @@ def _miembro(p: dict, miembro_id: str) -> dict:
 
 class CompraPensada(BaseModel):
     concepto: str = Field(max_length=120, examples=["los zapatos"])
-    importe: float = Field(gt=0, examples=[45])
+    importe: float = Field(gt=0, le=LIMITE_APP, examples=[45])
 
 
 class Compra(BaseModel):
-    importe: float = Field(gt=0, examples=[80])
+    importe: float = Field(gt=0, le=LIMITE_APP, examples=[80])
     concepto: str = Field(examples=["las zapatillas"])
     hucha: str | None = Field(default=None, description="id de la hucha; por defecto mis_cosas")
     antes: list[CompraPensada] = Field(default=[], max_length=20,
@@ -79,7 +96,7 @@ class Compra(BaseModel):
 
 class Decision(BaseModel):
     concepto: str = Field(examples=["las zapatillas"])
-    importe: float = Field(ge=0, examples=[80])
+    importe: float = Field(ge=0, le=LIMITE_APP, examples=[80])
     decision: Literal["comprar", "esperar", "hablarlo"]
     palabras_persona: str = Field(default="", description="Lo que dijo la persona, con sus palabras")
     pidio_apoyo: bool = False
@@ -91,7 +108,7 @@ class Decision(BaseModel):
 
 class Pago(BaseModel):
     destinatario: str = Field(examples=["Marcos"])
-    importe: float = Field(gt=0, examples=[200])
+    importe: float = Field(gt=0, le=LIMITE_APP, examples=[200])
     contexto: str = Field(default="", description="Lo que la persona cuenta sobre el pago",
                           examples=["Un amigo nuevo de Instagram me pide 200 euros urgente para un billete"])
     telefono: str | None = Field(default=None, description="Número de quien pide el dinero, si se sabe",
@@ -117,7 +134,7 @@ class DocumentoConfirmado(BaseModel):
     tipo: Literal["factura", "recibo", "ticket", "nomina", "multa", "carta_banco", "mensaje", "otro"]
     titulo: str = Field(min_length=1, examples=["Multa de aparcamiento"])
     remitente: str | None = Field(default=None, examples=["Ayuntamiento"])
-    importe: float | None = Field(default=None, ge=0, examples=[90.0])
+    importe: float | None = Field(default=None, ge=0, le=LIMITE_APP, examples=[90.0])
     fecha_limite: date | None = Field(default=None, examples=["2026-12-20"])
     texto_mensaje: str | None = Field(default=None, max_length=documents.MAX_TEXTO_MENSAJE,
                                       description="Solo si tipo es mensaje: lo que escribe la otra persona",
@@ -201,6 +218,12 @@ def evaluar_compra(persona_id: str, compra: Compra):
                                   [a.model_dump() for a in compra.antes])
     except KeyError:
         raise HTTPException(400, f"No existe la hucha {compra.hucha}")
+    # Más de 1.000 € hoy (con lo que ya ha pensado en la conversación): se puede, pero se avisa al círculo.
+    total = compra.importe + r["pensado_antes"]
+    r["pasa_limite_diario"] = r["alcanza"] and limites.revisar(p, total)["pasa_limite_diario"]
+    if r["pasa_limite_diario"]:
+        r["texto_lectura_facil"] += (" Con esto, hoy pasas de 1.000 €. Si lo compras, "
+                                     "se lo diré a tu persona de apoyo.")
     pausa = p.get("pausa_para_pensar")
     r["pausa_para_pensar"] = bool(pausa and pausa["activa"] and compra.importe >= pausa["desde_importe"])
     if r["pausa_para_pensar"]:
@@ -216,17 +239,24 @@ def registrar_decision(persona_id: str, d: Decision):
         hucha = budget.buscar_hucha(p, d.hucha)["id"]
     except KeyError:
         raise HTTPException(400, f"No existe la hucha {d.hucha}")
-    ahora = datetime.combine(hoy(), datetime.now().time()).isoformat(timespec="seconds")
-    reg = {**d.model_dump(), "fecha": ahora}
-    p["decisiones"].append(reg)
-    pendiente = None
+    pendiente, avisados_limite = None, []
+    # Primero el dinero: si no se permite (limites.py), no se guarda nada.
     if d.decision == "comprar" and d.importe > 0:
         if d.pagado:
             # Ya está pagado: el dinero baja ahora. Si estaba en "Quiero comprar", sale de ahí.
-            purchases.pagar(p, d.concepto, d.importe, hucha)
+            avisados_limite = purchases.pagar(p, d.concepto, d.importe, hucha)["avisados_limite"]
         else:
             # Solo lo ha decidido: se apunta en "Quiero comprar". El dinero baja cuando lo pague.
+            # Algo que no le llega no se apunta: después no lo podría pagar sin quedarse en negativo.
+            if limites.revisar(p, d.importe, hucha)["negativo"]:
+                quedan = limites.revisar(p, d.importe, hucha)["quedan"]
+                raise limites.FueraDeLimite(
+                    f"No te llega. Te faltan {easyread.euros(round(d.importe - quedan, 2))}. "
+                    "No lo apunto en Quiero comprar.", "saldo_negativo")
             pendiente = purchases.apuntar(p, d.concepto, d.importe, hucha)
+    ahora = datetime.combine(hoy(), datetime.now().time()).isoformat(timespec="seconds")
+    reg = {**d.model_dump(), "fecha": ahora}
+    p["decisiones"].append(reg)
     avisados = []
     if d.compartir:
         comprar = "compró" if d.pagado else "ha decidido comprar"
@@ -240,8 +270,10 @@ def registrar_decision(persona_id: str, d: Decision):
     if pendiente:
         texto = ("Lo he apuntado en Quiero comprar. Tu dinero no baja todavía. "
                  "Baja cuando lo pagues. Es tu decisión.")
+    if avisados_limite:
+        texto += f" Hoy pasas de 1.000 €: se lo he dicho a {' y '.join(avisados_limite)}."
     return {"guardado": reg, "avisados": [a["para_nombre"] for a in avisados],
-            "compra_pendiente": pendiente, "texto_lectura_facil": texto}
+            "avisados_limite": avisados_limite, "compra_pendiente": pendiente, "texto_lectura_facil": texto}
 
 
 @app.get("/api/personas/{persona_id}/compras")
@@ -287,8 +319,11 @@ def compra_pagada(persona_id: str, compra_id: str):
     c = purchases.buscar(p, compra_id)
     if not c:
         raise HTTPException(404, "Esa compra no está en Quiero comprar")
-    purchases.pagar(p, c["concepto"], c["importe"], c["hucha"], compra_id=compra_id)
-    return {"ok": True, "texto_lectura_facil": f"Apuntado. Has pagado {easyread.euros(c['importe'])}."}
+    avisados = purchases.pagar(p, c["concepto"], c["importe"], c["hucha"], compra_id=compra_id)["avisados_limite"]
+    texto = f"Apuntado. Has pagado {easyread.euros(c['importe'])}."
+    if avisados:
+        texto += f" Hoy pasas de 1.000 €: se lo he dicho a {' y '.join(avisados)}."
+    return {"ok": True, "avisados_limite": avisados, "texto_lectura_facil": texto}
 
 
 @app.delete("/api/personas/{persona_id}/compras/{compra_id}")
@@ -583,11 +618,12 @@ def registrar_gasto(persona_id: str, g: GastoDictado):
         raise HTTPException(422, str(e))
     if gasto["hucha"] not in {h["id"] for h in p["huchas"]}:
         gasto["hucha"] = "mis_cosas"  # p. ej. "cine": Javi no tiene hucha de ocio, va a sus cosas
+    avisados = limites.comprobar(p, gasto["importe"], gasto["concepto"], gasto["hucha"], ya_pagado=True)
     mov = {"fecha": hoy().isoformat(), "concepto": gasto["concepto"], "importe": gasto["importe"],
            "tipo": "gasto", "hucha": gasto["hucha"], "destinatario": None,
            "registrado_por": m["nombre"], "texto_original": g.texto}
     p["movimientos"].append(mov)
-    return mov
+    return {**mov, "avisados_limite": avisados}
 
 
 @app.post("/api/gastos/transcribir")

@@ -103,7 +103,8 @@ def evaluar_compra(persona: dict[str, Any], importe: float, concepto: str,
     if h["id"] != "comida" and any(x["id"] == "comida" for x in persona["huchas"]):
         frase_comida = "El dinero de la comida está aparte."
         frases.append(frase_comida)
-    frases.append("Tú decides.")
+    # Si no llega, no se puede (limites.py no lo dejará apuntar): no se dice "Tú decides".
+    frases.append("Tú decides." if alcanza else "Con este dinero no se puede: tu hucha se quedaría en negativo.")
     return {
         "hucha": h["id"],
         "hucha_nombre": h["nombre"],
