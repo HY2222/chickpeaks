@@ -29,7 +29,7 @@ def resumen(persona: dict[str, Any], anio: int) -> dict[str, Any]:
     for m in movs:
         if m["tipo"] == "ingreso":
             ingresos[m["concepto"]] += m["importe"]
-        elif m["hucha"] == "ahorro":
+        elif m["hucha"] == "ahorro" or m.get("meta"):
             ahorro += m["importe"]  # Traspaso a la cuenta de ahorro: no es un gasto.
         else:
             gastos[nombres.get(m["hucha"], m["hucha"] or "Otros")] += m["importe"]

@@ -323,7 +323,8 @@ def buscar_ticket(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any] 
     from .store import hoy
     mes = hoy().isoformat()[:7]
     for m in persona["movimientos"]:
-        if m["tipo"] == "gasto" and m["fecha"][:7] == mes and _mismo_importe(m["importe"], d["importe"]):
+        if (m["tipo"] == "gasto" and not m.get("meta") and m["fecha"][:7] == mes
+                and _mismo_importe(m["importe"], d["importe"])):
             return m
     return None
 

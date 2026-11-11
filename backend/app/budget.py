@@ -125,6 +125,44 @@ def _dias_hasta_fin_de_mes() -> int:
     return monthrange(h.year, h.month)[1] - h.day + 1
 
 
+class NoSePuedeGuardar(ValueError):
+    """No se puede meter ese dinero en la hucha. El mensaje va en lectura fácil."""
+
+
+def meter_en_meta(persona: dict[str, Any], meta_id: str, importe: float) -> dict[str, Any]:
+    """Pasa dinero de "Para tus cosas" a una hucha de ahorro (viaje, móvil...).
+
+    - No se puede meter más de lo que te queda este mes para tus cosas.
+    - No se puede meter más de lo que le falta a la hucha.
+    El dinero baja de "Para tus cosas" y sube en la hucha. No es un gasto: sigue siendo tuyo."""
+    meta = next((m for m in persona.get("metas", []) if m["id"] == meta_id), None)
+    if meta is None:
+        raise KeyError(meta_id)
+    importe = round(importe, 2)
+    if importe <= 0:
+        raise NoSePuedeGuardar("Escribe cuánto dinero quieres meter.")
+    tus_cosas = buscar_hucha(persona, "mis_cosas")
+    tienes = max(tus_cosas["quedan"], 0.0)
+    falta = round(max(meta["importe"] - meta["ahorrado"], 0.0), 2)
+    if falta == 0:
+        raise NoSePuedeGuardar("Esta hucha ya está llena.")
+    if importe > tienes:
+        raise NoSePuedeGuardar(f"Este mes te quedan {euros(tienes)}. No puedes meter {euros(importe)}.")
+    if importe > falta:
+        raise NoSePuedeGuardar(f"A esta hucha solo le faltan {euros(falta)}.")
+    meta["ahorrado"] = round(meta["ahorrado"] + importe, 2)
+    persona["movimientos"].append({
+        "fecha": hoy().isoformat(), "concepto": f"A la hucha {meta['nombre']}", "importe": importe,
+        "tipo": "gasto", "hucha": "mis_cosas", "destinatario": "Hucha", "registrado_por": "persona",
+        "meta": meta["id"],  # traspaso a una hucha de ahorro: baja de tus cosas, pero no es un gasto
+    })
+    quedan = round(tienes - importe, 2)
+    frases = [f"Has metido {euros(importe)} en la hucha {meta['nombre']}.",
+              f"En la hucha tienes {euros(meta['ahorrado'])}.",
+              f"Este mes te quedan {euros(quedan)} para {nombre_en_frase(tus_cosas)}."]
+    return {"meta": progreso_meta(meta), "quedan": quedan, "texto_lectura_facil": " ".join(frases)}
+
+
 def progreso_meta(meta: dict[str, Any]) -> dict[str, Any]:
     falta = round(max(meta["importe"] - meta["ahorrado"], 0.0), 2)
     meses = 0 if falta == 0 else -(-falta // meta["aporte_mensual"])

@@ -448,7 +448,7 @@ window.addEventListener("hashchange", mostrar);
 
 // ---------- 1 · Inicio de Javi ----------
 // "Este mes te quedan" = lo que queda en la hucha "Para tus cosas" (id mis_cosas, la misma que usa evaluar_compra).
-AL_ENTRAR["1"] = async () => {
+AL_ENTRAR["1"] = async (huchasAbiertas = false) => {
   const d = await api("presupuesto");
   const fecha = new Date();   // la fecha de hoy de verdad, la del móvil
   const texto = fecha.toLocaleDateString("es-ES", {weekday: "long", day: "numeric", month: "long"});
@@ -494,14 +494,32 @@ AL_ENTRAR["1"] = async () => {
 
   const metas = await api("metas").catch(() => []);
   $("p1-huchas-titulo").textContent = `Tus huchas (${metas.length})`;
+  const tienes = Math.max(h.quedan, 0);
   $("p1-huchas").innerHTML = metas.map(m => `
-    <div class="tarjeta fila" style="padding-right:40px">
-      <span class="picto" data-icono="hucha"></span>
-      <div>
-        <p class="nombre">${esc(m.nombre)}</p>
-        <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
-        <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
+    <div class="tarjeta hucha" data-meta="${esc(m.id)}">
+      <div class="hucha-fila">
+        <span class="picto" data-icono="hucha"></span>
+        <div>
+          <p class="nombre">${esc(m.nombre)}</p>
+          <p class="suave" style="margin-top:8px">${euros(m.ahorrado)} de ${euros(m.importe)}</p>
+          <div class="barra"><span style="width:${pct(m.ahorrado, m.importe)}"></span></div>
+        </div>
       </div>
+      ${m.falta > 0 ? `
+      <button class="boton secundario meter-abrir" type="button">Meter dinero</button>
+      <form class="meter" hidden novalidate>
+        <label class="meter-pregunta" for="meter-${esc(m.id)}">¿Cuánto dinero metes?</label>
+        <p class="suave">Te quedan ${euros(tienes)} para tus cosas</p>
+        <div class="campo-euros">
+          <input id="meter-${esc(m.id)}" type="text" inputmode="decimal" autocomplete="off" placeholder="0">
+          <span aria-hidden="true">€</span>
+        </div>
+        <div class="meter-error" role="alert" hidden></div>
+        <div class="botones">
+          <button class="boton" type="submit">Meter en la hucha</button>
+          <button class="boton secundario meter-cancelar" type="button">Cancelar</button>
+        </div>
+      </form>` : `<p class="suave meter-llena">Ya tienes todo el dinero</p>`}
     </div>`).join("");
   pintarIconos($("p1-huchas"));
   // Las huchas están cerradas: Javi las abre con un toque (y se cierran al volver a pulsar).
@@ -509,9 +527,53 @@ AL_ENTRAR["1"] = async () => {
     $("p1-huchas").hidden = !abiertas;
     $("p1-huchas-boton").setAttribute("aria-expanded", String(abiertas));
   };
-  abrirHuchas(false);
+  abrirHuchas(huchasAbiertas);
   $("p1-huchas-boton").onclick = () => abrirHuchas($("p1-huchas").hidden);
+  $("p1-huchas").querySelectorAll(".hucha").forEach(t => prepararMeter(t, metas.find(m => m.id === t.dataset.meta), tienes));
 };
+
+// Meter dinero en una hucha: sale de "Para tus cosas". Nunca más de lo que te queda
+// ni más de lo que le falta a la hucha. El backend lo vuelve a comprobar.
+function prepararMeter(tarjeta, meta, tienes) {
+  const abrir = tarjeta.querySelector(".meter-abrir"), form = tarjeta.querySelector(".meter");
+  if (!abrir) return;
+  const input = form.querySelector("input"), error = form.querySelector(".meter-error");
+  const fallo = frases => {
+    error.innerHTML = frases.map(f => `<p>${esc(sinPunto(f))}</p>`).join("");
+    error.hidden = false;
+    input.setAttribute("aria-invalid", "true");
+  };
+  abrir.onclick = () => {
+    $("p1-hucha-hecho").hidden = true;
+    abrir.hidden = true; form.hidden = false; error.hidden = true;
+    input.value = ""; input.removeAttribute("aria-invalid"); input.focus();
+  };
+  form.querySelector(".meter-cancelar").onclick = () => { form.hidden = true; abrir.hidden = false; abrir.focus(); };
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const importe = Math.round(parseFloat(input.value.replace(",", ".")) * 100) / 100;
+    if (!(importe > 0)) return fallo(["Escribe cuánto dinero quieres meter"]);
+    if (importe > tienes) return fallo([`Este mes te quedan ${euros(tienes)}`, `No puedes meter ${euros(importe)}`]);
+    if (importe > meta.falta) return fallo([`A esta hucha solo le faltan ${euros(meta.falta)}`]);
+    const boton = form.querySelector("[type=submit]");
+    boton.disabled = true;
+    try {
+      const r = await fetch(`/api/personas/${P}/metas/${encodeURIComponent(meta.id)}/meter`, {
+        method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({importe})});
+      const datos = await r.json();
+      if (!r.ok) return fallo([typeof datos.detail === "string" ? datos.detail : "No se ha podido meter el dinero"]);
+      await AL_ENTRAR["1"](true);   // vuelve a pintar el inicio: baja "Este mes te quedan" y sube la hucha
+      const hecho = $("p1-hucha-hecho");
+      hecho.innerHTML = datos.texto_lectura_facil.split(/(?<=\.)\s+/).map(f => `<p>${esc(sinPunto(f))}</p>`).join("");
+      hecho.hidden = false;
+      hecho.scrollIntoView({block: "nearest"});
+    } catch {
+      fallo(["No se ha podido meter el dinero", "Prueba otra vez"]);
+    } finally {
+      boton.disabled = false;
+    }
+  };
+}
 
 // ---------- 2 · Hablando con Noa ----------
 // La voz es el agente Noa de ElevenLabs (su transcripción es Scribe). Noa explica; aquí no se paga nada.

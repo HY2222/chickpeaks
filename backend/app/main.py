@@ -326,7 +326,8 @@ def ver_cuenta(persona_id: str, ultimos: int = 6):
     movs = p["movimientos"]
     entra = sum(m["importe"] for m in movs if m["tipo"] == "ingreso")
     # Los traspasos a la hucha de ahorro no son gasto: el dinero sigue siendo de Javi.
-    gasta = sum(m["importe"] for m in movs if m["tipo"] != "ingreso" and m.get("hucha") != "ahorro")
+    gasta = sum(m["importe"] for m in movs
+                if m["tipo"] != "ingreso" and m.get("hucha") != "ahorro" and not m.get("meta"))
     total = p.get("saldo_inicial_anio", 0.0) + entra - gasta
     ahorro = sum(m["ahorrado"] for m in p.get("metas", []))
     recientes = sorted(reversed(movs), key=lambda m: m["fecha"], reverse=True)[:max(1, min(ultimos, 20))]
@@ -538,6 +539,23 @@ def crear_meta(persona_id: str, nueva: NuevaMeta):
             "aporte_mensual": max(1.0, round(nueva.importe / 6, 2))}
     metas_.append(meta)
     return budget.progreso_meta(meta)
+
+
+class Aporte(BaseModel):
+    importe: float = Field(gt=0, examples=[20])
+
+
+@app.post("/api/personas/{persona_id}/metas/{meta_id}/meter")
+def meter_en_meta(persona_id: str, meta_id: str, aporte: Aporte):
+    """Javi mete dinero en una de sus huchas. Sale de "Para tus cosas" y nunca puede ser más
+    de lo que le queda. Si no se puede, el error viene en lectura fácil (detail)."""
+    p = _persona(persona_id)
+    try:
+        return budget.meter_en_meta(p, meta_id, aporte.importe)
+    except KeyError:
+        raise HTTPException(404, "No existe esa hucha")
+    except budget.NoSePuedeGuardar as e:
+        raise HTTPException(400, str(e))
 
 
 @app.post("/api/personas/{persona_id}/pausa")
