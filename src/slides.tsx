@@ -44,7 +44,7 @@ const T80 = "titular text-[80px] font-semibold leading-[1.08]";
 function Circulo({ r, top, w, small = false }: { r: { k: string; t: string; n: string; e: string; d: string }; top: number; w: number; small?: boolean }) {
   return (
     <div className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center text-center" style={{ top, width: w }}>
-      <p className="text-[22px] font-bold uppercase tracking-[0.08em] opacity-70">{r.k} · {r.t}</p>
+      <p className={`whitespace-nowrap font-bold uppercase ${small ? "text-[20px] tracking-[0.04em]" : "text-[22px] tracking-[0.08em]"}`}><span className="text-[28px] font-black">{r.k}</span> <span className="opacity-70">· {r.t}</span></p>
       <p className={`titular whitespace-nowrap ${small ? "text-[64px]" : "text-[76px]"} font-semibold leading-[1.05]`}>{r.n}</p>
       <p className={`${small ? "text-[20px]" : "text-[22px]"} opacity-80`}>{r.d}</p>
       <p className={`mt-[6px] ${small ? "text-[24px]" : "text-[28px]"} font-bold`}>{r.e}</p>
