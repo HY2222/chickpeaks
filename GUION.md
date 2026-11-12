@@ -32,7 +32,7 @@ Vamos a verlo en directo con los móviles de Javi y de su hermana Ana. Empezamos
 → Seguid `docs/diseno/guion-demo.md` (rama `main`): entrada del concierto, multa, Bizum de Carlos e informe. Si falla internet, vídeo de reserva.
 
 ## 8 · Lo que habéis visto (≈ 25 s)
-Resumen de lo que acabáis de ver. Uno: Noa hace la cuenta y dice "Tú decides". Dos: Noa lee una multa; Javi confirma los datos y la foto no se guarda. Tres: ante un Bizum raro, Willo hace una pausa y explica por qué parece una estafa, pero no bloquea nada. Cuatro: el informe para el juez sale en un clic.
+Resumen de lo que acabáis de ver. Uno: Noa hace la cuenta y dice "Tú decides". Dos: Noa lee una multa; Javi confirma los datos y la foto no se guarda. Tres: ante un Bizum raro, Willo hace una pausa y explica por qué parece una estafa, pero no bloquea nada.
 
 ## 9 · Círculo de apoyo (≈ 30 s)
 En vez de un control parental, Willo tiene un círculo de apoyo. Javi elige quién le apoya y cuánto, con nombres fáciles: Solo yo, Ver, Apoyar, Guardar y Representar. Ver y Apoyar los da y los quita Javi. Ana, su hermana, está en Guardar: recibe avisos de estafa al momento y saca el informe anual para el juez. Esto sigue la Ley 8/2021: apoyar a la persona, no sustituirla.
