@@ -57,7 +57,7 @@ Nos quedan unos **18.320 euros al mes: un margen operativo del 53 por ciento**. 
 En números: cada banco paga 15.000 euros al empezar, 1.500 euros al mes de base y 2,40 euros por usuario activo. Y captar usuarios nos cuesta casi cero, porque nos llegan por las asociaciones.
 
 ## 15 · Equipo (≈ 15 s)
-Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.
+Somos seis y nos complementamos: Inés, nuestra ingeniera de datos; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.
 
 ## Pruébalo (≈ 10 s) · NUEVA
 Y ahora os toca a vosotros: escanead el código con el móvil y probad Willo. Es la demo de verdad, sin instalar nada. Gracias a MyInvestor por patrocinar el hackathon.

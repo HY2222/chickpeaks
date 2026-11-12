@@ -760,10 +760,10 @@ export const slides: Slide[] = [
   {
     id: "equipo",
     notes:
-      "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.",
+      "Somos seis y nos complementamos: Inés, nuestra ingeniera de datos; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.",
     render: () => {
       const team = [
-        { n: "Inés", r: "Arquitecta de ML", f: "ines" },
+        { n: "Inés", r: "Ingeniera de Datos", f: "ines" },
         { n: "Jiawen", r: "Analista de Datos", f: "jiawen" },
         { n: "He", r: "Informática y ADE", f: "he" },
         { n: "Nolan", r: "Empresa y Tecnología", f: "nolan" },
