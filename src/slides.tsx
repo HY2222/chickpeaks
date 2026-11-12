@@ -454,7 +454,7 @@ export const slides: Slide[] = [
         <div className="absolute left-[128px] top-[470px] flex w-[780px] flex-col gap-[34px]">
           {[
             { t: "Solo ve lo que Javi comparte", d: "Sus pagos y sus decisiones, si él quiere." },
-            { t: "Le llega un aviso si Javi lo pide", d: "A quién, cuánto y por qué parece un engaño." },
+            { t: "Si Javi pide ayuda, Ana recibe un aviso", d: "Ve a quién quiere pagar, cuánto y por qué parece un engaño." },
             { t: "No puede bloquear pagos", d: "Puede llamar a Javi y hablarlo con él." },
           ].map((p, i) => (
             <Rise key={p.t} o={6 + i} className="flex items-start gap-[24px]">
@@ -762,12 +762,12 @@ export const slides: Slide[] = [
       "Somos seis y nos complementamos: Inés, nuestra arquitecta de machine learning; Jiawen, analista de datos; He, de Informática y ADE; Nolan, de Empresa y Tecnología; Xingyi, de Telecomunicación; y Anqi, de Economía.",
     render: () => {
       const team = [
-        { n: "Inés", r: "Arquitecta de ML" },
-        { n: "Jiawen", r: "Analista de Datos" },
-        { n: "He", r: "Informática y ADE" },
-        { n: "Nolan", r: "Empresa y Tecnología" },
-        { n: "Xingyi", r: "Telecomunicación" },
-        { n: "Anqi", r: "Economía" },
+        { n: "Inés", r: "Arquitecta de ML", f: "ines" },
+        { n: "Jiawen", r: "Analista de Datos", f: "jiawen" },
+        { n: "He", r: "Informática y ADE", f: "he" },
+        { n: "Nolan", r: "Empresa y Tecnología", f: "nolan" },
+        { n: "Xingyi", r: "Telecomunicación", f: "xingyi" },
+        { n: "Anqi", r: "Economía", f: "anqi" },
       ];
       return (
         <div className="absolute inset-0 bg-fondo text-texto">
@@ -779,9 +779,14 @@ export const slides: Slide[] = [
           </div>
           <div className="absolute left-[128px] top-[470px] grid w-[1664px] grid-cols-3 gap-x-[64px] gap-y-[64px]">
             {team.map((p, i) => (
-              <Rise key={p.n} o={i + 4} className="border-t-2 border-salvia pt-[20px]">
-                <h3 className="text-[44px] font-bold leading-[1.15]">{p.n}</h3>
-                <p className="mt-[8px] text-[30px] leading-[1.3] text-suave">{p.r}</p>
+              <Rise key={p.n} o={i + 4} className="flex items-center justify-between gap-[24px] border-t-2 border-salvia pt-[20px]">
+                <div>
+                  <h3 className="text-[44px] font-bold leading-[1.15]">{p.n}</h3>
+                  <p className="mt-[8px] text-[30px] leading-[1.3] text-suave">{p.r}</p>
+                </div>
+                {/* Foto en círculo, sin borde: todas del mismo tamaño, a la derecha del nombre. */}
+                <img src={`${import.meta.env.BASE_URL}equipo/${p.f}.jpg`} alt={`Foto de ${p.n}`}
+                  className="h-[132px] w-[132px] shrink-0 rounded-full object-cover" />
               </Rise>
             ))}
           </div>
