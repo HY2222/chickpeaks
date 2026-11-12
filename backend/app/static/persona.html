@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=10">
+<link rel="stylesheet" href="/static/willo.css?v=11">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -639,6 +639,9 @@ function pintarMicro() {
   $("p2-micro").classList.toggle("silencio", apagado);
   if (apagado) $("p2-micro").classList.remove("activo");
   $("p2-micro").setAttribute("aria-pressed", String(apagado));
+  $("micro-flotante").classList.toggle("silencio", apagado);
+  $("micro-flotante").setAttribute("aria-pressed", String(apagado));
+  $("micro-flotante-texto").textContent = apagado ? "Micro apagado" : "Micro encendido";
   $("p2-micro-texto").textContent = apagado ? "Micro apagado. Toca el micro para hablar."
                                             : "Noa te oye. Toca el micro para silenciarlo.";
 }
@@ -648,6 +651,10 @@ function ponerMicro(apagado) {
   pintarMicro();
 }
 $("p2-micro").onclick = () => ponerMicro(!estado.microApagado);
+$("micro-flotante").onclick = () => ponerMicro(!estado.microApagado);
+pintarIconos($("micro-flotante"));
+// Sale mientras Noa está activa y no estás en la pantalla 2 (allí está el micro grande).
+setInterval(() => { $("micro-flotante").hidden = !conv || location.hash === "#2"; }, 300);
 
 async function pararVoz() {
   sesionVoz++;
@@ -1578,5 +1585,9 @@ await post("confianza/reiniciar", {}).catch(() => {});
 mostrar();
 cargarConfianza();
 </script>
+<!-- Micro de Noa siempre a mano mientras hay conversación (en cualquier pantalla menos la 2, que tiene el grande) -->
+<button type="button" class="micro-flotante" id="micro-flotante" hidden aria-pressed="false">
+  <span data-icono="micro" aria-hidden="true"></span><span id="micro-flotante-texto">Micro</span>
+</button>
 </body>
 </html>

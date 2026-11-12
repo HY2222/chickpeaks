@@ -333,3 +333,21 @@ label.etiqueta { display: block; }   /* si no, su margin-top no separa los campo
 
 /* Botón "Editar" dentro de la burbuja de una persona de confianza */
 .tarjeta.fila .editar { width: auto; min-height: 0; padding: 10px 18px; font-size: 18px; flex: none; }
+
+/* Micro de Noa siempre a mano: flotante, abajo en el centro, solo mientras hay conversación */
+.micro-flotante {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 20;
+  display: flex; align-items: center; gap: 10px; padding: 12px 22px; border: 0; border-radius: 999px;
+  background: var(--verde-oscuro); color: var(--blanco); font: inherit; font-size: 18px; font-weight: 700;
+  box-shadow: 0 6px 18px rgba(30, 42, 27, .35); cursor: pointer;
+}
+.micro-flotante[hidden] { display: none; }
+.micro-flotante svg { width: 24px; height: 24px; display: block; }
+.micro-flotante.silencio { background: #8b9487; }
+.micro-flotante.silencio svg { opacity: .55; }
+.micro-flotante.silencio span:first-child { position: relative; }
+.micro-flotante.silencio span:first-child::after { content: ""; position: absolute; left: 50%; top: -2px; width: 3px; height: 28px;
+  background: var(--blanco); transform: rotate(45deg); border-radius: 2px; }
+@media (min-width: 700px) and (min-height: 620px) and (hover: hover) and (pointer: fine) {
+  .micro-flotante { bottom: calc(50% - min(422px, 50dvh - 24px) + 28px); }
+}
