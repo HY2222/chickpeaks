@@ -38,6 +38,21 @@ h1, h2, h3, p { margin: 0; }
 [hidden] { display: none !important; }
 .pantalla > .botones { margin-top: auto; } /* los botones siempre abajo */
 
+/* ---------- En ordenador: la app dentro de un marco de móvil ----------
+   Solo con ratón y pantalla grande. En un móvil real no se aplica nada. */
+@media (min-width: 700px) and (min-height: 620px) and (hover: hover) and (pointer: fine) {
+  body { background: linear-gradient(160deg, var(--salvia), #b9cdab); min-height: 100dvh;
+         display: flex; align-items: center; justify-content: center; }
+  .pantalla {
+    width: 390px; height: min(844px, calc(100dvh - 48px)); min-height: 0; margin: 24px 0;
+    overflow-y: auto; background: var(--fondo);
+    border: 12px solid #1E2A1B; border-radius: 52px;
+    box-shadow: 0 30px 60px rgba(30, 42, 27, .35), 0 0 0 2px #3a4a36;
+  }
+  .pantalla::-webkit-scrollbar { display: none; }
+  .pantalla { scrollbar-width: none; }
+}
+
 /* ---------- Textos ---------- */
 .titulo { font-size: 32px; font-weight: 700; line-height: 1.15; }
 .titulo-seccion { font-size: 24px; font-weight: 700; }
