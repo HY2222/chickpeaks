@@ -2,7 +2,7 @@
   "name": "Willo",
   "short_name": "Willo",
   "lang": "es",
-  "start_url": "/demo",
+  "start_url": "/demo/banco",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

@@ -143,7 +143,7 @@ def test_pwa_instalable(client):
     sw = client.get("/sw.js")
     assert sw.status_code == 200 and "javascript" in sw.headers["content-type"]
     m = client.get("/static/manifest-persona.webmanifest").json()
-    assert m["display"] == "standalone" and m["start_url"] == "/demo"
+    assert m["display"] == "standalone" and m["start_url"] == "/demo/banco"
     assert {i["sizes"] for i in m["icons"]} == {"192x192", "512x512"}
     assert 'rel="manifest"' in client.get("/demo").text
 
