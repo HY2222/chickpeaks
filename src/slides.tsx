@@ -322,7 +322,7 @@ export const slides: Slide[] = [
         <div className="absolute left-[128px] top-[128px] flex w-[1040px] flex-col gap-[40px]">
           <Label dark>Demo en directo · 3 minutos</Label>
           <h2 className={T80}>
-            <Words text="Un mes de Javi: un capricho, una multa y un Bizum sospechoso." />
+            <Words text="Un capricho, una carta o un Bizum sospechoso." />
           </h2>
         </div>
         <MockupIn o={2} className="absolute left-[1305px] top-[100px]">
