@@ -74,7 +74,8 @@ ESQUEMA = {
         "telefono": {**_TEXTO_O_NULO,
                      "description": "Solo si es un mensaje y se ve el número de quien escribe. Si solo sale un nombre, null"},
         "texto_mensaje": {**_TEXTO_O_NULO,
-                          "description": "Solo si es un mensaje: el texto que escribe la otra persona, tal cual. Si no, null"},
+                          "description": "Si es un mensaje, el texto que escribe la otra persona, tal cual. Si es una carta que "
+                                         "pide datos, documentos o dinero, lo que pide, tal cual. Si no, null"},
         "sospechoso": {"type": "boolean"},
         "motivo_sospecha": {**_TEXTO_O_NULO,
                             "description": "Si es sospechoso, qué te pide o qué tiene de raro, en lectura fácil: "
@@ -103,8 +104,14 @@ del chat si se ve (si sale un nombre guardado, null); accion es "pagar" si pide 
 - accion: "pagar" si hay que pagar; "nada" si ya está pagado (los tickets casi siempre); \
 "contestar" si pide una respuesta; "revisar" si no está claro.
 - importe: el total final que hay que pagar o que se pagó, en euros.
-- sospechoso: true si pide claves, PIN, códigos SMS o datos de la tarjeta; si mete prisa \
-con amenazas; si pide pagar por Bizum o transferencia a una persona; o si parece falso.
+- sospechoso: true si pide claves, PIN, códigos SMS o datos de la tarjeta; si pide el DNI, \
+fotos del DNI, extractos del banco, el número de cuenta u otros datos personales; si pide mandar \
+documentos por correo o por mensaje (sobre todo a un correo normal como gmail, outlook o hotmail \
+en nombre de un organismo oficial o un banco); si promete dinero, ayudas o subidas de prestaciones \
+a cambio de datos; si habla de un "ataque informático" o de que se han perdido datos; si mete prisa \
+con amenazas; si pide pagar por Bizum o transferencia a una persona; o si parece falso (faltas, \
+formato raro, firma sin nombre). Ante la duda, pon true: es mejor avisar de más.
+- texto_mensaje: también en cartas que piden algo (datos, documentos o dinero): copia lo que pide, tal cual.
 - legible: false si no puedes leer bien el tipo o el importe."""
 
 
@@ -177,8 +184,8 @@ def limpiar(datos: dict[str, Any]) -> dict[str, Any]:
     fecha = _fecha(datos.get("fecha_limite"))
     sospechoso = bool(datos.get("sospechoso"))
     tipo = tipo if tipo in TIPOS else "otro"
-    texto_mensaje = (str(datos.get("texto_mensaje") or "").strip()[:MAX_TEXTO_MENSAJE] or None
-                     if tipo == "mensaje" else None)
+    texto_copiado = str(datos.get("texto_mensaje") or "").strip()[:MAX_TEXTO_MENSAJE] or None
+    texto_mensaje = texto_copiado if tipo == "mensaje" else None
     telefono = str(datos.get("telefono") or "").strip()
     telefono = telefono if tipo == "mensaje" and sum(c.isdigit() for c in telefono) >= 9 else None
     return {
@@ -190,6 +197,7 @@ def limpiar(datos: dict[str, Any]) -> dict[str, Any]:
         "accion": accion if accion in ACCIONES else "revisar",
         "telefono": telefono,
         "texto_mensaje": texto_mensaje,
+        "_texto_revision": texto_copiado,   # solo para las reglas antiestafa; no se guarda ni se devuelve
         "sospechoso": sospechoso,
         "motivo_sospecha": (str(datos.get("motivo_sospecha") or "").strip() or None) if sospechoso else None,
     }
@@ -234,7 +242,7 @@ def _aviso(d: dict[str, Any]) -> list[str]:
     """Si parece un engaño, Noa lo dice ya al leerlo, con el motivo si es corto."""
     if not d.get("sospechoso"):
         return []
-    frases = ["Cuidado: puede ser un engaño."]
+    frases = ["Cuidado: esto parece una estafa."]
     motivo = (d.get("motivo_sospecha") or "").strip()
     if motivo and len(motivo.split()) <= 15:
         frases.append(motivo if motivo.endswith((".", "!", "?")) else motivo + ".")
@@ -242,10 +250,15 @@ def _aviso(d: dict[str, Any]) -> list[str]:
 
 
 def revisar_mensaje(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any] | None:
-    """Pasa las reglas antiestafa (las mismas que con la voz) por un mensaje. Es código, no IA."""
+    """Pasa las reglas antiestafa (las mismas que con la voz) por un mensaje. Es código, no IA.
+
+    Una carta que pide algo (datos, documentos) también se revisa, pero solo con las reglas del texto:
+    no tiene sentido hablar de "remitente desconocido" o de importes en un papel.
+    """
     from . import risk
     if d["tipo"] != "mensaje":
-        return None
+        texto = d.get("_texto_revision")
+        return risk.evaluar_texto(texto) if texto else None
     return risk.evaluar_pago(persona, d["remitente"], d["importe"] or 0.0,
                              d.get("texto_mensaje") or "", d.get("telefono"))
 
@@ -259,6 +272,7 @@ def leer(contenido: bytes, media_type: str | None, persona: dict[str, Any] | Non
     imagen, tipo_imagen = preparar_imagen(contenido, media_type)
     datos = limpiar(_llamar_claude(imagen, tipo_imagen))
     riesgo = revisar_mensaje(persona, datos) if persona else None
+    datos.pop("_texto_revision", None)   # el texto de un papel no se guarda
     senales = [s["explicacion"] for s in riesgo["senales"]] if riesgo else []
     if riesgo and riesgo["nivel_riesgo"] != "bajo":
         datos["sospechoso"] = True
@@ -366,11 +380,11 @@ def confirmar(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any]:
     if d["sospechoso"]:
         if d["tipo"] == "mensaje":
             senales = [s["explicacion"] for s in riesgo["senales"]] if riesgo else []
-            frases = ["Cuidado. Este mensaje puede ser un engaño.", *senales[:3],
+            frases = ["Cuidado. Este mensaje parece una estafa.", *senales[:3],
                       "Esto pasa a veces en las estafas.", "Tú decides qué hacer."]
         else:
             senales = []
-            frases = ["Cuidado. Este papel puede ser un engaño.",
+            frases = ["Cuidado. Este papel parece una estafa.",
                       "Los bancos nunca te piden tu clave ni tu PIN.",
                       "Tú decides qué hacer."]
         avisados = (riesgo or {}).get("avisados") or []

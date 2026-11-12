@@ -21,7 +21,7 @@ EJEMPLOS = [
         "pago indebido que deberá regularizar mediante transferencia bancaria en el plazo improrrogable "
         "de 48 horas, a fin de evitar la suspensión cautelar de su prestación y el inicio del "
         "correspondiente procedimiento sancionador.",
-        "Cuidado. Este papel puede ser un engaño. Los bancos nunca te piden tu clave ni tu PIN. "
+        "Cuidado. Este papel parece una estafa. Los bancos nunca te piden tu clave ni tu PIN. "
         "Tú decides qué hacer. ¿Quieres hablarlo con Ana?",
     ),
     (
