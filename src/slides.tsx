@@ -328,7 +328,7 @@ export const slides: Slide[] = [
         <MockupIn o={2} className="absolute left-[1305px] top-[100px]">
           <img src={img("02-escucha.png")} alt="Pantalla Noa te escucha, con el botón del micrófono" className="h-[880px] w-[407px] rounded-[32px] object-contain" />
         </MockupIn>
-        <Rise o={7} className="absolute left-[128px] top-[600px]">
+        <Rise o={7} className="absolute left-[128px] top-[600px] flex items-center gap-[36px]">
           <a
             href="https://willo-sfh4.onrender.com/demo/banco"
             target="_blank"
@@ -338,6 +338,8 @@ export const slides: Slide[] = [
           >
             Abrir la demo <span aria-hidden="true">↗</span>
           </a>
+          {/* La dirección a la vista: en el PowerPoint la diapositiva es un vídeo y el botón no se puede pulsar. */}
+          <span className="text-[34px] font-semibold text-crema/80">willo-sfh4.onrender.com</span>
         </Rise>
         <Fade o={9} className="absolute left-[128px] top-[800px] w-[960px]">
           <p className="text-[40px] leading-[1.3] text-crema/70">Fijaos en una cosa: Noa explica, pero <span className="text-crema">los botones los pulsa Javi.</span></p>
