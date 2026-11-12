@@ -796,6 +796,40 @@ export const slides: Slide[] = [
     },
   },
   {
+    id: "pruebalo",
+    notes:
+      "Y ahora os toca a vosotros: escanead el código con el móvil y probad Willo. Es la demo de verdad, sin instalar nada. Gracias a MyInvestor por patrocinar el hackathon.",
+    render: () => (
+      <div className="absolute inset-0 bg-fondo text-texto">
+        <div className="absolute left-[1040px] top-0 h-[1080px] w-[880px] bg-salvia" />
+        <div className="absolute left-[128px] top-[128px] flex w-[820px] flex-col gap-[40px]">
+          <Label>Pruébalo</Label>
+          <h2 className={`${T80} w-[780px]`}>
+            <Words text="¡No olvides probarnos!" />
+          </h2>
+          <Rise o={5}>
+            <p className="text-[36px] leading-[1.35] text-suave">
+              Escanea el código con el móvil y prueba la demo de Willo. Sin instalar nada.
+            </p>
+          </Rise>
+          <Rise o={6}>
+            <p className="text-[32px] font-bold text-verde">willo-sfh4.onrender.com</p>
+          </Rise>
+        </div>
+        {/* Patrocinador del hackathon: su símbolo oficial y su nombre. */}
+        <Fade o={8} className="absolute left-[128px] top-[820px] flex items-center gap-[20px]">
+          <span className="text-[26px] text-suave">Patrocina el hackathon</span>
+          <img src={`${import.meta.env.BASE_URL}myinvestor.svg`} alt="" className="h-[48px] w-auto" />
+          <span className="text-[38px] font-bold text-[#282828]">MyInvestor</span>
+        </Fade>
+        <MockupIn o={4} className="absolute left-[1232px] top-[292px] rounded-[40px] bg-white p-[48px] shadow-[0_20px_60px_rgba(14,20,13,0.12)]">
+          <img src={`${import.meta.env.BASE_URL}qr-willo.svg`} alt="Código QR que lleva a la demo de Willo: willo-sfh4.onrender.com" className="h-[400px] w-[400px]" />
+        </MockupIn>
+        <Foot n="17" />
+      </div>
+    ),
+  },
+  {
     id: "cierre",
     dark: true,
     notes: "Nuestro objetivo: contactos en bancos y mentoría para el piloto. Willo no decide por nadie. Explica, avisa y deja decidir. Willo: tu voluntad, tu dinero. Gracias.",
