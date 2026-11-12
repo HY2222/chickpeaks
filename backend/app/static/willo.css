@@ -330,3 +330,6 @@ label.etiqueta { display: block; }   /* si no, su margin-top no separa los campo
                padding: 12px 16px; color: var(--aviso-texto); font-size: 20px; }
 .meter-error p + p { margin-top: 6px; }
 .meter .botones { margin-top: 4px; }
+
+/* Botón "Editar" dentro de la burbuja de una persona de confianza */
+.tarjeta.fila .editar { width: auto; min-height: 0; padding: 10px 18px; font-size: 18px; flex: none; }

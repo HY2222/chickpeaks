@@ -187,6 +187,13 @@ class Confianza(BaseModel):
     relacion: str | None = Field(default=None, max_length=40, examples=["amiga"])
 
 
+class CambioConfianza(BaseModel):
+    """Lo que Javi cambia de una persona de confianza. Lo que no se manda, se queda como estaba."""
+    nombre: str | None = Field(default=None, max_length=60, examples=["Marta"])
+    telefono: str | None = Field(default=None, max_length=30, examples=["+34 600 000 102"])
+    relacion: str | None = Field(default=None, max_length=40, examples=["amiga"])
+
+
 class SeleccionConfianza(BaseModel):
     """Las personas de confianza de Javi: ids de su círculo. Al menos una."""
     ids: list[str] = Field(max_length=50, examples=[["ana", "marta"]])
@@ -583,6 +590,19 @@ def anadir_confianza(persona_id: str, c: Confianza):
     nombres = [x["nombre"] for x in support.con_permiso(p, "recibir_avisos_estafa")]
     return {"persona_de_confianza": m, "personas_de_confianza": nombres,
             "texto_lectura_facil": _texto_confianza(nombres)}
+
+
+@app.patch("/api/personas/{persona_id}/confianza/{miembro_id}")
+def editar_confianza(persona_id: str, miembro_id: str, c: CambioConfianza):
+    """Perfil de Javi: cambia el nombre, el teléfono o la relación de una persona de su círculo."""
+    p = _persona(persona_id)
+    try:
+        m = support.editar_miembro(p, miembro_id, c.nombre, c.telefono, c.relacion)
+    except KeyError:
+        raise HTTPException(404, "No está en tu círculo")
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    return {"persona_de_confianza": m, "texto_lectura_facil": f"He guardado los cambios de {m['nombre']}."}
 
 
 @app.put("/api/personas/{persona_id}/confianza")

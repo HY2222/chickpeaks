@@ -1,7 +1,7 @@
 // Service worker de Willo: guarda las pantallas para que la app abra rápido.
 // Los datos (/api) siempre se piden al servidor, nunca se guardan.
 const CACHE = "willo-v11";
-const BASE = ["/demo/banco", "/demo", "/demo/apoyo", "/static/icons/favicon-32.png", "/static/willo.css?v=9", "/static/pwa.js",
+const BASE = ["/demo/banco", "/demo", "/demo/apoyo", "/static/icons/favicon-32.png", "/static/willo.css?v=10", "/static/pwa.js",
               "/static/icons/icon-192.png", "/static/icons/icon-512.png"];
 
 self.addEventListener("install", e => {
