@@ -653,8 +653,10 @@ function ponerMicro(apagado) {
 $("p2-micro").onclick = () => ponerMicro(!estado.microApagado);
 $("micro-flotante").onclick = () => ponerMicro(!estado.microApagado);
 pintarIconos($("micro-flotante"));
-// Sale mientras Noa está activa y no estás en la pantalla 2 (allí está el micro grande).
-setInterval(() => { $("micro-flotante").hidden = !conv || location.hash === "#2"; }, 300);
+// Solo sale en las pantallas donde se habla con Noa (decidir, documento, estafa), y solo mientras hay
+// conversación. En la 2 está el micro grande; en el inicio, el pago, la cámara y los ajustes no sale.
+const PANTALLAS_CON_NOA = ["#3", "#6", "#7", "#8"];
+setInterval(() => { $("micro-flotante").hidden = !conv || !PANTALLAS_CON_NOA.includes(location.hash); }, 300);
 
 async function pararVoz() {
   sesionVoz++;
