@@ -115,6 +115,29 @@ def anadir_confianza(persona: dict[str, Any], nombre: str, telefono: str | None 
     return m
 
 
+def editar_miembro(persona: dict[str, Any], miembro_id: str, nombre: str | None = None,
+                   telefono: str | None = None, relacion: str | None = None) -> dict[str, Any]:
+    """Cambia el nombre, el teléfono o la relación de alguien del círculo. No toca su nivel ni sus permisos."""
+    m = miembro(persona, miembro_id)
+    if m is None:
+        raise KeyError(miembro_id)
+    if nombre is not None:
+        nombre = " ".join(nombre.split())
+        if not nombre:
+            raise ValueError("Escribe cómo se llama.")
+        if any(x["id"] != miembro_id and x["nombre"].lower() == nombre.lower() for x in persona["circulo_apoyo"]):
+            raise ValueError(f"Ya tienes a {nombre} en tu círculo.")
+        m["nombre"] = nombre[:1].upper() + nombre[1:]
+    if relacion is not None:
+        m["relacion"] = relacion.strip() or "persona de confianza"
+    if telefono is not None:
+        if telefono.strip():
+            m["telefono"] = telefono.strip()
+        else:
+            m.pop("telefono", None)
+    return m
+
+
 def fijar_confianza(persona: dict[str, Any], ids: list[str]) -> list[dict[str, Any]]:
     """Las personas de confianza son exactamente estas (ids de su círculo). Al menos una."""
     circulo = persona["circulo_apoyo"]

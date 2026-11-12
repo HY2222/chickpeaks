@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=9">
+<link rel="stylesheet" href="/static/willo.css?v=11">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -291,6 +291,24 @@
     <h2 class="titulo-seccion" id="p15-todas-titulo">Tus personas de confianza</h2>
     <div class="lista" id="p15-todas-lista"></div>
     <form method="dialog"><button class="boton">Cerrar</button></form>
+  </dialog>
+
+  <!-- Cambiar los datos de una persona que ya está -->
+  <dialog class="tarjeta popup lista-popup" id="p15-editar" aria-labelledby="p15-editar-titulo">
+    <h2 class="titulo-seccion" id="p15-editar-titulo">Cambiar sus datos</h2>
+    <form id="p15-editar-form" autocomplete="off" novalidate>
+      <label class="etiqueta" for="p15-e-nombre">¿Cómo se llama?</label>
+      <input class="campo" id="p15-e-nombre" maxlength="60" required>
+      <label class="etiqueta" for="p15-e-relacion" style="margin-top:20px">¿Quién es para ti?</label>
+      <input class="campo" id="p15-e-relacion" maxlength="40" placeholder="Por ejemplo: hermana">
+      <label class="etiqueta" for="p15-e-telefono" style="margin-top:20px">Su teléfono</label>
+      <input class="campo" id="p15-e-telefono" type="tel" inputmode="tel" maxlength="30">
+      <p class="suave" id="p15-e-mensaje" role="status" hidden style="margin-top:12px"></p>
+      <div class="botones" style="margin-top:20px">
+        <button class="boton" type="submit">Guardar</button>
+        <button class="boton secundario" type="button" id="p15-e-cancelar">Cancelar</button>
+      </div>
+    </form>
   </dialog>
 
   <!-- Desplegable, como "Tus huchas": cerrado hasta que Javi lo abre. -->
@@ -621,6 +639,9 @@ function pintarMicro() {
   $("p2-micro").classList.toggle("silencio", apagado);
   if (apagado) $("p2-micro").classList.remove("activo");
   $("p2-micro").setAttribute("aria-pressed", String(apagado));
+  $("micro-flotante").classList.toggle("silencio", apagado);
+  $("micro-flotante").setAttribute("aria-pressed", String(apagado));
+  $("micro-flotante-texto").textContent = apagado ? "Micro apagado" : "Micro encendido";
   $("p2-micro-texto").textContent = apagado ? "Micro apagado. Toca el micro para hablar."
                                             : "Noa te oye. Toca el micro para silenciarlo.";
 }
@@ -630,6 +651,12 @@ function ponerMicro(apagado) {
   pintarMicro();
 }
 $("p2-micro").onclick = () => ponerMicro(!estado.microApagado);
+$("micro-flotante").onclick = () => ponerMicro(!estado.microApagado);
+pintarIconos($("micro-flotante"));
+// Solo sale en las pantallas donde se habla con Noa (decidir, documento, estafa), y solo mientras hay
+// conversación. En la 2 está el micro grande; en el inicio, el pago, la cámara y los ajustes no sale.
+const PANTALLAS_CON_NOA = ["#3", "#6", "#7", "#8"];
+setInterval(() => { $("micro-flotante").hidden = !conv || !PANTALLAS_CON_NOA.includes(location.hash); }, 300);
 
 async function pararVoz() {
   sesionVoz++;
@@ -1393,6 +1420,8 @@ AL_ENTRAR["15"] = async () => {
       <span class="picto" data-icono="persona"></span>
       <div><p class="nombre">${esc(m.nombre)}</p>
         ${m.relacion ? `<p class="suave" style="margin-top:4px">${esc(mayuscula(m.relacion))}</p>` : ""}</div>
+      <button class="boton secundario editar" type="button" data-editar="${esc(m.id)}"
+              aria-label="Editar a ${esc(m.nombre)}">Editar</button>
     </div>`;
   $("p15-ahora").innerHTML = elegidas.length ? elegidas.slice(0, VISIBLES).map(burbuja).join("")
     : '<div class="tarjeta"><p class="nombre">Todavía no has elegido a nadie</p></div>';
@@ -1401,6 +1430,39 @@ AL_ENTRAR["15"] = async () => {
   $("p15-ver-mas").textContent = `Ver más (${resto.length})`;
   $("p15-todas-lista").innerHTML = elegidas.map(burbuja).join("");   // en la ventana, todas
   $("p15-ver-mas").onclick = () => $("p15-todas").showModal();
+  // Editar: abre la ventana con sus datos. Guardar los cambia sin tocar sus permisos.
+  let editando = null;
+  const abrirEditar = id => {
+    const m = circulo.find(x => x.id === id);
+    if (!m) return;
+    editando = m;
+    $("p15-e-nombre").value = m.nombre;
+    $("p15-e-relacion").value = m.relacion || "";
+    $("p15-e-telefono").value = m.telefono || "";
+    $("p15-e-mensaje").hidden = true;
+    if ($("p15-todas").open) $("p15-todas").close();
+    $("p15-editar").showModal();
+  };
+  for (const caja of [$("p15-ahora"), $("p15-todas-lista")])
+    caja.onclick = e => { const b = e.target.closest("[data-editar]"); if (b) abrirEditar(b.dataset.editar); };
+  $("p15-e-cancelar").onclick = () => $("p15-editar").close();
+  $("p15-editar-form").onsubmit = async e => {
+    e.preventDefault();
+    const nombre = $("p15-e-nombre").value.trim();
+    const aviso = t => { $("p15-e-mensaje").textContent = t; $("p15-e-mensaje").hidden = false; };
+    if (!nombre) return aviso("Escribe cómo se llama.");
+    if (circulo.some(x => x.id !== editando.id && x.nombre.toLowerCase() === nombre.toLowerCase()))
+      return aviso(`Ya tienes a ${nombre}.`);
+    try {
+      const r = await api(`confianza/${encodeURIComponent(editando.id)}`, {method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({nombre, relacion: $("p15-e-relacion").value.trim(), telefono: $("p15-e-telefono").value.trim()})});
+      $("p15-editar").close();
+      $("p15-mensaje").textContent = r.texto_lectura_facil;
+      $("p15-mensaje").hidden = false;
+      await AL_ENTRAR["15"]();
+    } catch (e2) { aviso(e2.message); }
+  };
   // Desplegable: se abre y se cierra con un toque. Sigue como estaba al marcar o quitar a alguien.
   $("p15-circulo-boton").onclick = () => {
     const abrir = $("p15-circulo-caja").hidden;
@@ -1525,5 +1587,9 @@ await post("confianza/reiniciar", {}).catch(() => {});
 mostrar();
 cargarConfianza();
 </script>
+<!-- Micro de Noa siempre a mano mientras hay conversación (en cualquier pantalla menos la 2, que tiene el grande) -->
+<button type="button" class="micro-flotante" id="micro-flotante" hidden aria-pressed="false">
+  <span data-icono="micro" aria-hidden="true"></span><span id="micro-flotante-texto">Micro</span>
+</button>
 </body>
 </html>

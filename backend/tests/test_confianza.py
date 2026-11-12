@@ -45,3 +45,25 @@ def test_reiniciar_deja_solo_a_ana(client):
     client.put(f"{URL}/confianza", json={"ids": ["marta"]})
     assert client.post(f"{URL}/confianza/reiniciar").status_code == 200
     assert list(circulo(client)) == ["Ana"] and de_confianza(client) == ["Ana"]
+
+
+def test_editar_una_persona_de_confianza(client):
+    client.post(f"{URL}/confianza", json={"nombre": "Marta", "telefono": "600 000 102"})
+    nivel = circulo(client)["Marta"]["nivel"]
+    r = client.patch(f"{URL}/confianza/marta", json={"nombre": "marta luisa", "relacion": "amiga", "telefono": "611 111 111"})
+    assert r.status_code == 200
+    m = circulo(client)["Marta luisa"]
+    assert m["id"] == "marta" and m["relacion"] == "amiga" and m["telefono"] == "611 111 111"
+    assert m["nivel"] == nivel and "Marta" not in circulo(client)   # no cambia sus permisos
+    assert de_confianza(client) == ["Ana", "Marta luisa"]
+    # lo que no se manda se queda; teléfono vacío lo borra
+    client.patch(f"{URL}/confianza/marta", json={"telefono": ""})
+    m = circulo(client)["Marta luisa"]
+    assert "telefono" not in m and m["relacion"] == "amiga"
+
+
+def test_editar_no_deja_nombres_repetidos_ni_vacios(client):
+    client.post(f"{URL}/confianza", json={"nombre": "Marta"})
+    assert client.patch(f"{URL}/confianza/marta", json={"nombre": "ana"}).status_code == 422
+    assert client.patch(f"{URL}/confianza/marta", json={"nombre": "  "}).status_code == 422
+    assert client.patch(f"{URL}/confianza/nadie", json={"nombre": "X"}).status_code == 404
