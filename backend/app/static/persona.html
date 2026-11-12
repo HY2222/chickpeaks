@@ -11,6 +11,16 @@
 <link rel="icon" type="image/png" href="/static/icons/favicon-32.png">
 <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
 <script src="/static/pwa.js" defer></script>
+<script>
+  // La app instalada abre siempre en el banco (MyInvestor). Si alguien la instaló cuando abría en Willo,
+  // la primera vez de cada apertura se le lleva al banco. Después, desde el botón de Willo, entra normal.
+  try {
+    if (matchMedia("(display-mode: standalone)").matches && !sessionStorage.getItem("willo_entrada") && !location.hash) {
+      sessionStorage.setItem("willo_entrada", "1");
+      location.replace("/demo/banco");
+    }
+  } catch (e) {}
+</script>
 </head>
 <body>
 
