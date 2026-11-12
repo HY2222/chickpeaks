@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Willo · Javi</title>
-<link rel="stylesheet" href="/static/willo.css?v=8">
+<link rel="stylesheet" href="/static/willo.css?v=9">
 <link rel="manifest" href="/static/manifest-persona.webmanifest">
 <meta name="theme-color" content="#3E5A34">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -59,9 +59,10 @@
 <section class="pantalla" data-pantalla="2" hidden>
   <h1 class="titulo centrado">Noa te escucha</h1>
 
-  <div class="microfono" id="p2-micro" aria-hidden="true">
-    <div class="microfono-dentro" data-icono="micro"></div>
-  </div>
+  <button type="button" class="microfono" id="p2-micro" aria-pressed="false" aria-label="Micrófono: toca para silenciarlo o para hablar">
+    <span class="microfono-dentro" data-icono="micro"></span>
+  </button>
+  <p class="centrado suave" id="p2-micro-texto">Noa te oye. Toca el micro para silenciarlo.</p>
 
   <div class="tarjeta" style="padding:24px 20px">
     <p class="etiqueta">Noa ha oído:</p>
@@ -614,6 +615,22 @@ async function frasePorDefecto() {
 
 // Corta la conversación con Noa. No espera más de 1 segundo: si ElevenLabs tarda en
 // cerrar, la pantalla sigue igual (si no, el botón "Parar" parecía no hacer nada).
+// Micro de Noa: se enciende y se apaga con un toque. Apagado, Noa no oye nada (útil con ruido o gente).
+function pintarMicro() {
+  const apagado = !!estado.microApagado;
+  $("p2-micro").classList.toggle("silencio", apagado);
+  if (apagado) $("p2-micro").classList.remove("activo");
+  $("p2-micro").setAttribute("aria-pressed", String(apagado));
+  $("p2-micro-texto").textContent = apagado ? "Micro apagado. Toca el micro para hablar."
+                                            : "Noa te oye. Toca el micro para silenciarlo.";
+}
+function ponerMicro(apagado) {
+  estado.microApagado = apagado;
+  try { conv?.setMicMuted?.(apagado); } catch (e) { console.warn("Micro:", e); }
+  pintarMicro();
+}
+$("p2-micro").onclick = () => ponerMicro(!estado.microApagado);
+
 async function pararVoz() {
   sesionVoz++;
   estado.irAFoto = false;
@@ -632,6 +649,8 @@ AL_ENTRAR["2"] = async () => {
   estado.pregunta = estado.respuesta = null;
   estado.pensadas = [];   // conversación nueva: Noa empieza sin compras pensadas
   $("p2-oido").textContent = "…";
+  estado.microApagado = false;   // cada conversación empieza con el micro abierto
+  pintarMicro();
   $("p2-micro").classList.add("activo");
   try {
     const r = await fetch("/api/voz/signed-url");
@@ -718,7 +737,7 @@ AL_ENTRAR["2"] = async () => {
         }
       },
       onModeChange: async ({mode}) => {
-        $("p2-micro").classList.toggle("activo", mode === "listening");
+        $("p2-micro").classList.toggle("activo", mode === "listening" && !estado.microApagado);
         if (mode === "listening" && estado.irAFoto) {
           estado.irAFoto = false;
           await pararVoz();
@@ -736,6 +755,7 @@ AL_ENTRAR["2"] = async () => {
     // Si Javi pulsó Parar (o salió de la pantalla) mientras Noa se conectaba, se cierra ya.
     if (miSesion !== sesionVoz) { nueva.endSession().catch(() => {}); return; }
     conv = nueva;
+    if (estado.microApagado) nueva.setMicMuted?.(true);   // lo apagó mientras se conectaba
     // Noa no sabe quién hay en el círculo de apoyo: se lo contamos al empezar.
     // Si no hay nadie, no debe ofrecer "hablar con tu persona de apoyo".
     const circulo = await api("circulo").catch(() => []);

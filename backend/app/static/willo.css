@@ -175,6 +175,11 @@ h1, h2, h3, p { margin: 0; }
   color: var(--blanco);
   display: grid; place-items: center;
 }
+button.microfono { border: 0; padding: 0; cursor: pointer; font: inherit; }
+.microfono.silencio { background: #e3e6dd; }
+.microfono.silencio .microfono-dentro { background: #8b9487; position: relative; }
+.microfono.silencio .microfono-dentro::after { content: ""; position: absolute; width: 8px; height: 110px; background: var(--blanco);
+  border-radius: 4px; transform: rotate(45deg); box-shadow: 0 0 0 3px #8b9487; }
 .microfono-dentro svg { width: 64px; height: 64px; stroke-width: 1.3; }
 .microfono.activo { animation: escucha 1.6s ease-in-out infinite; }
 @keyframes escucha {
