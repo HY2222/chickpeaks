@@ -85,7 +85,7 @@ def test_carta_sospechosa_avisa_al_leerla(client, claude_falso):
                                           "fecha_limite": None, "accion": "nada", "sospechoso": True,
                                           "motivo_sospecha": "Te pide tu DNI y datos del banco"}
     r = enviar(client).json()
-    assert r["texto_lectura_facil"] == ("He leído: carta de la Seguridad Social. Cuidado: puede ser un engaño. "
+    assert r["texto_lectura_facil"] == ("He leído: carta de la Seguridad Social. Cuidado: esto parece una estafa. "
                                         "Te pide tu DNI y datos del banco. ¿Es correcto?")
 
 
@@ -94,7 +94,7 @@ def test_motivo_largo_no_se_lee_entero(client, claude_falso):
     claude_falso["respuesta"]["datos"] = {**MULTA, "tipo": "otro", "titulo": "Carta", "importe": None,
                                           "accion": "nada", "sospechoso": True, "motivo_sospecha": largo}
     r = enviar(client).json()
-    assert r["texto_lectura_facil"] == "He leído: carta. Cuidado: puede ser un engaño. ¿Es correcto?"
+    assert r["texto_lectura_facil"] == "He leído: carta. Cuidado: esto parece una estafa. ¿Es correcto?"
     assert r["motivo_sospecha"] == largo  # el motivo entero sigue en la respuesta, para la pantalla
 
 

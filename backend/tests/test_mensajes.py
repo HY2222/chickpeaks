@@ -46,7 +46,7 @@ def test_mensaje_de_estafa_lo_ven_las_reglas_aunque_claude_no(client, claude_dic
     assert r["pictograma"] == "aviso"
     assert "No tienes guardado este número." in r["senales"]
     assert r["texto_lectura_facil"] == ("He leído: mensaje de Carlos. Te pide 300 €. "
-                                        "Cuidado: puede ser un engaño. No tienes guardado este número. "
+                                        "Cuidado: esto parece una estafa. No tienes guardado este número. "
                                         "¿Es correcto?")
     assert r["texto_mensaje"] == "Hola, soy Carlos. Dame 300 euros"
 
@@ -76,13 +76,36 @@ def test_en_papeles_no_se_guarda_texto_ni_telefono(client, claude_dice):
     assert r["telefono"] is None and r["texto_mensaje"] is None and r["senales"] == []
 
 
+CARTA_FALSA = ("Desde la seguridad social nos ponemos en contacto con usted. Debido al ataque informático "
+               "se han perdido datos. Incremento de las prestaciones de 75 a 150 euros. Envíe fotos de ambas "
+               "caras del DNI y el extracto bancario a seguridadsocial.granada@outlook.es")
+
+
+def test_carta_falsa_se_marca_aunque_claude_no_la_vea(client, claude_dice):
+    """La carta del correo gratuito con DNI: aunque Claude diga que no es sospechosa, las reglas la paran."""
+    claude_dice(tipo="otro", titulo="Cambio de datos bancarios", remitente="Seguridad Social", importe=None,
+                accion="nada", telefono=None, sospechoso=False, texto_mensaje=CARTA_FALSA)
+    r = enviar(client).json()
+    assert r["sospechoso"] is True and r["pictograma"] == "aviso"
+    assert "Cuidado: esto parece una estafa." in r["texto_lectura_facil"]
+    assert r["texto_mensaje"] is None            # el texto de un papel no se guarda ni se devuelve
+    assert any("correo normal" in s for s in r["senales"])
+
+
+def test_carta_normal_con_texto_no_se_marca(client, claude_dice):
+    claude_dice(tipo="carta_banco", titulo="Carta del banco", remitente="Tu banco", importe=None, accion="nada",
+                texto_mensaje="Le informamos de que su tarjeta caduca el mes que viene.")
+    r = enviar(client).json()
+    assert r["sospechoso"] is False and r["senales"] == []
+
+
 # ---------- Confirmar: Noa explica y avisa a Ana ----------
 
 def test_confirmar_mensaje_de_estafa_avisa_a_ana(client):
     r = confirmar(client)
     assert r["sospechoso"] is True and r["quedan_despues"] is None
     assert r["aviso_id"] == "av_1" and r["avisados"] == ["Ana"]
-    assert r["texto_lectura_facil"].startswith("Cuidado. Este mensaje puede ser un engaño.")
+    assert r["texto_lectura_facil"].startswith("Cuidado. Este mensaje parece una estafa.")
     assert "No tienes guardado este número." in r["texto_lectura_facil"]
     assert "Tú decides qué hacer." in r["texto_lectura_facil"]
     assert r["texto_lectura_facil"].endswith("Como acordaste, he avisado a Ana.")

@@ -40,6 +40,14 @@ _REGLAS_TEXTO = [
                          "cambiado el numero", "se me ha roto el movil", "perdi el movil",
                          "he perdido el movil", "tu hijo", "tu hija", "soy yo"], 3,
      "Dice que ha cambiado de número. Es un engaño muy común. Llama a su número de siempre."),
+    # Cartas falsas de "la Seguridad Social" o "Hacienda": piden fotos del DNI y del banco por correo.
+    ("datos_personales", ["dni", "nie", "foto del dni", "fotos del dni", "ambas caras", "extracto bancario",
+                          "extracto del banco", "datos bancarios", "numero de cuenta", "iban",
+                          "datos personales", "cambio de datos"], 3,
+     "Te piden tu DNI o datos del banco. Nunca los mandes por correo ni por mensaje."),
+    ("ayuda_falsa", ["incremento de las prestaciones", "incremento de la prestacion", "subida de la pension",
+                     "ayuda de", "devolucion de", "ataque informatico", "se han perdido"], 2,
+     "Te prometen dinero o dicen que se han perdido tus datos. Es un truco muy usado."),
     ("pide_dinero", ["dame", "mandame", "enviame", "pasame", "ingresame", "hazme un bizum",
                      "mandame un bizum", "necesito dinero", "necesito que me", "transfiereme",
                      "hacer un bizum", "hacerme un bizum", "hacer una transferencia",
@@ -144,6 +152,26 @@ def evaluar_pago(persona: dict[str, Any], destinatario: str | None, importe: flo
         "bloquea": False,  # La decisión siempre es de la persona.
         "sugerir_aviso_apoyo": nivel == "alto",
     }
+
+
+_CORREO_GRATIS = re.compile(r"[\w.+-]+@(?:gmail|hotmail|outlook|yahoo|live|icloud|protonmail)\.[a-z]{2,}")
+_ESTA_ES_OFICIAL = re.compile(r"\b(seguridad social|inss|hacienda|agencia tributaria|banco|policia|correos|dgt)\b")
+
+
+def evaluar_texto(texto: str) -> dict[str, Any]:
+    """Solo las reglas del texto (sin pagos ni números). Para cartas que piden algo."""
+    ctx = _normalizar(texto)
+    senales: list[dict[str, Any]] = []
+    for rid, claves, peso, explicacion in _REGLAS_TEXTO:
+        if any(re.search(rf"\b{re.escape(_normalizar(c))}\b", ctx) for c in claves):
+            senales.append({"id": rid, "peso": peso, "explicacion": explicacion})
+    if _CORREO_GRATIS.search(ctx) and _ESTA_ES_OFICIAL.search(ctx):
+        senales.append({"id": "correo_no_oficial", "peso": 3,
+                        "explicacion": "Dicen que son un organismo oficial, pero piden escribir a un correo normal."})
+    puntos = sum(s["peso"] for s in senales)
+    nivel = "alto" if puntos >= 5 else "medio" if puntos >= 3 else "bajo"
+    return {"nivel_riesgo": nivel, "puntos": puntos, "senales": senales, "texto_lectura_facil": _texto(nivel, senales),
+            "bloquea": False}
 
 
 def _texto(nivel: str, senales: list[dict[str, Any]]) -> str:
