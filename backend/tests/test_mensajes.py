@@ -46,7 +46,7 @@ def test_mensaje_de_estafa_lo_ven_las_reglas_aunque_claude_no(client, claude_dic
     assert r["pictograma"] == "aviso"
     assert "No tienes guardado este número." in r["senales"]
     assert r["texto_lectura_facil"] == ("He leído: mensaje de Carlos. Te pide 300 €. "
-                                        "Cuidado: esto parece una estafa. No tienes guardado este número. "
+                                        "Cuidado. Puede ser una estafa. No tienes guardado este número. "
                                         "¿Es correcto?")
     assert r["texto_mensaje"] == "Hola, soy Carlos. Dame 300 euros"
 
@@ -87,7 +87,7 @@ def test_carta_falsa_se_marca_aunque_claude_no_la_vea(client, claude_dice):
                 accion="nada", telefono=None, sospechoso=False, texto_mensaje=CARTA_FALSA)
     r = enviar(client).json()
     assert r["sospechoso"] is True and r["pictograma"] == "aviso"
-    assert "Cuidado: esto parece una estafa." in r["texto_lectura_facil"]
+    assert "Cuidado. Puede ser una estafa." in r["texto_lectura_facil"]
     assert r["texto_mensaje"] is None            # el texto de un papel no se guarda ni se devuelve
     assert any("correo normal" in s for s in r["senales"])
 
@@ -105,7 +105,7 @@ def test_confirmar_mensaje_de_estafa_avisa_a_ana(client):
     r = confirmar(client)
     assert r["sospechoso"] is True and r["quedan_despues"] is None
     assert r["aviso_id"] == "av_1" and r["avisados"] == ["Ana"]
-    assert r["texto_lectura_facil"].startswith("Cuidado. Este mensaje parece una estafa.")
+    assert r["texto_lectura_facil"].startswith("Cuidado. Este mensaje puede ser una estafa.")
     assert "No tienes guardado este número." in r["texto_lectura_facil"]
     assert "Tú decides qué hacer." in r["texto_lectura_facil"]
     assert r["texto_lectura_facil"].endswith("Como acordaste, he avisado a Ana.")

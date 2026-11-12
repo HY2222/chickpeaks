@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MyInvestor + Willo · maqueta de la demo</title>
 <meta name="theme-color" content="#EAF0FA">
+<link rel="manifest" href="/static/manifest-persona.webmanifest">
 <link rel="icon" type="image/png" href="/static/icons/favicon-32.png">
 <style>
   /* Pantalla 0: maqueta de la app móvil de MyInvestor (patrocinador del hackathon)
@@ -141,9 +142,22 @@
            border-radius: 12px; padding: 10px 14px; max-width: 340px; opacity: 0; transition: opacity .25s; pointer-events: none; }
   .aviso.visible { opacity: 1; }
   svg { display: block; }
+
+  /* En ordenador: la maqueta dentro de un marco de móvil (mismo marco que Willo). En un móvil no se aplica. */
+  @media (min-width: 700px) and (min-height: 620px) and (hover: hover) and (pointer: fine) {
+    body { display: flex; align-items: center; justify-content: center;
+           background: linear-gradient(160deg, #DCE6F8, #b8c8ea); }
+    .marco { position: relative; width: 390px; height: min(844px, calc(100dvh - 48px)); margin: 24px 0; overflow: hidden;
+             border: 12px solid #16192B; border-radius: 52px; box-shadow: 0 30px 60px rgba(22, 25, 43, .35), 0 0 0 2px #2c3150;
+             background: linear-gradient(#DCE6F8 0, var(--fondo) 160px, #F3F5F9 520px); }
+    .app { height: 100%; overflow-y: auto; scrollbar-width: none; }
+    .app::-webkit-scrollbar { display: none; }
+    .nav, .aviso { position: absolute; }
+  }
 </style>
 </head>
 <body>
+<div class="marco">
 <div class="app">
   <span class="maqueta">Maqueta para la demo de Willo · no es la app real</span>
 
@@ -303,6 +317,7 @@
   <span class="nav-chat" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></span>
 </nav>
 <div class="aviso" id="aviso" role="status"></div>
+</div>
 
 <script>
 // ---------- Pestañas (Inicio, Explorar, Actividad, Perfil) ----------

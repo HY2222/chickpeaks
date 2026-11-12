@@ -242,7 +242,7 @@ def _aviso(d: dict[str, Any]) -> list[str]:
     """Si parece un engaño, Noa lo dice ya al leerlo, con el motivo si es corto."""
     if not d.get("sospechoso"):
         return []
-    frases = ["Cuidado: esto parece una estafa."]
+    frases = ["Cuidado. Puede ser una estafa."]
     motivo = (d.get("motivo_sospecha") or "").strip()
     if motivo and len(motivo.split()) <= 15:
         frases.append(motivo if motivo.endswith((".", "!", "?")) else motivo + ".")
@@ -380,11 +380,11 @@ def confirmar(persona: dict[str, Any], d: dict[str, Any]) -> dict[str, Any]:
     if d["sospechoso"]:
         if d["tipo"] == "mensaje":
             senales = [s["explicacion"] for s in riesgo["senales"]] if riesgo else []
-            frases = ["Cuidado. Este mensaje parece una estafa.", *senales[:3],
+            frases = ["Cuidado. Este mensaje puede ser una estafa.", *senales[:3],
                       "Esto pasa a veces en las estafas.", "Tú decides qué hacer."]
         else:
             senales = []
-            frases = ["Cuidado. Este papel parece una estafa.",
+            frases = ["Cuidado. Este papel puede ser una estafa.",
                       "Los bancos nunca te piden tu clave ni tu PIN.",
                       "Tú decides qué hacer."]
         avisados = (riesgo or {}).get("avisados") or []
